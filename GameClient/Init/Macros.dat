@@ -1,0 +1,55 @@
+[BIND1]
+Accion= 2
+hlist= 1
+invslot= 0
+
+[BIND2]
+Accion= 2
+hlist= 0
+invslot= 0
+
+[BIND3]
+Accion= 2
+hlist= 6
+invslot= 0
+
+[BIND4]
+Accion= 2
+hlist= 3
+invslot= 0
+
+[BIND5]
+Accion= 2
+hlist= 0
+invslot= 0
+
+[BIND6]
+Accion= 4
+hlist= 0
+invslot= 8
+
+[BIND7]
+Accion= 4
+hlist= 0
+invslot= 8
+
+[BIND8]
+Accion= 4
+hlist= 0
+invslot= 8
+
+[BIND9]
+Accion= 1
+hlist= 0
+invslot= 0
+SndString=HOGAR
+
+[BIND10]
+Accion= 3
+hlist= 0
+invslot= 1
+
+[BIND11]
+Accion= 4
+hlist= 0
+invslot= 4

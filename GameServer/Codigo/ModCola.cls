@@ -11,7 +11,7 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
-'AoshaoServer 0.11.6
+'ImperiumAO 0.11.6
 'Copyright (C) 2002 Márquez Pablo Ignacio
 '
 'This program is free software; you can redistribute it and/or modify
@@ -26,7 +26,7 @@ Attribute VB_Exposed = False
 'You should have received a copy of the Affero General Public License
 'along with this program; if not, you can find it at http://www.affero.org/oagpl.html
 '
-'AoshaoServer is based on Baronsoft's VB6 Online RPG
+'ImperiumAO is based on Baronsoft's VB6 Online RPG
 'You can contact the original creator of ORE at aaron@baronsoft.com
 'for more information about ORE please visit http://www.baronsoft.com/
 '
@@ -72,7 +72,7 @@ Next i
 End Sub
 
 Public Property Get Longitud() As Integer
-Longitud = Cola.Count
+Longitud = Cola.count
 End Property
 
 Private Function IndexValido(ByVal i As Integer) As Boolean
@@ -83,11 +83,11 @@ Private Sub Class_Initialize()
 Set Cola = New Collection
 End Sub
 
-Public Function VerElemento(ByVal index As Integer) As String
+Public Function VerElemento(ByVal Index As Integer) As String
 On Error Resume Next
-    If IndexValido(index) Then
+    If IndexValido(Index) Then
         'Pablo
-        VerElemento = UCase$(Cola.Item(index))
+        VerElemento = UCase$(Cola.Item(Index))
         '/Pablo
         'VerElemento = Cola(Index)
     Else
@@ -111,7 +111,7 @@ End Sub
 Public Function Pop() As String
 On Error Resume Next
 'Quita elemento de la cola
-If Cola.Count > 0 Then
+If Cola.count > 0 Then
     Pop = Cola(FRENTE)
     Call Cola.Remove(FRENTE)
 Else
@@ -124,7 +124,7 @@ On Error Resume Next
 'Call LogTarea("PopByVal SOS")
 
 'Quita elemento de la cola
-If Cola.Count > 0 Then
+If Cola.count > 0 Then
     PopByVal = Cola.Item(1)
 Else
     PopByVal = 0
@@ -175,9 +175,9 @@ Next i
  
 End Sub
 
-Public Sub QuitarIndex(ByVal index As Integer)
+Public Sub QuitarIndex(ByVal Index As Integer)
 On Error Resume Next
-If IndexValido(index) Then Call Cola.Remove(index)
+If IndexValido(Index) Then Call Cola.Remove(Index)
 End Sub
 
 

@@ -10,7 +10,7 @@ Begin VB.Form frmEstadisticas
    MaxButton       =   0   'False
    ScaleHeight     =   3735
    ScaleWidth      =   5415
-   StartUpPosition =   3  'Windows Default
+   StartUpPosition =   2  'CenterScreen
    Begin VB.Frame Frame2 
       Caption         =   "Colas"
       Height          =   1095
@@ -209,7 +209,7 @@ Call ActualizaStats
 
 End Sub
 
-Private Sub lblStat_Click(index As Integer)
+Private Sub lblStat_Click(Index As Integer)
 Call ActualizaStats
 
 End Sub

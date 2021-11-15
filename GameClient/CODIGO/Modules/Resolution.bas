@@ -1,6 +1,36 @@
 Attribute VB_Name = "modResolution"
+'************************************************* ****************
+'ImperiumAO - v1.0
+'************************************************* ****************
+'Copyright (C) 2015 Gaston Jorge Martinez
+'Copyright (C) 2015 Alexis Rodriguez
+'Copyright (C) 2015 Luis Merino
+'Copyright (C) 2015 Girardi Luciano Valentin
+'
+'Respective portions copyright by taxpayers below.
+'
+'This library is free software; you can redistribute it and / or
+'Modify it under the terms of the GNU General Public
+'License as published by the Free Software Foundation version 2.1
+'The License
+'
+'This library is distributed in the hope that it will be useful,
+'But WITHOUT ANY WARRANTY; without even the implied warranty
+'MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+'Lesser General Public License for more details.
+'
+'You should have received a copy of the GNU General Public
+'License along with this library; if not, write to the Free Software
+'Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+'************************************************* ****************
+'
+'************************************************* ****************
+'You can contact me at:
+'Gaston Jorge Martinez (Zenitram@Hotmail.com)
+'************************************************* ****************
+
 Option Explicit
- 
+
 Private Const CCDEVICENAME As Long = 32
 Private Const CCFORMNAME As Long = 32
 Private Const DM_BITSPERPEL As Long = &H40000
@@ -9,7 +39,7 @@ Private Const DM_PELSHEIGHT As Long = &H100000
 Private Const DM_DISPLAYFREQUENCY As Long = &H400000
 Private Const CDS_TEST As Long = &H4
 Private Const ENUM_CURRENT_SETTINGS As Long = -1
- 
+
 Private Type typDevMODE
     dmDeviceName       As String * CCDEVICENAME
     dmSpecVersion      As Integer
@@ -38,66 +68,77 @@ Private Type typDevMODE
     dmDisplayFlags     As Long
     dmDisplayFrequency As Long
 End Type
- 
-Public oldResHeight As Long
-Public oldResWidth As Long
-Public oldDepth As Integer
-Public oldFrequency As Long
-Public bNoResChange As Boolean
- 
- 
+
+Private oldResHeight As Long
+Private oldResWidth As Long
+Private oldDepth As Integer
+Private oldFrequency As Long
+Private bNoResChange As Boolean
+
+
 Private Declare Function EnumDisplaySettings Lib "user32" Alias "EnumDisplaySettingsA" (ByVal lpszDeviceName As Long, ByVal iModeNum As Long, lptypDevMode As Any) As Boolean
 Private Declare Function ChangeDisplaySettings Lib "user32" Alias "ChangeDisplaySettingsA" (lptypDevMode As Any, ByVal dwFlags As Long) As Long
- 
- 
+
+
 'TODO : Change this to not depend on any external public variable using args instead!
- 
- 
- 
-Public Sub SetResolucion()
- 
+
+Public Sub SetResolution()
+'***************************************************
+'Autor: Unknown
+'Last Modification: 03/29/08
+'Changes the display resolution if needed.
+'Last Modified By: Juan Martín Sotuyo Dodero (Maraxus)
+' 03/29/2008: Maraxus - Retrieves current settings storing display depth and frequency for proper restoration.
+'***************************************************
     Dim lRes As Long
     Dim MidevM As typDevMODE
     Dim CambiarResolucion As Boolean
-   
+    
     lRes = EnumDisplaySettings(0, ENUM_CURRENT_SETTINGS, MidevM)
-   
+    
     oldResWidth = Screen.Width \ Screen.TwipsPerPixelX
     oldResHeight = Screen.Height \ Screen.TwipsPerPixelY
-   
+    
     If NoRes Then
         CambiarResolucion = (oldResWidth < 800 Or oldResHeight < 600)
     Else
         CambiarResolucion = (oldResWidth <> 800 Or oldResHeight <> 600)
     End If
-   
+    
     If CambiarResolucion Then
-       
+        
         With MidevM
             oldDepth = .dmBitsPerPel
             oldFrequency = .dmDisplayFrequency
-           
+            
             .dmFields = DM_PELSWIDTH Or DM_PELSHEIGHT Or DM_BITSPERPEL
             .dmPelsWidth = 800
             .dmPelsHeight = 600
-            .dmBitsPerPel = 16
+            .dmBitsPerPel = 32
         End With
-       
+        
         lRes = ChangeDisplaySettings(MidevM, CDS_TEST)
     Else
         bNoResChange = True
     End If
+    
 End Sub
- 
-Public Sub ResetResolucion()
- 
+
+Public Sub ResetResolution()
+'***************************************************
+'Autor: Unknown
+'Last Modification: 03/29/08
+'Changes the display resolution if needed.
+'Last Modified By: Juan Martín Sotuyo Dodero (Maraxus)
+' 03/29/2008: Maraxus - Properly restores display depth and frequency.
+'***************************************************
     Dim typDevM As typDevMODE
     Dim lRes As Long
-   
+    
     If Not bNoResChange Then
-   
+    
         lRes = EnumDisplaySettings(0, ENUM_CURRENT_SETTINGS, typDevM)
-       
+        
         With typDevM
             .dmFields = DM_PELSWIDTH Or DM_PELSHEIGHT Or DM_BITSPERPEL Or DM_DISPLAYFREQUENCY
             .dmPelsWidth = oldResWidth
@@ -105,8 +146,7 @@ Public Sub ResetResolucion()
             .dmBitsPerPel = oldDepth
             .dmDisplayFrequency = oldFrequency
         End With
-       
+        
         lRes = ChangeDisplaySettings(typDevM, CDS_TEST)
     End If
 End Sub
- 

@@ -1,7 +1,7 @@
 VERSION 5.00
 Object = "{6B7E6392-850A-101B-AFC0-4210102A8DA7}#1.3#0"; "COMCTL32.OCX"
 Begin VB.Form FrmStat 
-   BackColor       =   &H00C0C0C0&
+   BackColor       =   &H80000004&
    BorderStyle     =   3  'Fixed Dialog
    ClientHeight    =   1095
    ClientLeft      =   45
@@ -16,7 +16,7 @@ Begin VB.Form FrmStat
    ScaleMode       =   3  'Pixel
    ScaleWidth      =   375
    ShowInTaskbar   =   0   'False
-   StartUpPosition =   1  'CenterOwner
+   StartUpPosition =   2  'CenterScreen
    Begin ComctlLib.ProgressBar ProgressBar1 
       Height          =   255
       Left            =   240
@@ -54,7 +54,7 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
-'AoshaoServer 0.11.6
+'ImperiumAO 0.11.6
 'Copyright (C) 2002 Márquez Pablo Ignacio
 '
 'This program is free software; you can redistribute it and/or modify
@@ -69,7 +69,7 @@ Attribute VB_Exposed = False
 'You should have received a copy of the Affero General Public License
 'along with this program; if not, you can find it at http://www.affero.org/oagpl.html
 '
-'AoshaoServer is based on Baronsoft's VB6 Online RPG
+'ImperiumAO is based on Baronsoft's VB6 Online RPG
 'You can contact the original creator of ORE at aaron@baronsoft.com
 'for more information about ORE please visit http://www.baronsoft.com/
 '

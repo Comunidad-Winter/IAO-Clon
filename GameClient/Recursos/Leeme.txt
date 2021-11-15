@@ -1,5 +1,0 @@
-Si vas a querer robar inits,mp3,midi,mapas y graficos te recomiendo que sepas programar,porque ponerlo en un cliente dx7 o dx8 sin carga de recursos mmm se te va a complicar.
-
-ATTE:
-Green Games
-Mds,AoShao

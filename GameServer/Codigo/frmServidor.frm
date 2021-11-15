@@ -1,7 +1,7 @@
 VERSION 5.00
 Begin VB.Form frmServidor 
-   BackColor       =   &H00C0C0C0&
-   Caption         =   "Servidor"
+   BackColor       =   &H80000004&
+   Caption         =   "Configuracion del Server"
    ClientHeight    =   6540
    ClientLeft      =   60
    ClientTop       =   345
@@ -11,7 +11,7 @@ Begin VB.Form frmServidor
    ScaleHeight     =   436
    ScaleMode       =   3  'Pixel
    ScaleWidth      =   323
-   StartUpPosition =   3  'Windows Default
+   StartUpPosition =   2  'CenterScreen
    Begin VB.CommandButton Command26 
       Caption         =   "Reset Listen"
       BeginProperty Font 
@@ -27,7 +27,7 @@ Begin VB.Form frmServidor
       Left            =   1920
       TabIndex        =   28
       Top             =   6180
-      Width           =   1455
+      Width           =   1695
    End
    Begin VB.PictureBox picFuera 
       Appearance      =   0  'Flat
@@ -51,7 +51,7 @@ Begin VB.Form frmServidor
          Width           =   255
       End
       Begin VB.PictureBox picCont 
-         BackColor       =   &H00C0C0C0&
+         BackColor       =   &H80000004&
          BorderStyle     =   0  'None
          Height          =   5295
          Left            =   0
@@ -436,7 +436,7 @@ Begin VB.Form frmServidor
       Left            =   240
       TabIndex        =   5
       Top             =   5520
-      Width           =   4095
+      Width           =   4335
    End
    Begin VB.CommandButton Command5 
       Caption         =   "Cargar BackUp del mundo"
@@ -453,7 +453,7 @@ Begin VB.Form frmServidor
       Left            =   240
       TabIndex        =   1
       Top             =   5160
-      Width           =   4095
+      Width           =   4335
    End
    Begin VB.CommandButton Command18 
       Caption         =   "Guardar todos los personajes"
@@ -470,7 +470,7 @@ Begin VB.Form frmServidor
       Left            =   240
       TabIndex        =   3
       Top             =   4920
-      Width           =   4095
+      Width           =   4335
    End
    Begin VB.CommandButton Command4 
       Caption         =   "Hacer un Backup del mundo"
@@ -487,13 +487,13 @@ Begin VB.Form frmServidor
       Left            =   240
       TabIndex        =   2
       Top             =   4680
-      Width           =   4095
+      Width           =   4335
    End
    Begin VB.CommandButton Command2 
       Caption         =   "OK"
       Default         =   -1  'True
       Height          =   255
-      Left            =   3480
+      Left            =   3720
       TabIndex        =   0
       Top             =   6180
       Width           =   945
@@ -510,16 +510,16 @@ Begin VB.Form frmServidor
          Strikethrough   =   0   'False
       EndProperty
       Height          =   255
-      Left            =   240
+      Left            =   120
       TabIndex        =   4
       Top             =   6180
-      Width           =   1575
+      Width           =   1695
    End
    Begin VB.Shape Shape2 
       Height          =   1335
       Left            =   120
       Top             =   4560
-      Width           =   4335
+      Width           =   4575
    End
 End
 Attribute VB_Name = "frmServidor"
@@ -527,7 +527,7 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
-'AoshaoServer 0.11.6
+'ImperiumAO 0.11.6
 'Copyright (C) 2002 Márquez Pablo Ignacio
 '
 'This program is free software; you can redistribute it and/or modify
@@ -542,7 +542,7 @@ Attribute VB_Exposed = False
 'You should have received a copy of the Affero General Public License
 'along with this program; if not, you can find it at http://www.affero.org/oagpl.html
 '
-'AoshaoServer is based on Baronsoft's VB6 Online RPG
+'ImperiumAO is based on Baronsoft's VB6 Online RPG
 'You can contact the original creator of ORE at aaron@baronsoft.com
 'for more information about ORE please visit http://www.baronsoft.com/
 '
@@ -578,10 +578,6 @@ Private Sub Command13_Click()
 frmDebugSocket.Visible = True
 End Sub
 
-Private Sub Command14_Click()
-Call LoadMotd
-End Sub
-
 Private Sub Command15_Click()
 On Error Resume Next
 
@@ -594,7 +590,7 @@ Dim sENtrada As String
 sENtrada = InputBox("Escribe ""estoy DE acuerdo"" entre comillas y con distición de mayusculas minusculas para desbanear a todos los personajes", "UnBan", "hola")
 If sENtrada = "estoy DE acuerdo" Then
 
-    Fn = App.Path & "\logs\GenteBanned.log"
+    Fn = App.Path & "\Data\Files logs\GenteBanned.log"
     
     If FileExist(Fn, vbNormal) Then
         N = FreeFile
@@ -637,8 +633,8 @@ Dim sENtrada As String
 sENtrada = InputBox("Escribe ""estoy DE acuerdo"" sin comillas y con distición de mayusculas minusculas para desbanear a todos los personajes", "UnBan", "hola")
 If sENtrada = "estoy DE acuerdo" Then
     
-    N = BanIps.Count
-    For i = 1 To BanIps.Count
+    N = BanIps.count
+    For i = 1 To BanIps.count
         BanIps.Remove 1
     Next i
     
@@ -681,11 +677,11 @@ Private Sub Command21_Click()
 
 If EnPausa = False Then
     EnPausa = True
-    Call SendData(SendTarget.ToAll, 0, PrepareMessagePauseToggle())
+    Call SendData(SendTarget.toall, 0, PrepareMessagePauseToggle())
     Command21.Caption = "Reanudar el servidor"
 Else
     EnPausa = False
-    Call SendData(SendTarget.ToAll, 0, PrepareMessagePauseToggle())
+    Call SendData(SendTarget.toall, 0, PrepareMessagePauseToggle())
     Command21.Caption = "Pausar el servidor"
 End If
 
@@ -773,12 +769,12 @@ If frmMain.Visible Then frmMain.txStatus.Caption = "Reiniciando."
 
 FrmStat.Show
 
-If FileExist(App.Path & "\logs\errores.log", vbNormal) Then Kill App.Path & "\logs\errores.log"
-If FileExist(App.Path & "\logs\connect.log", vbNormal) Then Kill App.Path & "\logs\Connect.log"
-If FileExist(App.Path & "\logs\HackAttemps.log", vbNormal) Then Kill App.Path & "\logs\HackAttemps.log"
-If FileExist(App.Path & "\logs\Asesinatos.log", vbNormal) Then Kill App.Path & "\logs\Asesinatos.log"
-If FileExist(App.Path & "\logs\Resurrecciones.log", vbNormal) Then Kill App.Path & "\logs\Resurrecciones.log"
-If FileExist(App.Path & "\logs\Teleports.Log", vbNormal) Then Kill App.Path & "\logs\Teleports.Log"
+If FileExist(App.Path & "\Data\Files logs\errores.log", vbNormal) Then Kill App.Path & "\Data\Files logs\errores.log"
+If FileExist(App.Path & "\Data\Files logs\connect.log", vbNormal) Then Kill App.Path & "\Data\Files logs\Connect.log"
+If FileExist(App.Path & "\Data\Files logs\HackAttemps.log", vbNormal) Then Kill App.Path & "\Data\Files logs\HackAttemps.log"
+If FileExist(App.Path & "\Data\Files logs\Asesinatos.log", vbNormal) Then Kill App.Path & "\Data\Files logs\Asesinatos.log"
+If FileExist(App.Path & "\Data\Files logs\Resurrecciones.log", vbNormal) Then Kill App.Path & "\Data\Files logs\Resurrecciones.log"
+If FileExist(App.Path & "\Data\Files logs\Teleports.Log", vbNormal) Then Kill App.Path & "\Data\Files logs\Teleports.Log"
 
 
 #If UsarQueSocket = 1 Then

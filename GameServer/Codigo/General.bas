@@ -1,5 +1,5 @@
 Attribute VB_Name = "General"
-'AoshaoServer 0.11.6
+'ImperiumAO 0.11.6
 'Copyright (C) 2002 Márquez Pablo Ignacio
 '
 'This program is free software; you can redistribute it and/or modify
@@ -14,7 +14,7 @@ Attribute VB_Name = "General"
 'You should have received a copy of the Affero General Public License
 'along with this program; if not, you can find it at http://www.affero.org/oagpl.html
 '
-'AoshaoServer is based on Baronsoft's VB6 Online RPG
+'ImperiumAO is based on Baronsoft's VB6 Online RPG
 'You can contact the original creator of ORE at aaron@baronsoft.com
 'for more information about ORE please visit http://www.baronsoft.com/
 '
@@ -81,6 +81,7 @@ UserList(UserIndex).flags.Desnudo = 1
 
 End Sub
 
+
 Sub Bloquear(ByVal toMap As Boolean, ByVal sndIndex As Integer, ByVal X As Integer, ByVal Y As Integer, ByVal B As Boolean)
 'b ahora es boolean,
 'b=true bloquea el tile en (x,y)
@@ -99,13 +100,13 @@ End If
 End Sub
 
 
-Function HayAgua(ByVal map As Integer, ByVal X As Integer, ByVal Y As Integer) As Boolean
+Function HayAgua(ByVal Map As Integer, ByVal X As Integer, ByVal Y As Integer) As Boolean
 
-If map > 0 And map < NumMaps + 1 And X > 0 And X < 101 And Y > 0 And Y < 101 Then
-    If ((MapData(map, X, Y).Graphic(1) >= 1505 And MapData(map, X, Y).Graphic(1) <= 1520) Or _
-    (MapData(map, X, Y).Graphic(1) >= 5665 And MapData(map, X, Y).Graphic(1) <= 5680) Or _
-    (MapData(map, X, Y).Graphic(1) >= 13547 And MapData(map, X, Y).Graphic(1) <= 13562)) And _
-       MapData(map, X, Y).Graphic(2) = 0 Then
+If Map > 0 And Map < NumMaps + 1 And X > 0 And X < 101 And Y > 0 And Y < 101 Then
+    If ((MapData(Map, X, Y).Graphic(1) >= 1505 And MapData(Map, X, Y).Graphic(1) <= 1520) Or _
+    (MapData(Map, X, Y).Graphic(1) >= 5665 And MapData(Map, X, Y).Graphic(1) <= 5680) Or _
+    (MapData(Map, X, Y).Graphic(1) >= 13547 And MapData(Map, X, Y).Graphic(1) <= 13562)) And _
+       MapData(Map, X, Y).Graphic(2) = 0 Then
             HayAgua = True
     Else
             HayAgua = False
@@ -116,13 +117,13 @@ End If
 
 End Function
 
-Private Function HayLava(ByVal map As Integer, ByVal X As Integer, ByVal Y As Integer) As Boolean
+Private Function HayLava(ByVal Map As Integer, ByVal X As Integer, ByVal Y As Integer) As Boolean
 '***************************************************
 'Autor: Nacho (Integer)
 'Last Modification: 03/12/07
 '***************************************************
-If map > 0 And map < NumMaps + 1 And X > 0 And X < 101 And Y > 0 And Y < 101 Then
-    If MapData(map, X, Y).Graphic(1) >= 5837 And MapData(map, X, Y).Graphic(1) <= 5852 Then
+If Map > 0 And Map < NumMaps + 1 And X > 0 And X < 101 And Y > 0 And Y < 101 Then
+    If MapData(Map, X, Y).Graphic(1) >= 5837 And MapData(Map, X, Y).Graphic(1) <= 5852 Then
         HayLava = True
     Else
         HayLava = False
@@ -141,14 +142,14 @@ Sub LimpiarMundo()
 '01/14/2008: Marcos Martinez (ByVal) - La funcion FOR estaba mal. En ves de i habia un 1.
 '04/15/2008: (NicoNZ) - La funcion FOR estaba mal, de la forma que se hacia tiraba error.
 '***************************************************
-On Error GoTo ErrHandler
+On Error GoTo errhandler
 
 Dim i As Integer
 Dim d As New cGarbage
 
 For i = TrashCollector.count To 1 Step -1
     Set d = TrashCollector(i)
-    Call EraseObj(1, d.map, d.X, d.Y)
+    Call EraseObj(1, d.Map, d.X, d.Y)
     Call TrashCollector.Remove(i)
     Set d = Nothing
 Next i
@@ -157,7 +158,7 @@ Call SecurityIp.IpSecurityMantenimientoLista
 
 Exit Sub
 
-ErrHandler:
+errhandler:
     Call LogError("Error producido en el sub LimpiarMundo: " & Err.description)
 End Sub
 
@@ -175,18 +176,18 @@ Call WriteSpawnList(UserIndex, npcNames())
 
 End Sub
 
-Sub ConfigListeningSocket(ByRef obj As Object, ByVal Port As Integer)
+Sub ConfigListeningSocket(ByRef Obj As Object, ByVal Port As Integer)
 #If UsarQueSocket = 0 Then
 
-obj.AddressFamily = AF_INET
-obj.Protocol = IPPROTO_IP
-obj.SocketType = SOCK_STREAM
-obj.Binary = False
-obj.Blocking = False
-obj.BufferSize = 1024
-obj.LocalPort = Port
-obj.backlog = 5
-obj.listen
+Obj.AddressFamily = AF_INET
+Obj.Protocol = IPPROTO_IP
+Obj.SocketType = SOCK_STREAM
+Obj.Binary = False
+Obj.Blocking = False
+Obj.BufferSize = 1024
+Obj.LocalPort = Port
+Obj.backlog = 5
+Obj.listen
 
 #End If
 End Sub
@@ -195,18 +196,20 @@ End Sub
 
 
 Sub Main()
+
+'Iniciamos con apariencia Nueva de Windows.
+InitManifest
+
 On Error Resume Next
 Dim f As Date
-GlobalActivado = 1
-UltimoSlotLimpieza = -1
+
 ChDir App.Path
 ChDrive App.Path
 
-Call LoadMotd
 Call BanIpCargar
 
-Prision.map = 66
-Libertad.map = 66
+Prision.Map = 66
+Libertad.Map = 66
 
 Prision.X = 75
 Prision.Y = 47
@@ -215,11 +218,11 @@ Libertad.Y = 65
 
 
 LastBackup = Format(Now, "Short Time")
-minutos = Format(Now, "Short Time")
+Minutos = Format(Now, "Short Time")
 
 IniPath = App.Path & "\"
-DatPath = App.Path & "\Dat\"
-
+DatPath = App.Path & "\Data\Files dat\"
+AccountPath = App.Path & "\Data\Accounts\"
 
 
 LevelSkill(1).LevelValue = 3
@@ -281,27 +284,21 @@ ListaRazas(eRaza.Gnomo) = "Gnomo"
 ListaRazas(eRaza.Enano) = "Enano"
 ListaRazas(eRaza.Orco) = "Orco"
 
-ListaClases(eClass.Mage) = "Mago"
-ListaClases(eClass.Cleric) = "Clerigo"
-ListaClases(eClass.Warrior) = "Guerrero"
-ListaClases(eClass.Assasin) = "Asesino"
-ListaClases(eClass.thief) = "Ladron"
-ListaClases(eClass.Bard) = "Bardo"
-ListaClases(eClass.Druid) = "Druida"
-ListaClases(eClass.Bandit) = "Bandido"
+ListaClases(eClass.Mago) = "Mago"
+ListaClases(eClass.Clerigo) = "Clerigo"
+ListaClases(eClass.Guerrero) = "Guerrero"
+ListaClases(eClass.Asesino) = "Asesino"
+ListaClases(eClass.Ladron) = "Ladron"
+ListaClases(eClass.Bardo) = "Bardo"
+ListaClases(eClass.Druida) = "Druida"
 ListaClases(eClass.Paladin) = "Paladin"
-ListaClases(eClass.Hunter) = "Cazador"
-ListaClases(eClass.fisher) = "Pescador"
-ListaClases(eClass.Blacksmith) = "Herrero"
-ListaClases(eClass.Lumberjack) = "Leñador"
-ListaClases(eClass.Miner) = "Minero"
-ListaClases(eClass.Carpenter) = "Carpintero"
-ListaClases(eClass.drakkar) = "drakkar"
-ListaClases(eClass.BountyHunter) = "Cazarecompensas"
+ListaClases(eClass.Cazador) = "Cazador"
+ListaClases(eClass.Mercenario) = "Mercenario"
 ListaClases(eClass.Nigromante) = "Nigromante"
-ListaClases(eClass.Sastre) = "Sastre"
+ListaClases(eClass.Gladiador) = "Gladiador"
 
-SkillsNames(eSkill.magia) = "Magia"
+
+SkillsNames(eSkill.Magia) = "Magia"
 SkillsNames(eSkill.Robar) = "Robar"
 SkillsNames(eSkill.Tacticas) = "Tacticas de combate"
 SkillsNames(eSkill.Armas) = "Combate con armas"
@@ -327,7 +324,7 @@ SkillsNames(eSkill.Botanica) = "Botanica"
 SkillsNames(eSkill.Equitacion) = "Equitacion"
 SkillsNames(eSkill.Musica) = "Musica"
 SkillsNames(eSkill.Resistencia) = "Resistencia Magica"
-SkillsNames(eSkill.sastreria) = "Sastreria"
+SkillsNames(eSkill.Sastreria) = "Sastreria"
 
 ListaAtributos(eAtributos.Fuerza) = "Fuerza"
 ListaAtributos(eAtributos.Agilidad) = "Agilidad"
@@ -340,9 +337,8 @@ frmCargando.Show
 
 'Call PlayWaveAPI(App.Path & "\wav\harp3.wav")
 
-frmMain.Caption = frmMain.Caption & " V." & App.Major & "." & App.Minor & "." & App.Revision
 IniPath = App.Path & "\"
-CharPath = App.Path & "\Charfile\"
+CharPath = App.Path & "\Data\Characters Created\"
 
 'Bordes del mapa
 MinXBorder = XMinMapSize + (XWindow \ 2)
@@ -359,7 +355,7 @@ Call LoadGuildsDB
 Call CargarSpawnList
 Call CargarForbidenWords
 '¿?¿?¿?¿?¿?¿?¿?¿ CARGAMOS DATOS DESDE ARCHIVOS ¿??¿?¿?¿?¿?¿?¿?¿
-frmCargando.Label1(2).Caption = "Cargando Server.ini"
+frmCargando.Label1(2).Caption = "Cargando IMPAOSV.ini"
 
 MaxUsers = 0
 Call LoadSini
@@ -373,7 +369,7 @@ Call CargaNpcsDat
 frmCargando.Label1(2).Caption = "Cargando Obj.Dat"
 'Call LoadOBJData
 Call LoadOBJData
-Call LoadQuest
+    
 frmCargando.Label1(2).Caption = "Cargando Hechizos.Dat"
 Call CargarHechizos
     
@@ -384,8 +380,7 @@ Call LoadArmadurasHerreria
 
 frmCargando.Label1(2).Caption = "Cargando Objetos de Carpintería"
 Call LoadObjCarpintero
-Call LoadObjAlquimia
-Call LoadObjSastreria
+
 frmCargando.Label1(2).Caption = "Cargando Balance.Dat"
 Call LoadBalance    '4/01/08 Pablo ToxicWaste
 
@@ -483,7 +478,7 @@ Unload frmCargando
 'Log
 Dim N As Integer
 N = FreeFile
-Open App.Path & "\logs\Main.log" For Append Shared As #N
+Open App.Path & "\Data\Files logs\Main.log" For Append Shared As #N
 Print #N, Date & " " & time & " server iniciado " & App.Major & "."; App.Minor & "." & App.Revision
 Close #N
 
@@ -532,8 +527,8 @@ Function ReadField(ByVal Pos As Integer, ByRef Text As String, ByVal SepASCII As
     End If
 End Function
 
-Function MapaValido(ByVal map As Integer) As Boolean
-MapaValido = map >= 1 And map <= NumMaps
+Function MapaValido(ByVal Map As Integer) As Boolean
+MapaValido = Map >= 1 And Map <= NumMaps
 End Function
 
 Sub MostrarNumUsers()
@@ -544,109 +539,109 @@ End Sub
 
 
 Public Sub LogCriticEvent(desc As String)
-On Error GoTo ErrHandler
+On Error GoTo errhandler
 
 Dim nfile As Integer
 nfile = FreeFile ' obtenemos un canal
-Open App.Path & "\logs\Eventos.log" For Append Shared As #nfile
+Open App.Path & "\Data\Files logs\Eventos.log" For Append Shared As #nfile
 Print #nfile, Date & " " & time & " " & desc
 Close #nfile
 
 Exit Sub
 
-ErrHandler:
+errhandler:
 
 End Sub
 
 Public Sub LogEjercitoReal(desc As String)
-On Error GoTo ErrHandler
+On Error GoTo errhandler
 
 Dim nfile As Integer
 nfile = FreeFile ' obtenemos un canal
-Open App.Path & "\logs\EjercitoReal.log" For Append Shared As #nfile
+Open App.Path & "\Data\Files logs\EjercitoReal.log" For Append Shared As #nfile
 Print #nfile, desc
 Close #nfile
 
 Exit Sub
 
-ErrHandler:
+errhandler:
 
 End Sub
 
 Public Sub LogEjercitoCaos(desc As String)
-On Error GoTo ErrHandler
+On Error GoTo errhandler
 
 Dim nfile As Integer
 nfile = FreeFile ' obtenemos un canal
-Open App.Path & "\logs\EjercitoCaos.log" For Append Shared As #nfile
+Open App.Path & "\Data\Files logs\EjercitoCaos.log" For Append Shared As #nfile
 Print #nfile, desc
 Close #nfile
 
 Exit Sub
 
-ErrHandler:
+errhandler:
 
 End Sub
 
 
-Public Sub LogIndex(ByVal index As Integer, ByVal desc As String)
-On Error GoTo ErrHandler
+Public Sub LogIndex(ByVal Index As Integer, ByVal desc As String)
+On Error GoTo errhandler
 
 Dim nfile As Integer
 nfile = FreeFile ' obtenemos un canal
-Open App.Path & "\logs\" & index & ".log" For Append Shared As #nfile
+Open App.Path & "\Data\Files logs\" & Index & ".log" For Append Shared As #nfile
 Print #nfile, Date & " " & time & " " & desc
 Close #nfile
 
 Exit Sub
 
-ErrHandler:
+errhandler:
 
 End Sub
 
 
 Public Sub LogError(desc As String)
-On Error GoTo ErrHandler
+On Error GoTo errhandler
 
 Dim nfile As Integer
 nfile = FreeFile ' obtenemos un canal
-Open App.Path & "\logs\errores.log" For Append Shared As #nfile
+Open App.Path & "\Data\Files logs\errores.log" For Append Shared As #nfile
 Print #nfile, Date & " " & time & " " & desc
 Close #nfile
 
 Exit Sub
 
-ErrHandler:
+errhandler:
 
 End Sub
 
 Public Sub LogStatic(desc As String)
-On Error GoTo ErrHandler
+On Error GoTo errhandler
 
 Dim nfile As Integer
 nfile = FreeFile ' obtenemos un canal
-Open App.Path & "\logs\Stats.log" For Append Shared As #nfile
+Open App.Path & "\Data\Files logs\Stats.log" For Append Shared As #nfile
 Print #nfile, Date & " " & time & " " & desc
 Close #nfile
 
 Exit Sub
 
-ErrHandler:
+errhandler:
 
 End Sub
 
 Public Sub LogTarea(desc As String)
-On Error GoTo ErrHandler
+On Error GoTo errhandler
 
 Dim nfile As Integer
 nfile = FreeFile(1) ' obtenemos un canal
-Open App.Path & "\logs\haciendo.log" For Append Shared As #nfile
+Open App.Path & "\Data\Files logs\haciendo.log" For Append Shared As #nfile
 Print #nfile, Date & " " & time & " " & desc
 Close #nfile
 
 Exit Sub
 
-ErrHandler:
+errhandler:
 
 
 End Sub
@@ -656,7 +651,7 @@ Public Sub LogClanes(ByVal str As String)
 
 Dim nfile As Integer
 nfile = FreeFile ' obtenemos un canal
-Open App.Path & "\logs\clanes.log" For Append Shared As #nfile
+Open App.Path & "\Data\Files logs\clanes.log" For Append Shared As #nfile
 Print #nfile, Date & " " & time & " " & str
 Close #nfile
 
@@ -666,7 +661,7 @@ Public Sub LogIP(ByVal str As String)
 
 Dim nfile As Integer
 nfile = FreeFile ' obtenemos un canal
-Open App.Path & "\logs\IP.log" For Append Shared As #nfile
+Open App.Path & "\Data\Files logs\IP.log" For Append Shared As #nfile
 Print #nfile, Date & " " & time & " " & str
 Close #nfile
 
@@ -677,7 +672,7 @@ Public Sub LogDesarrollo(ByVal str As String)
 
 Dim nfile As Integer
 nfile = FreeFile ' obtenemos un canal
-Open App.Path & "\logs\desarrollo" & Month(Date) & Year(Date) & ".log" For Append Shared As #nfile
+Open App.Path & "\Data\Files logs\desarrollo" & Month(Date) & Year(Date) & ".log" For Append Shared As #nfile
 Print #nfile, Date & " " & time & " " & str
 Close #nfile
 
@@ -686,18 +681,18 @@ End Sub
 
 
 Public Sub LogGM(Nombre As String, texto As String)
-On Error GoTo ErrHandler
+On Error GoTo errhandler
 
 Dim nfile As Integer
 nfile = FreeFile ' obtenemos un canal
 'Guardamos todo en el mismo lugar. Pablo (ToxicWaste) 18/05/07
-Open App.Path & "\logs\" & Nombre & ".log" For Append Shared As #nfile
+Open App.Path & "\Data\Files logs\" & Nombre & ".log" For Append Shared As #nfile
 Print #nfile, Date & " " & time & " " & texto
 Close #nfile
 
 Exit Sub
 
-ErrHandler:
+errhandler:
 
 End Sub
 
@@ -706,7 +701,7 @@ Public Sub SaveDayStats()
 ''
 ''Dim nfile As Integer
 ''nfile = FreeFile ' obtenemos un canal
-''Open App.Path & "\logs\" & Replace(Date, "/", "-") & ".log" For Append Shared As #nfile
+''Open App.Path & "\Data\Files logs\" & Replace(Date, "/", "-") & ".log" For Append Shared As #nfile
 ''
 ''Print #nfile, "<stats>"
 ''Print #nfile, "<ao>"
@@ -721,33 +716,33 @@ Public Sub SaveDayStats()
 ''Close #nfile
 Exit Sub
 
-ErrHandler:
+errhandler:
 
 End Sub
 
 
 Public Sub LogAsesinato(texto As String)
-On Error GoTo ErrHandler
+On Error GoTo errhandler
 Dim nfile As Integer
 
 nfile = FreeFile ' obtenemos un canal
 
-Open App.Path & "\logs\asesinatos.log" For Append Shared As #nfile
+Open App.Path & "\Data\Files logs\asesinatos.log" For Append Shared As #nfile
 Print #nfile, Date & " " & time & " " & texto
 Close #nfile
 
 Exit Sub
 
-ErrHandler:
+errhandler:
 
 End Sub
 Public Sub logVentaCasa(ByVal texto As String)
-On Error GoTo ErrHandler
+On Error GoTo errhandler
 
 Dim nfile As Integer
 nfile = FreeFile ' obtenemos un canal
 
-Open App.Path & "\logs\propiedades.log" For Append Shared As #nfile
+Open App.Path & "\Data\Files logs\propiedades.log" For Append Shared As #nfile
 Print #nfile, "----------------------------------------------------------"
 Print #nfile, Date & " " & time & " " & texto
 Print #nfile, "----------------------------------------------------------"
@@ -755,16 +750,16 @@ Close #nfile
 
 Exit Sub
 
-ErrHandler:
+errhandler:
 
 
 End Sub
 Public Sub LogHackAttemp(texto As String)
-On Error GoTo ErrHandler
+On Error GoTo errhandler
 
 Dim nfile As Integer
 nfile = FreeFile ' obtenemos un canal
-Open App.Path & "\logs\HackAttemps.log" For Append Shared As #nfile
+Open App.Path & "\Data\Files logs\HackAttemps.log" For Append Shared As #nfile
 Print #nfile, "----------------------------------------------------------"
 Print #nfile, Date & " " & time & " " & texto
 Print #nfile, "----------------------------------------------------------"
@@ -772,32 +767,32 @@ Close #nfile
 
 Exit Sub
 
-ErrHandler:
+errhandler:
 
 End Sub
 
 Public Sub LogCheating(texto As String)
-On Error GoTo ErrHandler
+On Error GoTo errhandler
 
 Dim nfile As Integer
 nfile = FreeFile ' obtenemos un canal
-Open App.Path & "\logs\CH.log" For Append Shared As #nfile
+Open App.Path & "\Data\Files logs\CH.log" For Append Shared As #nfile
 Print #nfile, Date & " " & time & " " & texto
 Close #nfile
 
 Exit Sub
 
-ErrHandler:
+errhandler:
 
 End Sub
 
 
 Public Sub LogCriticalHackAttemp(texto As String)
-On Error GoTo ErrHandler
+On Error GoTo errhandler
 
 Dim nfile As Integer
 nfile = FreeFile ' obtenemos un canal
-Open App.Path & "\logs\CriticalHackAttemps.log" For Append Shared As #nfile
+Open App.Path & "\Data\Files logs\CriticalHackAttemps.log" For Append Shared As #nfile
 Print #nfile, "----------------------------------------------------------"
 Print #nfile, Date & " " & time & " " & texto
 Print #nfile, "----------------------------------------------------------"
@@ -805,23 +800,23 @@ Close #nfile
 
 Exit Sub
 
-ErrHandler:
+errhandler:
 
 End Sub
 
 Public Sub LogAntiCheat(texto As String)
-On Error GoTo ErrHandler
+On Error GoTo errhandler
 
 Dim nfile As Integer
 nfile = FreeFile ' obtenemos un canal
-Open App.Path & "\logs\AntiCheat.log" For Append Shared As #nfile
+Open App.Path & "\Data\Files logs\AntiCheat.log" For Append Shared As #nfile
 Print #nfile, Date & " " & time & " " & texto
 Print #nfile, ""
 Close #nfile
 
 Exit Sub
 
-ErrHandler:
+errhandler:
 
 End Sub
 
@@ -938,7 +933,7 @@ If frmMain.Visible Then frmMain.txStatus.Caption = "Escuchando conexiones entran
 'Log it
 Dim N As Integer
 N = FreeFile
-Open App.Path & "\logs\Main.log" For Append Shared As #N
+Open App.Path & "\Data\Files logs\Main.log" For Append Shared As #N
 Print #N, Date & " " & time & " servidor reiniciado."
 Close #N
 
@@ -956,21 +951,18 @@ End Sub
 
 Public Function Intemperie(ByVal UserIndex As Integer) As Boolean
     
-    If MapInfo(UserList(UserIndex).Pos.map).Zona <> "DUNGEON" Then
-        If MapData(UserList(UserIndex).Pos.map, UserList(UserIndex).Pos.X, UserList(UserIndex).Pos.Y).trigger <> 1 And _
-           MapData(UserList(UserIndex).Pos.map, UserList(UserIndex).Pos.X, UserList(UserIndex).Pos.Y).trigger <> 2 And _
-           MapData(UserList(UserIndex).Pos.map, UserList(UserIndex).Pos.X, UserList(UserIndex).Pos.Y).trigger <> 4 Then Intemperie = True
-     'En las arenas no te afecta la lluvia
-    
+    If MapInfo(UserList(UserIndex).Pos.Map).Zona <> "DUNGEON" Then
+        If MapData(UserList(UserIndex).Pos.Map, UserList(UserIndex).Pos.X, UserList(UserIndex).Pos.Y).Trigger <> 1 And _
+           MapData(UserList(UserIndex).Pos.Map, UserList(UserIndex).Pos.X, UserList(UserIndex).Pos.Y).Trigger <> 2 And _
+           MapData(UserList(UserIndex).Pos.Map, UserList(UserIndex).Pos.X, UserList(UserIndex).Pos.Y).Trigger <> 4 Then Intemperie = True
     Else
-   If UserList(UserIndex).Pos.map = 37 Or UserList(UserIndex).Pos.map = 48 Or UserList(UserIndex).Pos.map = 115 And 116 Or UserList(UserIndex).Pos.map = 202 Or UserList(UserIndex).Pos.map = 140 And 141 And 142 And 143 And 144 And 145 And 146 Or UserList(UserIndex).Pos.map = 230 And 231 And 232 Or UserList(UserIndex).Pos.map = 209 And 210 And 211 Then Intemperie = False
         Intemperie = False
     End If
     
 End Function
 
 Public Sub EfectoLluvia(ByVal UserIndex As Integer)
-On Error GoTo ErrHandler
+On Error GoTo errhandler
 
 
 If UserList(UserIndex).flags.UserLogged Then
@@ -983,7 +975,7 @@ If UserList(UserIndex).flags.UserLogged Then
 End If
 
 Exit Sub
-ErrHandler:
+errhandler:
  LogError ("Error en EfectoLluvia")
 End Sub
 
@@ -1004,11 +996,11 @@ End Sub
 Public Sub EfectoFrio(ByVal UserIndex As Integer)
     
     Dim modifi As Integer
+    
     If UserList(UserIndex).Counters.Frio < IntervaloFrio Then
         UserList(UserIndex).Counters.Frio = UserList(UserIndex).Counters.Frio + 1
     Else
-   If UserList(UserIndex).Pos.map = 217 Or UserList(UserIndex).Pos.map = 218 Or UserList(UserIndex).Pos.map = 219 Or UserList(UserIndex).Pos.map = 221 Or UserList(UserIndex).Pos.map = 222 Or UserList(UserIndex).Pos.map = 223 Or UserList(UserIndex).Pos.map = 224 Or UserList(UserIndex).Pos.map = 225 Or UserList(UserIndex).Pos.map = 226 Or UserList(UserIndex).Pos.map = 227 Or UserList(UserIndex).Pos.map = 228 Or UserList(UserIndex).Pos.map = 229 Or UserList(UserIndex).Pos.map = 220 Then
-        'If MapInfo(UserList(UserIndex).Pos.map).Terreno = Nieve Then
+        If MapInfo(UserList(UserIndex).Pos.Map).Terreno = Nieve Then
             Call WriteConsoleMsg(UserIndex, "¡¡Estas muriendo de frio, abrigate o moriras!!.", FontTypeNames.FONTTYPE_INFO)
             modifi = Porcentaje(UserList(UserIndex).Stats.MaxHP, 5)
             UserList(UserIndex).Stats.MinHP = UserList(UserIndex).Stats.MinHP - modifi
@@ -1039,7 +1031,7 @@ Public Sub EfectoLava(ByVal UserIndex As Integer)
     If UserList(UserIndex).Counters.Lava < IntervaloFrio Then 'Usamos el mismo intervalo que el del frio
         UserList(UserIndex).Counters.Lava = UserList(UserIndex).Counters.Lava + 1
     Else
-        If HayLava(UserList(UserIndex).Pos.map, UserList(UserIndex).Pos.X, UserList(UserIndex).Pos.Y) Then
+        If HayLava(UserList(UserIndex).Pos.Map, UserList(UserIndex).Pos.X, UserList(UserIndex).Pos.Y) Then
             Call WriteConsoleMsg(UserIndex, "¡¡Quitate de la lava, te estás quemando!!.", FontTypeNames.FONTTYPE_INFO)
             UserList(UserIndex).Stats.MinHP = UserList(UserIndex).Stats.MinHP - Porcentaje(UserList(UserIndex).Stats.MaxHP, 5)
             
@@ -1085,7 +1077,7 @@ Public Sub EfectoMimetismo(ByVal UserIndex As Integer)
                         .Char.body = iFragataCaos
                     Else
                         Barco = ObjData(UserList(UserIndex).Invent.BarcoObjIndex)
-                        If Criminal(UserIndex) Then
+                        If esRene(UserIndex) Then
                             If Barco.Ropaje = iBarca Then .Char.body = iBarcaPk
                             If Barco.Ropaje = iGalera Then .Char.body = iGaleraPk
                             If Barco.Ropaje = iGaleon Then .Char.body = iGaleonPk
@@ -1182,9 +1174,9 @@ End Sub
 
 Public Sub RecStamina(ByVal UserIndex As Integer, ByRef EnviarStats As Boolean, ByVal Intervalo As Integer)
 
-If MapData(UserList(UserIndex).Pos.map, UserList(UserIndex).Pos.X, UserList(UserIndex).Pos.Y).trigger = 1 And _
-   MapData(UserList(UserIndex).Pos.map, UserList(UserIndex).Pos.X, UserList(UserIndex).Pos.Y).trigger = 2 And _
-   MapData(UserList(UserIndex).Pos.map, UserList(UserIndex).Pos.X, UserList(UserIndex).Pos.Y).trigger = 4 Then Exit Sub
+If MapData(UserList(UserIndex).Pos.Map, UserList(UserIndex).Pos.X, UserList(UserIndex).Pos.Y).Trigger = 1 And _
+   MapData(UserList(UserIndex).Pos.Map, UserList(UserIndex).Pos.X, UserList(UserIndex).Pos.Y).Trigger = 2 And _
+   MapData(UserList(UserIndex).Pos.Map, UserList(UserIndex).Pos.X, UserList(UserIndex).Pos.Y).Trigger = 4 Then Exit Sub
 
 
 Dim massta As Integer
@@ -1222,32 +1214,6 @@ End If
 
 End Sub
 
-Public Sub EfectoIncinerado(ByVal UserIndex As Integer)
-Dim N As Integer
-
-If UserList(UserIndex).Counters.incinerado < intervaloIncinera Then
-  UserList(UserIndex).Counters.incinerado = UserList(UserIndex).Counters.incinerado + 1
-Else
-  Call WriteConsoleMsg(UserIndex, "Estás Incinerado, si no te curas moriras.", FontTypeNames.FONTTYPE_CENTINELA)
-  Call SendData(SendTarget.ToPCArea, UserIndex, PrepareMessageCreateFX(UserList(UserIndex).Char.CharIndex, FXINCINERA, 0))
-     Call SendData(SendTarget.ToPCArea, UserIndex, PrepareMessagePlayWave(SND_INCINERA, UserList(UserIndex).Pos.X, UserList(UserIndex).Pos.Y))
-  UserList(UserIndex).Counters.Veneno = 0
-  N = RandomNumber(1, 5)
-  UserList(UserIndex).Stats.MinHP = UserList(UserIndex).Stats.MinHP - N
-  If UserList(UserIndex).Stats.MinHP < 1 Then Call UserDie(UserIndex)
-  Call WriteUpdateHP(UserIndex)
-End If
-
-    If UserList(UserIndex).flags.Meditando Then
-               If UserList(UserIndex).flags.incinerado Then
-                UserList(UserIndex).flags.Meditando = False
-                Call WriteMeditateToggle(UserIndex)
-                Call WriteConsoleMsg(UserIndex, "Dejas de meditar.", FontTypeNames.FONTTYPE_INFO)
-                Call SendData(SendTarget.ToPCArea, UserIndex, PrepareMessageDestCharParticle(UserList(UserIndex).Char.CharIndex, ParticleToLevel(UserIndex)))
-            End If
-        End If
-        
-End Sub
 Public Sub DuracionPociones(ByVal UserIndex As Integer)
 
 'Controla la duracion de las pociones
@@ -1261,7 +1227,7 @@ If UserList(UserIndex).flags.DuracionEfecto > 0 Then
         For loopX = 1 To NUMATRIBUTOS
               UserList(UserIndex).Stats.UserAtributos(loopX) = UserList(UserIndex).Stats.UserAtributosBackUP(loopX)
         Next
-       Call WriteFuerza(UserIndex)
+        Call WriteFuerza(UserIndex)
         Call WriteAgilidad(UserIndex)
    End If
 End If
@@ -1308,9 +1274,9 @@ End Sub
 
 Public Sub Sanar(ByVal UserIndex As Integer, ByRef EnviarStats As Boolean, ByVal Intervalo As Integer)
 
-If MapData(UserList(UserIndex).Pos.map, UserList(UserIndex).Pos.X, UserList(UserIndex).Pos.Y).trigger = 1 And _
-   MapData(UserList(UserIndex).Pos.map, UserList(UserIndex).Pos.X, UserList(UserIndex).Pos.Y).trigger = 2 And _
-   MapData(UserList(UserIndex).Pos.map, UserList(UserIndex).Pos.X, UserList(UserIndex).Pos.Y).trigger = 4 Then Exit Sub
+If MapData(UserList(UserIndex).Pos.Map, UserList(UserIndex).Pos.X, UserList(UserIndex).Pos.Y).Trigger = 1 And _
+   MapData(UserList(UserIndex).Pos.Map, UserList(UserIndex).Pos.X, UserList(UserIndex).Pos.Y).Trigger = 2 And _
+   MapData(UserList(UserIndex).Pos.Map, UserList(UserIndex).Pos.X, UserList(UserIndex).Pos.Y).Trigger = 4 Then Exit Sub
 
 Dim mashit As Integer
 'con el paso del tiempo va sanando....pero muy lentamente ;-)
@@ -1341,32 +1307,38 @@ Public Sub CargaNpcsDat()
 End Sub
 
 Sub PasarSegundo()
-On Error GoTo ErrHandler
+On Error GoTo errhandler
     Dim i As Long
     
     For i = 1 To LastUser
         If UserList(i).flags.UserLogged Then
-            'Cerrar usuario
+                'Cerrar usuario
             If UserList(i).Counters.Saliendo Then
                 UserList(i).Counters.Salir = UserList(i).Counters.Salir - 1
+                Call WriteConsoleMsg(i, "En " & UserList(i).Counters.Salir & " segundos cerrará el juego...", FontTypeNames.FONTTYPE_INFO)
                 If UserList(i).Counters.Salir <= 0 Then
-                    Call WriteConsoleMsg(i, "Gracias por jugar a Aoshao", FontTypeNames.FONTTYPE_INFO)
+                    Call WriteConsoleMsg(i, "Gracias por jugar ImperiumAO", FontTypeNames.FONTTYPE_INFO)
                     Call WriteDisconnect(i)
                     Call FlushBuffer(i)
+                    'Cerramos el user
+                    'ResetUserButIp i
+                    CloseUser i
                     
                     Call CloseSocket(i)
+                    'Conectamo la cuenta
+                    Call ConectarCuenta(i, UserList(i).Account, "ISNOTHING123456789")
                 End If
             
             'ANTIEMPOLLOS
             ElseIf UserList(i).flags.EstaEmpo = 1 Then
                  UserList(i).EmpoCont = UserList(i).EmpoCont + 1
                  If UserList(i).EmpoCont = 30 Then
-                    'If FileExist(CharPath & UserList(Z).Name & ".chr", vbNormal) Then
+                    'If FileExist(CharPath & UserList(Z).Name & ".pjs", vbNormal) Then
                     'esto siempre existe! sino no estaria logueado ;p
                     
-                    'TmpP = val(GetVar(CharPath & UserList(Z).Name & ".chr", "PENAS", "Cant"))
-                    'Call WriteVar(CharPath & UserList(Z).Name & ".chr", "PENAS", "Cant", TmpP + 1)
-                    'Call WriteVar(CharPath & UserList(Z).Name & ".chr", "PENAS", "P" & TmpP + 1, LCase$(UserList(Z).Name) & ": CARCEL " & 30 & "m, MOTIVO: Empollando" & " " & Date & " " & Time)
+                    'TmpP = val(GetVar(CharPath & UserList(Z).Name & ".pjs", "PENAS", "Cant"))
+                    'Call WriteVar(CharPath & UserList(Z).Name & ".pjs", "PENAS", "Cant", TmpP + 1)
+                    'Call WriteVar(CharPath & UserList(Z).Name & ".pjs", "PENAS", "P" & TmpP + 1, LCase$(UserList(Z).Name) & ": CARCEL " & 30 & "m, MOTIVO: Empollando" & " " & Date & " " & Time)
                     
                     'Call Encarcelar(Z, 30, "El sistema anti empollo")
                     Call WriteShowMessageBox(i, "Fuiste expulsado por permanecer muerto sobre un item")
@@ -1384,7 +1356,7 @@ On Error GoTo ErrHandler
     Next i
 Exit Sub
 
-ErrHandler:
+errhandler:
     Call LogError("Error en PasarSegundo. Err: " & Err.description & " - " & Err.Number & " - UserIndex: " & i)
     Resume Next
 End Sub
@@ -1416,18 +1388,18 @@ End Sub
 Sub GuardarUsuarios()
     haciendoBK = True
     
-    Call SendData(SendTarget.ToAll, 0, PrepareMessagePauseToggle())
-    Call SendData(SendTarget.ToAll, 0, PrepareMessageConsoleMsg("Servidor> Grabando Personajes", FontTypeNames.FONTTYPE_SERVER))
+    Call SendData(SendTarget.toall, 0, PrepareMessagePauseToggle())
+    Call SendData(SendTarget.toall, 0, PrepareMessageConsoleMsg("Servidor> Grabando Personajes", FontTypeNames.FONTTYPE_SERVER))
     
     Dim i As Integer
     For i = 1 To LastUser
         If UserList(i).flags.UserLogged Then
-            Call SaveUser(i, CharPath & UCase$(UserList(i).name) & ".chr")
+            Call SaveUser(i, CharPath & UCase$(UserList(i).name) & ".pjs")
         End If
     Next i
     
-    Call SendData(SendTarget.ToAll, 0, PrepareMessageConsoleMsg("Servidor> Personajes Grabados", FontTypeNames.FONTTYPE_SERVER))
-    Call SendData(SendTarget.ToAll, 0, PrepareMessagePauseToggle())
+    Call SendData(SendTarget.toall, 0, PrepareMessageConsoleMsg("Servidor> Personajes Grabados", FontTypeNames.FONTTYPE_SERVER))
+    Call SendData(SendTarget.toall, 0, PrepareMessagePauseToggle())
 
     haciendoBK = False
 End Sub
@@ -1467,7 +1439,4 @@ Public Sub FreeCharIndexes()
 '***************************************************
     ' Free all char indexes (set them all to 0)
     Call ZeroMemory(CharList(1), MAXCHARS * Len(CharList(1)))
-End Sub
-Sub Ayudaa(ByVal UserIndex As Integer)
-Call WriteIniciarAyuda(UserIndex)
 End Sub

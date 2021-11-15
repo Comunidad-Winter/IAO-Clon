@@ -75,16 +75,46 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
+'************************************************* ****************
+'ImperiumAO - v1.0
+'************************************************* ****************
+'Copyright (C) 2015 Gaston Jorge Martinez
+'Copyright (C) 2015 Alexis Rodriguez
+'Copyright (C) 2015 Luis Merino
+'Copyright (C) 2015 Girardi Luciano Valentin
+'
+'Respective portions copyright by taxpayers below.
+'
+'This library is free software; you can redistribute it and / or
+'Modify it under the terms of the GNU General Public
+'License as published by the Free Software Foundation version 2.1
+'The License
+'
+'This library is distributed in the hope that it will be useful,
+'But WITHOUT ANY WARRANTY; without even the implied warranty
+'MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+'Lesser General Public License for more details.
+'
+'You should have received a copy of the GNU General Public
+'License along with this library; if not, write to the Free Software
+'Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+'************************************************* ****************
+'
+'************************************************* ****************
+'You can contact me at:
+'Gaston Jorge Martinez (Zenitram@Hotmail.com)
+'************************************************* ****************
+
 Option Explicit
 
-Private Sub Command2_MouseDown(Button As Integer, Shift As Integer, x As Single, y As Single)
-Command2.Picture = LoadPicture(App.path & "\Recursos\Interface\dejartododown.jpg")
+Private Sub Command2_MouseDown(Button As Integer, Shift As Integer, X As Single, Y As Single)
+Command2.Picture = LoadPicture(App.path & "\Resources\Interface\dejartododown.jpg")
 End Sub
 
-Private Sub Command2_MouseMove(Button As Integer, Shift As Integer, x As Single, y As Single)
+Private Sub Command2_MouseMove(Button As Integer, Shift As Integer, X As Single, Y As Single)
 
 If Command2.Tag = "0" Then
-    Command2.Picture = LoadPicture(App.path & "\Recursos\Interface\dejartodoover.jpg")
+    Command2.Picture = LoadPicture(App.path & "\Resources\Interface\dejartodoover.jpg")
     Command2.Tag = "1"
 End If
 
@@ -95,14 +125,14 @@ End If
 
 End Sub
 
-Private Sub Command1_MouseDown(Button As Integer, Shift As Integer, x As Single, y As Single)
-command1.Picture = LoadPicture(App.path & "\Recursos\Interface\dejardown.jpg")
+Private Sub Command1_MouseDown(Button As Integer, Shift As Integer, X As Single, Y As Single)
+command1.Picture = LoadPicture(App.path & "\Resources\Interface\dejardown.jpg")
 End Sub
 
-Private Sub Command1_MouseMove(Button As Integer, Shift As Integer, x As Single, y As Single)
+Private Sub Command1_MouseMove(Button As Integer, Shift As Integer, X As Single, Y As Single)
 
 If command1.Tag = "0" Then
-    command1.Picture = LoadPicture(App.path & "\Recursos\Interface\dejarover.jpg")
+    command1.Picture = LoadPicture(App.path & "\Resources\Interface\dejarover.jpg")
     command1.Tag = "1"
 End If
 
@@ -113,21 +143,21 @@ End If
 
 End Sub
 
-Private Sub Command1_MouseUp(Button As Integer, Shift As Integer, x As Single, y As Single)
-    If LenB(frmCantidad.text1.Text) > 0 Then
-        If Not IsNumeric(frmCantidad.text1.Text) Then Exit Sub  'Should never happen
-        Call WriteDrop(Inventario.SelectedItem, frmCantidad.text1.Text)
-        frmCantidad.text1.Text = ""
+Private Sub Command1_MouseUp(Button As Integer, Shift As Integer, X As Single, Y As Single)
+    If LenB(frmCantidad.Text1.Text) > 0 Then
+        If Not IsNumeric(frmCantidad.Text1.Text) Then Exit Sub  'Should never happen
+        Call WriteDrop(Inventario.SelectedItem, frmCantidad.Text1.Text)
+        frmCantidad.Text1.Text = ""
     End If
     
     Unload Me
 End Sub
 
-Private Sub Command2_MouseUp(Button As Integer, Shift As Integer, x As Single, y As Single)
+Private Sub Command2_MouseUp(Button As Integer, Shift As Integer, X As Single, Y As Single)
     If Inventario.SelectedItem = 0 Then Exit Sub
     
     If Inventario.SelectedItem <> FLAGORO Then
-        Call WriteDrop(Inventario.SelectedItem, Inventario.amount(Inventario.SelectedItem))
+        Call WriteDrop(Inventario.SelectedItem, Inventario.Amount(Inventario.SelectedItem))
         Unload Me
     Else
         If UserGLD > 10000 Then
@@ -139,24 +169,24 @@ Private Sub Command2_MouseUp(Button As Integer, Shift As Integer, x As Single, y
         End If
     End If
 
-    frmCantidad.text1.Text = ""
+    frmCantidad.Text1.Text = ""
 End Sub
 
 Private Sub Text1_Change()
 On Error GoTo ErrHandler
-     If Val(text1.Text) < 1 Then
-        text1.Text = "1"
+    If Val(Text1.Text) < 0 Then
+        Text1.Text = "1"
     End If
     
-    If Val(text1.Text) > 10000 Then
-        text1.Text = "10000"
+    If Val(Text1.Text) > MAX_INVENTORY_OBJS Then
+        Text1.Text = "10000"
     End If
     
     Exit Sub
     
 ErrHandler:
     'If we got here the user may have pasted (Shift + Insert) a REALLY large number, causing an overflow, so we set amount back to 1
-    text1.Text = "1"
+    Text1.Text = "1"
 End Sub
 
 Private Sub Text1_KeyPress(KeyAscii As Integer)
@@ -167,7 +197,7 @@ Private Sub Text1_KeyPress(KeyAscii As Integer)
     End If
 End Sub
 
-Private Sub imgCerrar_MouseMove(Button As Integer, Shift As Integer, x As Single, y As Single)
+Private Sub imgCerrar_MouseMove(Button As Integer, Shift As Integer, X As Single, Y As Single)
 
 If command1.Tag = "1" Then
     command1.Picture = Nothing
@@ -180,40 +210,40 @@ If Command2.Tag = "1" Then
 End If
 
 If imgCerrar.Tag = "0" Then
-    imgCerrar.Picture = LoadPicture(App.path & "\Recursos\Interface\cerrarcantover.jpg")
+    imgCerrar.Picture = LoadPicture(App.path & "\Resources\Interface\cerrarcantover.jpg")
     imgCerrar.Tag = "1"
 End If
 
 End Sub
 
-Private Sub imgCerrar_MouseDown(Button As Integer, Shift As Integer, x As Single, y As Single)
-imgCerrar.Picture = LoadPicture(App.path & "\Recursos\Interface\cerrarcantdown.jpg")
+Private Sub imgCerrar_MouseDown(Button As Integer, Shift As Integer, X As Single, Y As Single)
+imgCerrar.Picture = LoadPicture(App.path & "\Resources\Interface\cerrarcantdown.jpg")
 End Sub
 
-Private Sub imgCerrar_MouseUp(Button As Integer, Shift As Integer, x As Single, y As Single)
+Private Sub imgCerrar_MouseUp(Button As Integer, Shift As Integer, X As Single, Y As Single)
 Unload Me
 End Sub
 
 Private Sub imgMas_Click()
-text1.Text = Val(text1.Text) + 1
+Text1.Text = Val(Text1.Text) + 1
 End Sub
 
-Private Sub imgMas_MouseMove(Button As Integer, Shift As Integer, x As Single, y As Single)
-Call Form_MouseMove(Button, Shift, x, y)
+Private Sub imgMas_MouseMove(Button As Integer, Shift As Integer, X As Single, Y As Single)
+Call Form_MouseMove(Button, Shift, X, Y)
 End Sub
 
 Private Sub imgMenos_Click()
 
-If Val(text1.Text) > 0 Then _
-    text1.Text = Val(text1.Text) - 1
+If Val(Text1.Text) > 0 Then _
+    Text1.Text = Val(Text1.Text) - 1
 
 End Sub
 
-Private Sub imgMenos_MouseMove(Button As Integer, Shift As Integer, x As Single, y As Single)
-Call Form_MouseMove(Button, Shift, x, y)
+Private Sub imgMenos_MouseMove(Button As Integer, Shift As Integer, X As Single, Y As Single)
+Call Form_MouseMove(Button, Shift, X, Y)
 End Sub
 
-Private Sub Form_MouseMove(Button As Integer, Shift As Integer, x As Single, y As Single)
+Private Sub Form_MouseMove(Button As Integer, Shift As Integer, X As Single, Y As Single)
 
 If command1.Tag = "1" Then
     command1.Picture = Nothing
@@ -233,6 +263,5 @@ End If
 End Sub
 
 Private Sub Form_Load()
-    Me.Picture = LoadPicture(App.path & "\Recursos\Interface\cantidad.jpg")
-    Call Make_Transparent_Form(Me.hWnd, 210)
+    Me.Picture = LoadPicture(App.path & "\Resources\Interface\cantidad.jpg")
 End Sub

@@ -1,14 +1,14 @@
 VERSION 5.00
 Begin VB.Form FrmInterv 
-   Caption         =   "Intervalos"
-   ClientHeight    =   4650
+   Caption         =   "Opciones Intevalos"
+   ClientHeight    =   4710
    ClientLeft      =   60
    ClientTop       =   345
-   ClientWidth     =   7980
+   ClientWidth     =   7650
    LinkTopic       =   "Form1"
-   ScaleHeight     =   4650
-   ScaleWidth      =   7980
-   StartUpPosition =   3  'Windows Default
+   ScaleHeight     =   4710
+   ScaleWidth      =   7650
+   StartUpPosition =   2  'CenterScreen
    Begin VB.CommandButton Command2 
       Caption         =   "Guardar Intervalos"
       BeginProperty Font 
@@ -55,7 +55,7 @@ Begin VB.Form FrmInterv
          Strikethrough   =   0   'False
       EndProperty
       Height          =   2055
-      Left            =   3240
+      Left            =   2880
       TabIndex        =   49
       Top             =   2160
       Width           =   1695
@@ -123,7 +123,7 @@ Begin VB.Form FrmInterv
          Strikethrough   =   0   'False
       EndProperty
       Height          =   2055
-      Left            =   5040
+      Left            =   4680
       TabIndex        =   39
       Top             =   2160
       Width           =   2865
@@ -225,7 +225,7 @@ Begin VB.Form FrmInterv
          Strikethrough   =   0   'False
       EndProperty
       Height          =   2055
-      Left            =   0
+      Left            =   120
       TabIndex        =   3
       Top             =   0
       Width           =   7455
@@ -445,9 +445,9 @@ Begin VB.Form FrmInterv
             Strikethrough   =   0   'False
          EndProperty
          Height          =   1710
-         Left            =   3000
+         Left            =   3015
          TabIndex        =   4
-         Top             =   240
+         Top             =   210
          Width           =   1410
          Begin VB.TextBox txtStaminaIntervaloSinDescansar 
             Height          =   285
@@ -497,10 +497,10 @@ Begin VB.Form FrmInterv
          Strikethrough   =   0   'False
       EndProperty
       Height          =   2055
-      Left            =   0
+      Left            =   120
       TabIndex        =   2
       Top             =   2160
-      Width           =   3255
+      Width           =   2655
       Begin VB.Frame Frame10 
          Caption         =   "Duracion Spells"
          BeginProperty Font 
@@ -516,15 +516,7 @@ Begin VB.Form FrmInterv
          Left            =   135
          TabIndex        =   29
          Top             =   270
-         Width           =   3000
-         Begin VB.TextBox TextIntervaloIncinera 
-            Height          =   285
-            Left            =   2160
-            TabIndex        =   55
-            Text            =   "0"
-            Top             =   840
-            Width           =   735
-         End
+         Width           =   2400
          Begin VB.TextBox txtInvocacion 
             Height          =   300
             Left            =   1170
@@ -556,15 +548,6 @@ Begin VB.Form FrmInterv
             Text            =   "0"
             Top             =   510
             Width           =   795
-         End
-         Begin VB.Label Incinera 
-            Alignment       =   2  'Center
-            Caption         =   "Incinera"
-            Height          =   255
-            Left            =   2160
-            TabIndex        =   56
-            Top             =   600
-            Width           =   735
          End
          Begin VB.Label Label18 
             AutoSize        =   -1  'True
@@ -627,7 +610,7 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
-'AoshaoServer 0.11.6
+'ImperiumAO 0.11.6
 'Copyright (C) 2002 Márquez Pablo Ignacio
 '
 'This program is free software; you can redistribute it and/or modify
@@ -642,7 +625,7 @@ Attribute VB_Exposed = False
 'You should have received a copy of the Affero General Public License
 'along with this program; if not, you can find it at http://www.affero.org/oagpl.html
 '
-'AoshaoServer is based on Baronsoft's VB6 Online RPG
+'ImperiumAO is based on Baronsoft's VB6 Online RPG
 'You can contact the original creator of ORE at aaron@baronsoft.com
 'for more information about ORE please visit http://www.baronsoft.com/
 '
@@ -667,7 +650,6 @@ StaminaIntervaloDescansar = val(txtStaminaIntervaloDescansar.Text)
 IntervaloSed = val(txtIntervaloSed.Text)
 IntervaloHambre = val(txtIntervaloHambre.Text)
 IntervaloVeneno = val(txtIntervaloVeneno.Text)
-intervaloIncinera = val(TextIntervaloIncinera.Text)
 IntervaloParalizado = val(txtIntervaloParalizado.Text)
 IntervaloInvisible = val(txtIntervaloInvisible.Text)
 IntervaloFrio = val(txtIntervaloFrio.Text)
@@ -699,29 +681,28 @@ Private Sub Command2_Click()
 On Error GoTo Err
 
 'Intervalos
-Call WriteVar(IniPath & "Server.ini", "INTERVALOS", "SanaIntervaloSinDescansar", str(SanaIntervaloSinDescansar))
-Call WriteVar(IniPath & "Server.ini", "INTERVALOS", "StaminaIntervaloSinDescansar", str(StaminaIntervaloSinDescansar))
-Call WriteVar(IniPath & "Server.ini", "INTERVALOS", "SanaIntervaloDescansar", str(SanaIntervaloDescansar))
-Call WriteVar(IniPath & "Server.ini", "INTERVALOS", "StaminaIntervaloDescansar", str(StaminaIntervaloDescansar))
-Call WriteVar(IniPath & "Server.ini", "INTERVALOS", "IntervaloSed", str(IntervaloSed))
-Call WriteVar(IniPath & "Server.ini", "INTERVALOS", "IntervaloHambre", str(IntervaloHambre))
-Call WriteVar(IniPath & "Server.ini", "INTERVALOS", "IntervaloVeneno", str(IntervaloVeneno))
-Call WriteVar(IniPath & "Server.ini", "INTERVALOS", "IntervaloIncinera", str(intervaloIncinera))
-Call WriteVar(IniPath & "Server.ini", "INTERVALOS", "IntervaloParalizado", str(IntervaloParalizado))
-Call WriteVar(IniPath & "Server.ini", "INTERVALOS", "IntervaloInvisible", str(IntervaloInvisible))
-Call WriteVar(IniPath & "Server.ini", "INTERVALOS", "IntervaloFrio", str(IntervaloFrio))
-Call WriteVar(IniPath & "Server.ini", "INTERVALOS", "IntervaloWAVFX", str(IntervaloWavFx))
-Call WriteVar(IniPath & "Server.ini", "INTERVALOS", "IntervaloInvocacion", str(IntervaloInvocacion))
-Call WriteVar(IniPath & "Server.ini", "INTERVALOS", "IntervaloParaConexion", str(IntervaloParaConexion))
+Call WriteVar(IniPath & "IMPAOSV.ini", "INTERVALOS", "SanaIntervaloSinDescansar", str(SanaIntervaloSinDescansar))
+Call WriteVar(IniPath & "IMPAOSV.ini", "INTERVALOS", "StaminaIntervaloSinDescansar", str(StaminaIntervaloSinDescansar))
+Call WriteVar(IniPath & "IMPAOSV.ini", "INTERVALOS", "SanaIntervaloDescansar", str(SanaIntervaloDescansar))
+Call WriteVar(IniPath & "IMPAOSV.ini", "INTERVALOS", "StaminaIntervaloDescansar", str(StaminaIntervaloDescansar))
+Call WriteVar(IniPath & "IMPAOSV.ini", "INTERVALOS", "IntervaloSed", str(IntervaloSed))
+Call WriteVar(IniPath & "IMPAOSV.ini", "INTERVALOS", "IntervaloHambre", str(IntervaloHambre))
+Call WriteVar(IniPath & "IMPAOSV.ini", "INTERVALOS", "IntervaloVeneno", str(IntervaloVeneno))
+Call WriteVar(IniPath & "IMPAOSV.ini", "INTERVALOS", "IntervaloParalizado", str(IntervaloParalizado))
+Call WriteVar(IniPath & "IMPAOSV.ini", "INTERVALOS", "IntervaloInvisible", str(IntervaloInvisible))
+Call WriteVar(IniPath & "IMPAOSV.ini", "INTERVALOS", "IntervaloFrio", str(IntervaloFrio))
+Call WriteVar(IniPath & "IMPAOSV.ini", "INTERVALOS", "IntervaloWAVFX", str(IntervaloWavFx))
+Call WriteVar(IniPath & "IMPAOSV.ini", "INTERVALOS", "IntervaloInvocacion", str(IntervaloInvocacion))
+Call WriteVar(IniPath & "IMPAOSV.ini", "INTERVALOS", "IntervaloParaConexion", str(IntervaloParaConexion))
 
 '&&&&&&&&&&&&&&&&&&&&& TIMERS &&&&&&&&&&&&&&&&&&&&&&&
 
-Call WriteVar(IniPath & "Server.ini", "INTERVALOS", "IntervaloLanzaHechizo", str(IntervaloUserPuedeCastear))
-Call WriteVar(IniPath & "Server.ini", "INTERVALOS", "IntervaloNpcAI", frmMain.TIMER_AI.Interval)
-Call WriteVar(IniPath & "Server.ini", "INTERVALOS", "IntervaloNpcPuedeAtacar", frmMain.npcataca.Interval)
-Call WriteVar(IniPath & "Server.ini", "INTERVALOS", "IntervaloTrabajo", str(IntervaloUserPuedeTrabajar))
-Call WriteVar(IniPath & "Server.ini", "INTERVALOS", "IntervaloUserPuedeAtacar", str(IntervaloUserPuedeAtacar))
-Call WriteVar(IniPath & "Server.ini", "INTERVALOS", "IntervaloPerdidaStaminaLluvia", frmMain.tLluvia.Interval)
+Call WriteVar(IniPath & "IMPAOSV.ini", "INTERVALOS", "IntervaloLanzaHechizo", str(IntervaloUserPuedeCastear))
+Call WriteVar(IniPath & "IMPAOSV.ini", "INTERVALOS", "IntervaloNpcAI", frmMain.TIMER_AI.Interval)
+Call WriteVar(IniPath & "IMPAOSV.ini", "INTERVALOS", "IntervaloNpcPuedeAtacar", frmMain.npcataca.Interval)
+Call WriteVar(IniPath & "IMPAOSV.ini", "INTERVALOS", "IntervaloTrabajo", str(IntervaloUserPuedeTrabajar))
+Call WriteVar(IniPath & "IMPAOSV.ini", "INTERVALOS", "IntervaloUserPuedeAtacar", str(IntervaloUserPuedeAtacar))
+Call WriteVar(IniPath & "IMPAOSV.ini", "INTERVALOS", "IntervaloPerdidaStaminaLluvia", frmMain.tLluvia.Interval)
 
 
 MsgBox "Los intervalos se han guardado sin problemas"

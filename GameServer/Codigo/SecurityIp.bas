@@ -1,5 +1,5 @@
 Attribute VB_Name = "SecurityIp"
-'AoshaoServer 0.11.6
+'ImperiumAO 0.11.6
 'Copyright (C) 2002 Márquez Pablo Ignacio
 '
 'This program is free software; you can redistribute it and/or modify
@@ -14,7 +14,7 @@ Attribute VB_Name = "SecurityIp"
 'You should have received a copy of the Affero General Public License
 'along with this program; if not, you can find it at http://www.affero.org/oagpl.html
 '
-'AoshaoServer is based on Baronsoft's VB6 Online RPG
+'ImperiumAO is based on Baronsoft's VB6 Online RPG
 'You can contact the original creator of ORE at aaron@baronsoft.com
 'for more information about ORE please visit http://www.baronsoft.com/
 '
@@ -130,7 +130,7 @@ Dim IpTableIndex As Long
 End Function
 
 
-Private Sub AddNewIpIntervalo(ByVal ip As Long, ByVal index As Long)
+Private Sub AddNewIpIntervalo(ByVal ip As Long, ByVal Index As Long)
 '*************************************************  *************
 'Author: Lucio N. Tourrilhes (DuNga)
 'Last Modify Date: Unknow
@@ -146,8 +146,8 @@ Private Sub AddNewIpIntervalo(ByVal ip As Long, ByVal index As Long)
     End If
     
     '4) Corro todo el array para arriba
-    Call CopyMemory(IpTables(index + 2), IpTables(index), (MaxValue - index \ 2) * 8)   '*4 (peso del long) * 2(cantidad de elementos por c/u)
-    IpTables(index) = ip
+    Call CopyMemory(IpTables(Index + 2), IpTables(Index), (MaxValue - Index \ 2) * 8)   '*4 (peso del long) * 2(cantidad de elementos por c/u)
+    IpTables(Index) = ip
     
     '3) Subo el indicador de el maximo valor almacenado y listo :)
     MaxValue = MaxValue + 1
@@ -189,7 +189,7 @@ Dim IpTableIndex As Long
 
 End Function
 
-Private Sub AddNewIpLimiteConexiones(ByVal ip As Long, ByVal index As Long)
+Private Sub AddNewIpLimiteConexiones(ByVal ip As Long, ByVal Index As Long)
 '*************************************************  *************
 'Author: (EL OSO)
 'Last Modify Date: Unknow
@@ -211,14 +211,14 @@ Private Sub AddNewIpLimiteConexiones(ByVal ip As Long, ByVal index As Long)
 'Modified by Juan Martín Sotuyo Dodero (Maraxus)
 '*************************************************    *************
     Debug.Print "agrega conexion a " & ip
-    Debug.Print "(Declaraciones.MaxUsers - index) = " & (Declaraciones.MaxUsers - index)
+    Debug.Print "(Declaraciones.MaxUsers - index) = " & (Declaraciones.MaxUsers - Index)
     Debug.Print "Agrega conexion a nueva IP " & ip
     '4) Corro todo el array para arriba
     Dim temp() As Long
-    ReDim temp((MaxConTablesEntry - index \ 2) * 2) As Long  'VB no deja inicializar con rangos variables...
-    Call CopyMemory(temp(0), MaxConTables(index), (MaxConTablesEntry - index \ 2) * 8)    '*4 (peso del long) * 2(cantidad de elementos por c/u)
-    Call CopyMemory(MaxConTables(index + 2), temp(0), (MaxConTablesEntry - index \ 2) * 8)    '*4 (peso del long) * 2(cantidad de elementos por c/u)
-    MaxConTables(index) = ip
+    ReDim temp((MaxConTablesEntry - Index \ 2) * 2) As Long  'VB no deja inicializar con rangos variables...
+    Call CopyMemory(temp(0), MaxConTables(Index), (MaxConTablesEntry - Index \ 2) * 8)    '*4 (peso del long) * 2(cantidad de elementos por c/u)
+    Call CopyMemory(MaxConTables(Index + 2), temp(0), (MaxConTablesEntry - Index \ 2) * 8)    '*4 (peso del long) * 2(cantidad de elementos por c/u)
+    MaxConTables(Index) = ip
 
     '3) Subo el indicador de el maximo valor almacenado y listo :)
     MaxConTablesEntry = MaxConTablesEntry + 1

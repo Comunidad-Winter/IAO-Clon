@@ -1,5 +1,5 @@
 Attribute VB_Name = "InvNpc"
-'AoshaoServer 0.11.6
+'ImperiumAO 0.11.6
 'Copyright (C) 2002 Márquez Pablo Ignacio
 '
 'This program is free software; you can redistribute it and/or modify
@@ -14,7 +14,7 @@ Attribute VB_Name = "InvNpc"
 'You should have received a copy of the Affero General Public License
 'along with this program; if not, you can find it at http://www.affero.org/oagpl.html
 '
-'AoshaoServer is based on Baronsoft's VB6 Online RPG
+'ImperiumAO is based on Baronsoft's VB6 Online RPG
 'You can contact the original creator of ORE at aaron@baronsoft.com
 'for more information about ORE please visit http://www.baronsoft.com/
 '
@@ -40,21 +40,21 @@ Option Explicit
 '?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿
 '?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿
 '?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿
-Public Function TirarItemAlPiso(Pos As WorldPos, obj As obj, Optional Notdrakkar As Boolean = True) As WorldPos
-On Error GoTo Errhandler
+Public Function TirarItemAlPiso(Pos As WorldPos, Obj As Obj, Optional NotPirata As Boolean = True) As WorldPos
+On Error GoTo errhandler
 
     Dim NuevaPos As WorldPos
     NuevaPos.X = 0
     NuevaPos.Y = 0
     
-    Tilelibre Pos, NuevaPos, obj, Notdrakkar, True
+    Tilelibre Pos, NuevaPos, Obj, NotPirata, True
     If NuevaPos.X <> 0 And NuevaPos.Y <> 0 Then
-        Call MakeObj(obj, Pos.map, NuevaPos.X, NuevaPos.Y)
+        Call MakeObj(Obj, Pos.Map, NuevaPos.X, NuevaPos.Y)
     End If
     TirarItemAlPiso = NuevaPos
 
 Exit Function
-Errhandler:
+errhandler:
 
 End Function
 
@@ -65,7 +65,7 @@ On Error Resume Next
 If npc.Invent.NroItems > 0 Then
     
     Dim i As Byte
-    Dim MiObj As obj
+    Dim MiObj As Obj
     
     For i = 1 To MAX_INVENTORY_SLOTS
     

@@ -11,51 +11,47 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
-'**************************************************************
-' clsCustomMessages.cls - User-defined messages with shortcut.
-' Allows the creation and serialization of user defined messages to be used with shortcuts.
+'************************************************* ****************
+'ImperiumAO - v1.0
+'************************************************* ****************
+'Copyright (C) 2015 Gaston Jorge Martinez
+'Copyright (C) 2015 Alexis Rodriguez
+'Copyright (C) 2015 Luis Merino
+'Copyright (C) 2015 Girardi Luciano Valentin
 '
-' Designed and implemented by Juan Martín Sotuyo Dodero (Maraxus)
-' (juansotuyo@gmail.com)
-'**************************************************************
-
-'**************************************************************************
-'This program is free software; you can redistribute it and/or modify
-'it under the terms of the Affero General Public License;
-'either version 1 of the License, or any later version.
+'Respective portions copyright by taxpayers below.
 '
-'This program is distributed in the hope that it will be useful,
-'but WITHOUT ANY WARRANTY; without even the implied warranty of
-'MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-'Affero General Public License for more details.
+'This library is free software; you can redistribute it and / or
+'Modify it under the terms of the GNU General Public
+'License as published by the Free Software Foundation version 2.1
+'The License
 '
-'You should have received a copy of the Affero General Public License
-'along with this program; if not, you can find it at http://www.affero.org/oagpl.html
-'**************************************************************************
-
+'This library is distributed in the hope that it will be useful,
+'But WITHOUT ANY WARRANTY; without even the implied warranty
+'MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+'Lesser General Public License for more details.
+'
+'You should have received a copy of the GNU General Public
+'License along with this library; if not, write to the Free Software
+'Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+'************************************************* ****************
+'
+'************************************************* ****************
+'You can contact me at:
+'Gaston Jorge Martinez (Zenitram@Hotmail.com)
+'************************************************* ****************
 
 Option Explicit
 Option Base 0
 
-''
-' Defines the number of messages that can be created.
 Private Const MESSAGE_COUNT As Byte = 10
 
-''
-' Defines the maximum length allowed for any custom message.
 Private Const MAX_MESSAGE_LENGTH As Byte = 120
 
-''
-' The error code thrown when the message being set is invalid.
 Private Const INVALID_MESSAGE As Long = vbObjectError + 123
 
-''
-' Relative path from the application in which custom message are stored.
 Private Const MESSAGE_FILE_PATH As String = "/init/messages.txt"
 
-
-''
-'Array of defined messages.
 Private CustomMessages(MESSAGE_COUNT - 1) As String
 
 
@@ -137,17 +133,17 @@ End Sub
 ' @param    index   The message index to retrieve.
 ' @return   The message requested.
 
-Public Property Get Message(ByVal index As Integer) As String
+Public Property Get Message(ByVal Index As Integer) As String
 '***************************************************
 'Author: Juan Martín Sotuyo Dodero (Maraxus)
 'Last Modification: 07/26/07
 'Retrieves the requested message.
 '***************************************************
-    If index < 0 Or index >= MESSAGE_COUNT Then
+    If Index < 0 Or Index >= MESSAGE_COUNT Then
         Exit Property
     End If
     
-    Message = CustomMessages(index)
+    Message = CustomMessages(Index)
 End Property
 
 ''
@@ -156,13 +152,13 @@ End Property
 ' @param    index   The message index to be set.
 ' @param    nValue  The message to be stored.
 
-Public Property Let Message(ByVal index As Integer, ByVal nValue As String)
+Public Property Let Message(ByVal Index As Integer, ByVal nValue As String)
 '***************************************************
 'Author: Juan Martín Sotuyo Dodero (Maraxus)
 'Last Modification: 07/26/07
 'Sets the given message index with the requested message.
 '***************************************************
-    If index < 0 Or index >= MESSAGE_COUNT Then
+    If Index < 0 Or Index >= MESSAGE_COUNT Then
         Exit Property
     End If
     
@@ -171,7 +167,7 @@ Public Property Let Message(ByVal index As Integer, ByVal nValue As String)
         Exit Property
     End If
     
-    CustomMessages(index) = nValue
+    CustomMessages(Index) = nValue
 End Property
 
 ''

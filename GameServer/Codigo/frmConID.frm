@@ -8,7 +8,7 @@ Begin VB.Form frmConID
    LinkTopic       =   "Form1"
    ScaleHeight     =   4440
    ScaleWidth      =   4680
-   StartUpPosition =   3  'Windows Default
+   StartUpPosition =   2  'CenterScreen
    Begin VB.CommandButton Command3 
       Caption         =   "Liberar todos los slots"
       Height          =   390
@@ -53,7 +53,7 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
-'AoshaoServer 0.11.6
+'ImperiumAO 0.11.6
 'Copyright (C) 2002 Márquez Pablo Ignacio
 '
 'This program is free software; you can redistribute it and/or modify
@@ -68,7 +68,7 @@ Attribute VB_Exposed = False
 'You should have received a copy of the Affero General Public License
 'along with this program; if not, you can find it at http://www.affero.org/oagpl.html
 '
-'AoshaoServer is based on Baronsoft's VB6 Online RPG
+'ImperiumAO is based on Baronsoft's VB6 Online RPG
 'You can contact the original creator of ORE at aaron@baronsoft.com
 'for more information about ORE please visit http://www.baronsoft.com/
 '
@@ -91,18 +91,18 @@ Private Sub Command2_Click()
 
 List1.Clear
 
-Dim c As Integer
+Dim C As Integer
 Dim i As Integer
 
 For i = 1 To MaxUsers
     List1.AddItem "UserIndex " & i & " -- " & UserList(i).ConnID
-    If UserList(i).ConnID <> -1 Then c = c + 1
+    If UserList(i).ConnID <> -1 Then C = C + 1
 Next i
 
-If c = MaxUsers Then
+If C = MaxUsers Then
     Label1.Caption = "No hay slots vacios!"
 Else
-    Label1.Caption = "Hay " & MaxUsers - c & " slots vacios!"
+    Label1.Caption = "Hay " & MaxUsers - C & " slots vacios!"
 End If
 
 End Sub

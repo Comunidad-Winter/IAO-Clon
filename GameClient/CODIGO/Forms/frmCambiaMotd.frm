@@ -136,28 +136,39 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
-'**************************************************************
-' frmCambiarMotd.frm
+'************************************************* ****************
+'ImperiumAO - v1.0
+'************************************************* ****************
+'Copyright (C) 2015 Gaston Jorge Martinez
+'Copyright (C) 2015 Alexis Rodriguez
+'Copyright (C) 2015 Luis Merino
+'Copyright (C) 2015 Girardi Luciano Valentin
 '
-'**************************************************************
-
-'**************************************************************************
-'This program is free software; you can redistribute it and/or modify
-'it under the terms of the Affero General Public License;
-'either version 1 of the License, or any later version.
+'Respective portions copyright by taxpayers below.
 '
-'This program is distributed in the hope that it will be useful,
-'but WITHOUT ANY WARRANTY; without even the implied warranty of
-'MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-'Affero General Public License for more details.
+'This library is free software; you can redistribute it and / or
+'Modify it under the terms of the GNU General Public
+'License as published by the Free Software Foundation version 2.1
+'The License
 '
-'You should have received a copy of the Affero General Public License
-'along with this program; if not, you can find it at http://www.affero.org/oagpl.html
-'**************************************************************************
+'This library is distributed in the hope that it will be useful,
+'But WITHOUT ANY WARRANTY; without even the implied warranty
+'MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+'Lesser General Public License for more details.
+'
+'You should have received a copy of the GNU General Public
+'License along with this library; if not, write to the Free Software
+'Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+'************************************************* ****************
+'
+'************************************************* ****************
+'You can contact me at:
+'Gaston Jorge Martinez (Zenitram@Hotmail.com)
+'************************************************* ****************
 
 Option Explicit
 
-Private Sub cmdOk_Click()
+Private Sub cmdOK_Click()
     Dim T() As String
     Dim i As Long, N As Long, Pos As Long
     
@@ -182,7 +193,6 @@ Private Sub cmdOk_Click()
         End If
     Next i
     
-    Call WriteSetMOTD(txtMotd.Text)
     Unload Me
 End Sub
 
@@ -218,3 +228,4 @@ End Sub
 Private Sub cmdMarron_Click()
     txtMotd.Text = txtMotd & "~97~58~31~" & CStr(chkBold.value) & "~" & CStr(chkItalic.value)
 End Sub
+

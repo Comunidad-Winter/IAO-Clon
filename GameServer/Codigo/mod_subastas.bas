@@ -1,183 +1,130 @@
-Attribute VB_Name = "mod_subastas"
+Attribute VB_Name = "Mod_Subastas"
 Option Explicit
- 
-Private Type tSubasta
-    HaySubasta As Boolean
-    OfertadorNombre As String
-    SubastadorNombre As String
-    ObjetoSubastado As obj
-    PujaAnterio As Long
-    PrecioInicial As Long
+Private Const SUBASTAGLD_MAX As Long = 50000000 ' valor maximo wachos puto gs zone manda perros
+Private Const GLD_MIN As Long = 1000
+Private Const MAX_SUBASTAS As Byte = 10 ' Establecemos un valor máximo de subastas.
+Public LastSubasta As Byte
+'Public ObjSubasta() As tSubastas
+Public ObjSubasta As tSubastas
+Private UltimateSlotLibre As Byte
+Type tSubastas
+NombreObj(1 To MAX_SUBASTAS) As String
+Vendedor(1 To MAX_SUBASTAS) As String
+precio(1 To MAX_SUBASTAS) As Long
+ItemIndex(1 To MAX_SUBASTAS) As Integer
+IndexVendedor(1 To MAX_SUBASTAS) As Integer
 End Type
- 
-Private Const NPCSubastas As Byte = 164
-Private Const Duracion_Subasta As Byte = 2
-Private Subasta As tSubasta
-Private SegundosSubasta As Integer
-Private MinutosSubasta As Integer
-Public Sub PasarMinutoSubasta()
-With Subasta
-If .HaySubasta = True Then
-MinutosSubasta = MinutosSubasta + 1
-If SegundosSubasta >= MinutosSubasta Then 'Termino la subasta
-If .PujaAnterio <> 0 Then 'alguien oferto
-Call EntregarObjetoAOfertador
-Call ReniciarSubasta
-Call SendData(SendTarget.ToAll, 0, PrepareMessageConsoleMsg("La subasta finalizo", FontTypeNames.FONTTYPE_INFO))
-Else 'nadie oferto
-Call EntregarObjetoASubastador
-Call ReniciarSubasta
-Call SendData(SendTarget.ToAll, 0, PrepareMessageConsoleMsg("La subasta finalizo", FontTypeNames.FONTTYPE_INFO))
-End If
+Public Sub HandleSubastarObjeto(ByVal UserIndex As Integer, ByVal ObjIndex As Integer, ByVal PrecioObj As Long)
+If ObjIndex <= 0 Then
+Call WriteConsoleMsg(UserIndex, "El objeto es inválido.", FontTypeNames.FONTTYPE_INFO)
+ElseIf EsNewbie(UserIndex) Then
+Call WriteConsoleMsg(UserIndex, "Eres newbie!.", FontTypeNames.FONTTYPE_INFO)
+ElseIf PrecioObj > SUBASTAGLD_MAX Then
+Call WriteConsoleMsg(UserIndex, "El valor máximo de oro para subastar es de " & SUBASTAGLD_MAX & " monedas de oro.", FontTypeNames.FONTTYPE_INFO)
+ElseIf LastSubasta >= MAX_SUBASTAS Then
+Call WriteConsoleMsg(UserIndex, "Ya se estan subastando demaciados objetos!.", FontTypeNames.FONTTYPE_INFO)
+ElseIf UserList(UserIndex).flags.Subastando > 0 Then
+Call WriteConsoleMsg(UserIndex, "¡Ya te encuentras en una subasta!, para hacer otra deberás salir y entrar en el juego.", FontTypeNames.FONTTYPE_INFO)
+ElseIf PrecioObj < GLD_MIN Then
+Call WriteConsoleMsg(UserIndex, "El precio mínimo es de 1.000 monedas de oro.", FontTypeNames.FONTTYPE_INFO)
 Else
-'Call SendData(SendTarget.ToAll, 0, PrepareMessageConsoleMsg("El usuario " & .SubastadorNombre & " esta subastando " & .ObjetoSubastado.Amount & "-" & ObjData(.ObjetoSubastado_ObjIndex).name & " a un precio inicial de " & Subasta.PrecioInicial & ".", FontTypeNames.FONTTYPE_INFO))
-End If
-End If
-End With
-End Sub
- 
-Private Sub EntregarObjetoAOfertador()
- 
-    Dim OfertadorIndex As Integer
-    Dim SubastadorIndex As Integer
- 
-    OfertadorIndex = NameIndex(Subasta.OfertadorNombre)
-    SubastadorIndex = NameIndex(Subasta.SubastadorNombre)
-   
-    If (OfertadorIndex <= 0 And SubastadorIndex <= 0) Then
-        Call LogCriticEvent("Error: Subasta...")
-        Exit Sub
-    End If
-   
-    If (OfertadorIndex <> 0) Then 'Esta conectado el usuario que oferto.
-        If Not MeterItemEnInventario(OfertadorIndex, Subasta.ObjetoSubastado) Then _
-            Call TirarItemAlPiso(UserList(OfertadorIndex).Pos, Subasta.ObjetoSubastado)
-    End If
-   
-    If (SubastadorIndex <> 0) Then 'Esta conectado el usuario que subasto.
-        UserList(SubastadorIndex).Stats.GLD = UserList(SubastadorIndex).Stats.GLD + Subasta.PujaAnterio
-        Call WriteUpdateGold(SubastadorIndex)
-    End If
-   
-End Sub
-Private Sub EntregarObjetoASubastador()
- 
-Dim UserIndex As Integer
- 
-UserIndex = NameIndex(Subasta.SubastadorNombre)
- 
-If (UserIndex <= 0) Then
-'Call LogCriticEvent("No se logro entregar el objeto [" & Subasta.ObjetoSubastado & " cantidad: " & Subasta.ObjetoSubastado.ObjIndex & " a->" & Subasta.SubastadorNombre)
+Dim LastetSubasta As Byte
+If UltimateSlotLibre > 0 Then
+LastetSubasta = UltimateSlotLibre
 Else
-    If Not MeterItemEnInventario(UserIndex, Subasta.ObjetoSubastado) Then _
-         Call TirarItemAlPiso(UserList(UserIndex).Pos, Subasta.ObjetoSubastado)
+LastSubasta = LastSubasta + 1
+LastetSubasta = LastSubasta
 End If
- 
+ObjSubasta.NombreObj(LastetSubasta) = UCase$(ObjData(ObjIndex).name)
+ObjSubasta.precio(LastetSubasta) = PrecioObj
+ObjSubasta.Vendedor(LastetSubasta) = UCase$(UserList(UserIndex).name)
+ObjSubasta.ItemIndex(LastetSubasta) = ObjIndex
+ObjSubasta.IndexVendedor(LastetSubasta) = UserIndex
+UserList(UserIndex).flags.Subastando = 1
+UserList(UserIndex).flags.Index_Subasta = LastetSubasta
+Call QuitarObjetos(ObjIndex, 1, UserIndex)
+PrecioObj = 0
+ObjIndex = 0
+UltimateSlotLibre = 0
+Call SendData(SendTarget.ToAll, 0, PrepareMessageConsoleMsg("Subastas> Un nuevo objeto se agregó al sistema de compra & venta de items. Dirígete al NPC de subastas para obtener más información. Precio del objeto " & ObjSubasta.precio(LastetSubasta) & ".", FontTypeNames.FONTTYPE_INFO))
+End If
 End Sub
-Public Sub Subastar(ByVal UserIndex As Integer, ByVal PrecioInicial As Long)
-   Dim NpcIndex As Integer
-   Dim ObjTile As obj
-   With UserList(UserIndex)
-   NpcIndex = UserList(UserIndex).flags.TargetNPC
-   ObjTile = MapData(.Pos.map, .Pos.X, .Pos.Y).ObjInfo
-   
-   If UserList(UserIndex).flags.Muerto Then
-       Call WriteConsoleMsg(UserIndex, "Estas Muerto", FontTypeNames.FONTTYPE_INFO)
-       Exit Sub
-   End If
-   
-   If NpcIndex = 0 Then
-       Call WriteConsoleMsg(UserIndex, "Tiene que seleccionar al npc subastador", FontTypeNames.FONTTYPE_INFO)
-       Exit Sub
-   End If
-   
-   If Npclist(NpcIndex).NPCtype <> eNPCType.Subastador Then
-       Call WriteConsoleMsg(UserIndex, "El npc seleccionado no es un subastador", FontTypeNames.FONTTYPE_INFO)
-       Exit Sub
-   End If
-   
-   If Subasta.HaySubasta Then
-       Call WriteConsoleMsg(UserIndex, "Hay una subasta actualmente, espere hasta que esta termine", FontTypeNames.FONTTYPE_INFO)
-       Exit Sub
-   End If
-   
-   If ObjTile.ObjIndex = 0 Then
-       Call WriteConsoleMsg(UserIndex, "No hay un item en el piso.", FontTypeNames.FONTTYPE_INFO)
-       Exit Sub
-   End If
-   
-   If PrecioInicial <= 0 Then
-       Call WriteConsoleMsg(UserIndex, "No puede subastar por cantidades negativas", FontTypeNames.FONTTYPE_INFO)
-       Exit Sub
-   End If
-   
-   If Distancia(Npclist(NpcIndex).Pos, UserList(UserIndex).Pos) > 1 Then
-       Call WriteConsoleMsg(UserIndex, "Estas demasiado lejos", FontTypeNames.FONTTYPE_INFO)
-       Exit Sub
-   End If
-   
-   Call IniciarSubasta(UserIndex, PrecioInicial, ObjTile)
-End With
+Public Sub UsuarioDesconectaEnSubasta(ByVal UserIndex As Integer)
+If UserList(UserIndex).flags.Subastando < 1 Then Exit Sub 'JAO ;-)
+Dim i As Integer
+Dim MiObj As Obj
+For i = 1 To LastSubasta
+If UserList(UserIndex).flags.Index_Subasta = i Then
+'JAO ; CON ESTO DEPOSITAMOS EL OBJETO SI NO TIENE LUGAR EN EL INV
+MiObj.amount = 1
+MiObj.ObjIndex = ObjSubasta.ItemIndex(UserList(UserIndex).flags.Index_Subasta)
+If Not MeterItemEnInventario(UserIndex, MiObj) Then
+Call TirarItemAlPiso(UserList(UserIndex).Pos, MiObj) 'si no tiene lugar, que se joda :-)
+End If
+'JAO ; CON ESTO DEPOSITAMOS EL OBJETO SI NO TIENE LUGAR EN EL INV
+UltimateSlotLibre = UserList(UserIndex).flags.Index_Subasta
+ObjSubasta.NombreObj(UserList(UserIndex).flags.Index_Subasta) = "(VACÍO)"
+ObjSubasta.precio(UserList(UserIndex).flags.Index_Subasta) = 0
+ObjSubasta.Vendedor(UserList(UserIndex).flags.Index_Subasta) = ""
+ObjSubasta.ItemIndex(UserList(UserIndex).flags.Index_Subasta) = 0
+ObjSubasta.IndexVendedor(UserList(UserIndex).flags.Index_Subasta) = 0
+UserList(UserIndex).flags.Subastando = 0
+UserList(UserIndex).flags.Index_Subasta = 0
+Call SendData(SendTarget.ToAll, 0, PrepareMessageConsoleMsg("Subastas> La subasta de " & UserList(UserIndex).name & " se suspende por la desconección del mismo.", FontTypeNames.FONTTYPE_INFO))
+End If
+Next i
 End Sub
-Private Sub IniciarSubasta(ByVal UserIndex As Integer, ByVal PrecioInicial As Long, ByRef Objeto As obj)
- 
-With UserList(UserIndex)
- 
-   Call ReniciarSubasta
-   Call EraseObj(10000, .Pos.map, .Pos.X, .Pos.Y)
-   Subasta.HaySubasta = True
-   Subasta.ObjetoSubastado = Objeto
-   Subasta.PrecioInicial = PrecioInicial
-   Subasta.SubastadorNombre = .name
-   Call SendData(SendTarget.ToAll, 0, PrepareMessageConsoleMsg("El usuario " & .name & " esta subastando " & Objeto.Amount & "-" & ObjData(Objeto.ObjIndex).name & " a un precio inicial de " & PrecioInicial & ".", FontTypeNames.FONTTYPE_INFO))
-   Call SendData(SendTarget.ToAll, 0, PrepareMessageConsoleMsg("Escribar /OFERTAR ...", FontTypeNames.FONTTYPE_INFO))
-   
-End With
+Public Sub EnviarSubastaUser(ByVal UserIndex As Integer)
+Dim i As Byte
+'JAO ;-)
+If UserList(UserIndex).flags.TargetNPC = 0 Then
+Call WriteConsoleMsg(UserIndex, "¡Clickea al npc subastador!.", FontTypeNames.FONTTYPE_INFO)
+ElseIf Not Npclist(UserList(UserIndex).flags.TargetNPC).NPCtype = eNPCType.Subastador Then Call WriteConsoleMsg(UserIndex, "¡Clickea al npc subastador!.", FontTypeNames.FONTTYPE_INFO)
+Call WriteConsoleMsg(UserIndex, "¡Clickea al npc subastador!.", FontTypeNames.FONTTYPE_INFO)
+Else
+'JAO ;-)
+For i = 1 To MAX_SUBASTAS
+If ObjSubasta.NombreObj(i) = "" Then
+ObjSubasta.NombreObj(i) = "(VACÍO)"
+ObjSubasta.precio(i) = 0
+ObjSubasta.Vendedor(i) = "> "
+End If
+Call WriteSendSubastas(UserIndex, ObjSubasta.NombreObj(i), ObjSubasta.precio(i), ObjSubasta.Vendedor(i))
+Next i
+End If
 End Sub
-Private Sub ReniciarSubasta()
-   Subasta.HaySubasta = False
-   Subasta.ObjetoSubastado.Amount = 0
-   Subasta.ObjetoSubastado.ObjIndex = 0
-   Subasta.PujaAnterio = 0
-   Subasta.PrecioInicial = 0
-   Subasta.SubastadorNombre = vbNullString
-   Subasta.OfertadorNombre = vbNullString
-   SegundosSubasta = 0
-   MinutosSubasta = 0
+Public Sub ComprarObjetoSubasta(ByVal UserIndex As Integer, ByVal ObjLista As Byte)
+If ObjLista <= 0 Then
+Call WriteConsoleMsg(UserIndex, "Objeto inválido, selecciona uno.", FontTypeNames.FONTTYPE_INFO)
+ElseIf ObjSubasta.ItemIndex(ObjLista) <= 0 Then
+Call WriteConsoleMsg(UserIndex, "Objeto inválido, selecciona uno.", FontTypeNames.FONTTYPE_INFO)
+'ElseIf UserList(userIndex).flags.Subastando > 0 Or ObjSubasta.Vendedor(UserList(userIndex).flags.Index_Subasta) = UCase$(UserList(userIndex).name) Then
+'Call WriteConsoleMsg(userIndex, "No podes comprar un objeto que vos mismo subastaste. Sal y entra del juego para cancelar la subasta.", FontTypeNames.FONTTYPE_INFO)
+ElseIf UserList(UserIndex).Stats.GLD < ObjSubasta.precio(ObjLista) Then
+Call WriteConsoleMsg(UserIndex, "Para comprar éste objeto necesitas " & ObjSubasta.precio(ObjLista) & " monedas de oro.", FontTypeNames.FONTTYPE_INFO)
+ElseIf EsNewbie(UserIndex) Then
+Call WriteConsoleMsg(UserIndex, "¡Los newbies no pueden acceder a las subastas!", FontTypeNames.FONTTYPE_INFO)
+ElseIf ObjSubasta.IndexVendedor(ObjLista) <= 0 Then
+Call WriteConsoleMsg(UserIndex, "El vendedor posee un index inválido, reporte el error a los administradores.", FontTypeNames.FONTTYPE_INFO)
+Else
+Dim MiObj As Obj
+MiObj.amount = 1
+MiObj.ObjIndex = ObjSubasta.ItemIndex(ObjLista)
+If Not MeterItemEnInventario(UserIndex, MiObj) Then
+Call TirarItemAlPiso(UserList(UserIndex).Pos, MiObj)
+End If
+Call WriteConsoleMsg(ObjSubasta.IndexVendedor(ObjLista), "" & UserList(UserIndex).name & " compró tu objeto ha " & ObjSubasta.precio(ObjLista) & " monedas de oro.", FontTypeNames.FONTTYPE_INFO)
+UserList(ObjSubasta.IndexVendedor(ObjLista)).Stats.GLD = UserList(ObjSubasta.IndexVendedor(ObjLista)).Stats.GLD + ObjSubasta.precio(ObjLista)
+Call WriteUpdateUserStats(ObjSubasta.IndexVendedor(ObjLista))
+UserList(UserIndex).Stats.GLD = UserList(UserIndex).Stats.GLD - ObjSubasta.precio(ObjLista)
+Call WriteUpdateUserStats(UserIndex)
+UltimateSlotLibre = ObjLista
+ObjSubasta.IndexVendedor(ObjLista) = 0
+ObjSubasta.ItemIndex(ObjLista) = 0
+ObjSubasta.NombreObj(ObjLista) = ""
+ObjSubasta.precio(ObjLista) = 0
+ObjSubasta.Vendedor(ObjLista) = ""
+Call SendData(SendTarget.ToAll, 0, PrepareMessageConsoleMsg("Subastas> El slot " & val(ObjLista) & " se encuentra disponible.", FontTypeNames.FONTTYPE_INFO))
+ObjLista = 0
+End If
 End Sub
-Public Sub ofertar(UserIndex As Integer, ByVal oferta As Long)
-   With Subasta
-       Dim UserName As String
-       If .HaySubasta = False Then
-           Call WriteConsoleMsg(UserIndex, "¡No hay subastas en este momento!", FontTypeNames.FONTTYPE_INFO)
-           Exit Sub
-       End If
-     
-     
-       If UserList(UserIndex).Stats.GLD < oferta Then
-           Call WriteConsoleMsg(UserIndex, "No tienes esa cantidad", FontTypeNames.FONTTYPE_INFO)
-           Exit Sub
-       End If
-     
-     
-       If oferta <= .PujaAnterio Then
-           Call WriteConsoleMsg(UserIndex, "Tu Oferta debe ser mayor a " & .PujaAnterio & " monedas de oro.", FontTypeNames.FONTTYPE_INFO)
-           Exit Sub
-       End If
-     
-     
-       If .OfertadorNombre <> 0 Then
-           UserList(.SubastadorNombre).Stats.GLD = UserList(Subasta.SubastadorNombre).Stats.GLD - Subasta.SubastadorNombre
-           Call SendUserOROTxtFromChar(Subasta.SubastadorNombre, UserName)
-       End If
-     
-       Call SendData(SendTarget.ToAll, 0, PrepareMessageConsoleMsg("El usuario " & UserList(UserIndex).name & " ha ofertado " & oferta & " monedas de oro.", FontTypeNames.FONTTYPE_INFO))
-       .PujaAnterio = UserIndex
-       .OfertadorNombre = UserIndex
-     
-   End With
-   UserList(UserIndex).Stats.GLD = UserList(UserIndex).Stats.GLD - oferta
-   Call SendUserOROTxtFromChar(UserIndex, UserName)
-End Sub
- 
-

@@ -1,5 +1,5 @@
 Attribute VB_Name = "Matematicas"
-'AoshaoServer 0.11.6
+'ImperiumAO 0.11.6
 'Copyright (C) 2002 Márquez Pablo Ignacio
 '
 'This program is free software; you can redistribute it and/or modify
@@ -14,7 +14,7 @@ Attribute VB_Name = "Matematicas"
 'You should have received a copy of the Affero General Public License
 'along with this program; if not, you can find it at http://www.affero.org/oagpl.html
 '
-'AoshaoServer is based on Baronsoft's VB6 Online RPG
+'ImperiumAO is based on Baronsoft's VB6 Online RPG
 'You can contact the original creator of ORE at aaron@baronsoft.com
 'for more information about ORE please visit http://www.baronsoft.com/
 '
@@ -35,7 +35,7 @@ End Function
 
 Function Distancia(ByRef wp1 As WorldPos, ByRef wp2 As WorldPos) As Long
     'Encuentra la distancia entre dos WorldPos
-    Distancia = Abs(wp1.X - wp2.X) + Abs(wp1.Y - wp2.Y) + (Abs(wp1.map - wp2.map) * 100)
+    Distancia = Abs(wp1.X - wp2.X) + Abs(wp1.Y - wp2.Y) + (Abs(wp1.Map - wp2.Map) * 100)
 End Function
 
 Function Distance(X1 As Variant, Y1 As Variant, X2 As Variant, Y2 As Variant) As Double

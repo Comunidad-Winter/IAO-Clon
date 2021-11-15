@@ -1,8 +1,7 @@
 Attribute VB_Name = "modSistemaComercio"
 '*****************************************************
-'Sistema de Comercio para AoshaoServer
-'Programado por Nacho (Integer)
-'integer-x@hotmail.com
+'Sistema de Comercio para ImperiumAO
+'Programado por Gaston
 '*****************************************************
 
 '**************************************************************************
@@ -44,7 +43,7 @@ Public Sub Comercio(ByVal Modo As eModoComercio, ByVal UserIndex As Integer, ByV
         If Slot > MAX_INVENTORY_SLOTS Then
             Exit Sub
         ElseIf Cantidad > MAX_INVENTORY_OBJS Then
-            Call SendData(SendTarget.ToAll, 0, PrepareMessageConsoleMsg(UserList(UserIndex).name & " ha sido baneado por el sistema anti-cheats.", FontTypeNames.FONTTYPE_FIGHT))
+            Call SendData(SendTarget.toall, 0, PrepareMessageConsoleMsg(UserList(UserIndex).name & " ha sido baneado por el sistema anti-cheats.", FontTypeNames.FONTTYPE_FIGHT))
             Call Ban(UserList(UserIndex).name, "Sistema Anti Cheats", "Intentar hackear el sistema de comercio. Quiso comprar demasiados items:" & Cantidad)
             UserList(UserIndex).flags.Ban = 1
             Call WriteErrorMsg(UserIndex, "Has sido baneado por el Sistema AntiCheat.")

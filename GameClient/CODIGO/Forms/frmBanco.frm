@@ -2,23 +2,24 @@ VERSION 5.00
 Begin VB.Form frmBanco 
    BorderStyle     =   4  'Fixed ToolWindow
    Caption         =   "Operación bancaria"
-   ClientHeight    =   3390
+   ClientHeight    =   3375
    ClientLeft      =   45
-   ClientTop       =   255
+   ClientTop       =   315
    ClientWidth     =   4635
    ControlBox      =   0   'False
+   Icon            =   "frmBanco.frx":0000
    LinkTopic       =   "Form1"
    MaxButton       =   0   'False
    MinButton       =   0   'False
-   ScaleHeight     =   3390
+   ScaleHeight     =   3375
    ScaleWidth      =   4635
    ShowInTaskbar   =   0   'False
    StartUpPosition =   2  'CenterScreen
    Begin VB.ListBox lstBanco 
       Height          =   840
-      ItemData        =   "frmBanco.frx":0000
+      ItemData        =   "frmBanco.frx":8D25A
       Left            =   120
-      List            =   "frmBanco.frx":0010
+      List            =   "frmBanco.frx":8D26A
       TabIndex        =   3
       Top             =   1260
       Width           =   4395
@@ -57,7 +58,7 @@ Begin VB.Form frmBanco
    End
    Begin VB.Label lblInfo 
       BackStyle       =   0  'Transparent
-      Caption         =   $"frmBanco.frx":0072
+      Caption         =   $"frmBanco.frx":8D2CC
       BeginProperty Font 
          Name            =   "Tahoma"
          Size            =   9.75
@@ -87,62 +88,57 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
+    'Eternal AO 1.3
+'
+'Copyright (C) 2014 - Saurus - Eternal AO
+'
+'frmBanco - Eternal AO 1.3 !
+
 Private Sub cmdClose_Click()
 Call WriteBankEnd
-    Unload Me
+Unload Me
 End Sub
-
-Private Sub cmdOk_Click()
+Private Sub cmdOK_Click()
 Select Case lstBanco.ListIndex
 
     Case 0 'depositar oro
     
         'Si es negativo o cero jodete por pobre xD
-        If Val(txtDatos.text) <= 0 Then
+        If Val(txtDatos.Text) <= 0 Then
             lblDatos.Caption = "Cantidad inválida."
             Exit Sub
         End If
         
-        If Val(txtDatos.text) > UserGLD Then
+        If Val(txtDatos.Text) > UserGLD Then
             lblDatos.Caption = "No tienes esa cantidad. Escríbela nuevamente."
             Exit Sub
         Else
-            Call ParseUserCommand("/DEPOSITAR " & Val(txtDatos.text))
-            lblInfo.Caption = "Bienvenido a la cadena de finanzas Goliath. Tienes " & UserGLD & " monedas de oro en tu billetera y en tu cuenta tienes " & OB & " Monedas de oro. y " & UserBOVItem & "item en tu Boveda ¿Cómo te puedo ayudar?"
+            Call ParseUserCommand("/DEPOSITAR " & Val(txtDatos.Text))
+            lblInfo.Caption = "Bienvenido a la cadena de finanzas Goliath. Tienes " & UserGLD & " monedas de oro en tu billetera y en tu cuenta tienes " & UserGLDBOV & " Monedas de oro. y " & UserBOVItem & "item en tu Boveda ¿Cómo te puedo ayudar?"
          End If
-        Call WriteBankEnd
+        
     Case 1 'Retirar
     
         'Si es negativo o cero jodete por pobre xD
-        If Val(txtDatos.text) <= 0 Then
+        If Val(txtDatos.Text) <= 0 Then
             lblDatos.Caption = "Cantidad inválida."
             Exit Sub
         End If
         
-        Call ParseUserCommand("/RETIRAR " & Val(txtDatos.text))
-         Call Audio.PlayWave(SND_RETIRAR)
-            lblInfo.Caption = "Bienvenido a la cadena de finanzas Goliath. Tienes " & OB & " monedas de oro en tu billetera y en tu cuenta tienes " & UserGLD & " Monedas de oro. y " & UserBOVItem & "item en tu Boveda ¿Cómo te puedo ayudar?"
-Call WriteBankEnd
-frmBancoObj.List1(0).Clear
-frmBancoObj.List1(1).Clear
-Case 2 'ver la Boveda
-'Call ParseUserCommand("/Boveda")
+        Call ParseUserCommand("/RETIRARORO " & Val(txtDatos.Text))
+            lblInfo.Caption = "Bienvenido a la cadena de finanzas Goliath. Tienes " & UserGLD & " monedas de oro en tu billetera y en tu cuenta tienes " & UserGLDBOV & " Monedas de oro. y " & UserBOVItem & "item en tu Boveda ¿Cómo te puedo ayudar?"
 
-
-'Unload Me
-
-    Case 3 'trasferir oro
+        
+    Case 2 'trasferir oro
     On Local Error GoTo Error
         Dim Usuario As String
         Dim cantidad As String
         
-        lblDatos.Caption = "Precione Aceptar."
-        
             Usuario = InputBox("Usuario al que desea Transferir:", "")
-            cantidad = InputBox("Cantidad que desea transferir:", "")
+                cantidad = InputBox("Cantidad que desea transferir:", "")
                 
             If MsgBox("Estas seguro que deseas transferirle " & cantidad & " al usuario " & Usuario, vbYesNo) = vbYes Then
-                Call ParseUserCommand("/DARORO " & Usuario & "@" & cantidad)
+                Call ParseUserCommand("/CAXOXO " & Usuario & " " & cantidad)
             Else
                 Exit Sub
             End If
@@ -153,14 +149,9 @@ End Select
 
 End Sub
 
-Private Sub Command1_Click()
-'frmBancoObj.Show , frmMain
-End Sub
 Private Sub Form_Load()
-    lblInfo.Caption = "Bienvenido a la cadena de finanzas Goliath. Tienes " & UserGLD & " monedas de oro en tu billetera y en tu cuenta tienes " & OB & " Monedas de oro. y " & UserBOVItem & " items en tu Boveda. ¿Cómo te puedo ayudar?"
-Call Make_Transparent_Form(Me.hWnd, 210)
+    lblInfo.Caption = "Bienvenido a la cadena de finanzas Goliath. Tienes " & UserGLD & " monedas de oro en tu billetera y en tu cuenta tienes " & UserGLDBOV & " Monedas de oro. y " & UserBOVItem & " items en tu Boveda. ¿Cómo te puedo ayudar?"
 End Sub
-
 
 Private Sub lstBanco_Click()
 
@@ -172,15 +163,11 @@ Select Case lstBanco.ListIndex
         lblDatos.Caption = "¿Cuánto deseas retirar?"
         txtDatos.Visible = True
     Case 2 'ver la Boveda
-    lblDatos.Caption = ""
-        frmBancoObj.Show , frmMain
-        'txtDatos.Visible = False
-        Unload Me
+        frmBancoObj.Show
     Case 3 'Transferir oro
-        lblDatos.Caption = "Preciona Aceptar."
+        lblDatos.Caption = "Reparacion"
         txtDatos.Visible = False
 End Select
 
 End Sub
-
 

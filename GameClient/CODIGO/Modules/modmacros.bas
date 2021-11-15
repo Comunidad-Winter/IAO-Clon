@@ -8,7 +8,7 @@ End Enum
  
 Public Type tMacros
     mTipe As Byte
-    Grh As Long
+    Grh As Integer
     Nombre As String
     slot As Byte
     OBJIndex As Integer
@@ -44,7 +44,16 @@ Public Sub LoadMacros(ByVal Nombre As String)
                 .OBJIndex = 0
             End With
          Next i
-          
+            With MacroList(12)
+                 .Nombre = "/salir"
+                 .Grh = 538
+                 .mTipe = eMacros.aComando
+            End With
+            With MacroList(11)
+                 .Nombre = "/meditar"
+                 .Grh = 538
+                 .mTipe = eMacros.aComando
+            End With
             Call SaveMacros(Nombre)
     End If
 End Sub
@@ -161,7 +170,10 @@ Public Sub UsarMacro(ByVal Index As Byte)
             Exit Sub
         End If
         slot = CheckMacrosSpells(MacroList(Index).SpellSlot, MacroList(Index).Nombre, Index)
-        If slot < 0 Then Exit Sub
+        If slot < 0 Then
+            Call MsgBox("Macro Invalido,Asigne una accion para el macro", vbCritical + vbOKOnly)
+            Exit Sub
+        End If
         Call WriteCastSpell(slot + 1)
         Call WriteWork(eSkill.Magia)
         UsaMacro = True
@@ -196,9 +208,8 @@ Public Sub UsarMacro(ByVal Index As Byte)
     If LenB(MacroList(Index).Nombre) > 0 Then _
     Call ParseUserCommand(MacroList(Index).Nombre)
     Case Else
-        Exit Sub
+        Call MsgBox("Macro Invalido,Asigne una accion para el macro", vbCritical + vbOKOnly)
     End Select
  
 End Sub
-
 

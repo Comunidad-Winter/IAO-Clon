@@ -1,0 +1,44 @@
+[INIT]
+NumObjs=14
+
+[OBJ1] 'Cuchara
+Index=163
+
+[OBJ2] 'Flecha
+Index=480
+
+[OBJ3] 'Flecha +1
+Index=551
+
+[OBJ4] 'Flecha +2
+Index=552
+
+[OBJ5] 'Flecha +3
+Index=553
+
+[OBJ6] 'Arco simple
+Index=989
+
+[OBJ7] 'Flauta
+Index=540
+
+[OBJ8] 'Tambor
+Index=362
+
+[OBJ9] 'Silla Izquierda
+Index=162
+
+[OBJ10] 'Barca
+Index=474
+
+[OBJ11] 'Galera
+Index=475
+
+[OBJ12] 'Galeón
+Index=476
+
+[OBJ13] 'Silla Derecha
+Index=168
+
+[OBJ14] 'Sillón
+Index=167

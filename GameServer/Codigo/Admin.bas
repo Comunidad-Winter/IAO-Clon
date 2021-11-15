@@ -1,5 +1,5 @@
 Attribute VB_Name = "Admin"
-'AoshaoServer 0.11.6
+'ImperiumAO 0.11.6
 'Copyright (C) 2002 Márquez Pablo Ignacio
 '
 'This program is free software; you can redistribute it and/or modify
@@ -14,7 +14,7 @@ Attribute VB_Name = "Admin"
 'You should have received a copy of the Affero General Public License
 'along with this program; if not, you can find it at http://www.affero.org/oagpl.html
 '
-'AoshaoServer is based on Baronsoft's VB6 Online RPG
+'ImperiumAO is based on Baronsoft's VB6 Online RPG
 'You can contact the original creator of ORE at aaron@baronsoft.com
 'for more information about ORE please visit http://www.baronsoft.com/
 '
@@ -28,14 +28,6 @@ Attribute VB_Name = "Admin"
 'Pablo Ignacio Márquez
 
 Option Explicit
-
-Public Type tMotd
-    texto As String
-    Formato As String
-End Type
-
-Public MaxLines As Integer
-Public MOTD() As tMotd
 
 Public Type tAPuestas
     Ganancias As Long
@@ -64,7 +56,6 @@ Public StaminaIntervaloDescansar As Integer
 Public IntervaloSed As Integer
 Public IntervaloHambre As Integer
 Public IntervaloVeneno As Integer
-Public intervaloIncinera As Integer
 Public IntervaloParalizado As Integer
 Public IntervaloInvisible As Integer
 Public IntervaloFrio As Integer
@@ -95,7 +86,7 @@ Public MAXPASOS As Long
 
 Public BootDelBackUp As Byte
 Public Lloviendo As Boolean
-
+Public DeNoche As Boolean
 
 Public IpList As New Collection
 Public ClientsCommandsQueue As Byte
@@ -143,7 +134,7 @@ For i = 1 To LastNPC
    'OJO
    If Npclist(i).flags.NPCActive Then
         
-        If InMapBounds(Npclist(i).Orig.map, Npclist(i).Orig.X, Npclist(i).Orig.Y) And Npclist(i).Numero = Guardias Then
+        If InMapBounds(Npclist(i).Orig.Map, Npclist(i).Orig.X, Npclist(i).Orig.Y) And Npclist(i).Numero = Guardias Then
                 MiNPC = Npclist(i)
                 Call QuitarNPC(i)
                 Call ReSpawnNpc(MiNPC)
@@ -166,7 +157,7 @@ On Error Resume Next
 Dim loopX As Integer
 Dim Porc As Long
 
-Call SendData(SendTarget.ToAll, 0, PrepareMessageConsoleMsg("Servidor> Iniciando WorldSave", FontTypeNames.FONTTYPE_SERVER))
+Call SendData(SendTarget.toall, 0, PrepareMessageConsoleMsg("Servidor> Iniciando WorldSave", FontTypeNames.FONTTYPE_SERVER))
 
 #If SeguridadAlkon Then
     Encriptacion.StringValidacion = Encriptacion.ArmarStringValidacion
@@ -189,7 +180,7 @@ For loopX = 1 To NumMaps
     
     If MapInfo(loopX).BackUp = 1 Then
     
-            Call GrabarMapa(loopX, App.Path & "\WorldBackUp\Mapa" & loopX)
+            Call GrabarMapa(loopX, App.Path & "\Data\WorldBackUp\Mapa" & loopX)
             FrmStat.ProgressBar1.value = FrmStat.ProgressBar1.value + 1
     End If
 
@@ -206,7 +197,7 @@ For loopX = 1 To LastNPC
     End If
 Next
 
-Call SendData(SendTarget.ToAll, 0, PrepareMessageConsoleMsg("Servidor> WorldSave ha concluído", FontTypeNames.FONTTYPE_SERVER))
+Call SendData(SendTarget.toall, 0, PrepareMessageConsoleMsg("Servidor> WorldSave ha concluído", FontTypeNames.FONTTYPE_SERVER))
 
 End Sub
 
@@ -220,7 +211,7 @@ Public Sub PurgarPenas()
                 
                 If UserList(i).Counters.Pena < 1 Then
                     UserList(i).Counters.Pena = 0
-                    Call WarpUserChar(i, Libertad.map, Libertad.X, Libertad.Y, True)
+                    Call WarpUserChar(i, Libertad.Map, Libertad.X, Libertad.Y, True)
                     Call WriteConsoleMsg(i, "Has sido liberado!", FontTypeNames.FONTTYPE_INFO)
                     
                     Call FlushBuffer(i)
@@ -231,17 +222,17 @@ Public Sub PurgarPenas()
 End Sub
 
 
-Public Sub Encarcelar(ByVal UserIndex As Integer, ByVal minutos As Long, Optional ByVal GmName As String = vbNullString)
+Public Sub Encarcelar(ByVal UserIndex As Integer, ByVal Minutos As Long, Optional ByVal GmName As String = vbNullString)
         
-        UserList(UserIndex).Counters.Pena = minutos
+        UserList(UserIndex).Counters.Pena = Minutos
        
         
-        Call WarpUserChar(UserIndex, Prision.map, Prision.X, Prision.Y, True)
+        Call WarpUserChar(UserIndex, Prision.Map, Prision.X, Prision.Y, True)
         
         If LenB(GmName) = 0 Then
-            Call WriteConsoleMsg(UserIndex, "Has sido encarcelado, deberas permanecer en la carcel " & minutos & " minutos.", FontTypeNames.FONTTYPE_INFO)
+            Call WriteConsoleMsg(UserIndex, "Has sido encarcelado, deberas permanecer en la carcel " & Minutos & " minutos.", FontTypeNames.FONTTYPE_INFO)
         Else
-            Call WriteConsoleMsg(UserIndex, GmName & " te ha encarcelado, deberas permanecer en la carcel " & minutos & " minutos.", FontTypeNames.FONTTYPE_INFO)
+            Call WriteConsoleMsg(UserIndex, GmName & " te ha encarcelado, deberas permanecer en la carcel " & Minutos & " minutos.", FontTypeNames.FONTTYPE_INFO)
         End If
         
 End Sub
@@ -249,30 +240,31 @@ End Sub
 
 Public Sub BorrarUsuario(ByVal UserName As String)
 On Error Resume Next
-If FileExist(CharPath & UCase$(UserName) & ".chr", vbNormal) Then
-    Kill CharPath & UCase$(UserName) & ".chr"
+If FileExist(CharPath & UCase$(UserName) & ".pjs", vbNormal) Then
+    Kill CharPath & UCase$(UserName) & ".pjs"
 End If
 End Sub
 
 Public Function BANCheck(ByVal name As String) As Boolean
 
-BANCheck = (val(GetVar(App.Path & "\charfile\" & name & ".chr", "FLAGS", "Ban")) = 1)
+BANCheck = (val(GetVar(App.Path & "\Data\Characters Created\" & name & ".pjs", "FLAGS", "Ban")) = 1)
 
 End Function
 
 Public Function PersonajeExiste(ByVal name As String) As Boolean
 
-PersonajeExiste = FileExist(CharPath & UCase$(name) & ".chr", vbNormal)
+PersonajeExiste = FileExist(CharPath & UCase$(name) & ".pjs", vbNormal)
 
 End Function
 
 Public Function UnBan(ByVal name As String) As Boolean
 'Unban the character
-Call WriteVar(App.Path & "\charfile\" & name & ".chr", "FLAGS", "Ban", "0")
+Call WriteVar(App.Path & "\Data\Characters Created\" & name & ".pjs", "FLAGS", "Ban", "0")
+
 
 'Remove it from the banned people database
-Call WriteVar(App.Path & "\logs\" & "BanDetail.dat", name, "BannedBy", "NOBODY")
-Call WriteVar(App.Path & "\logs\" & "BanDetail.dat", name, "Reason", "NO REASON")
+Call WriteVar(App.Path & "\Data\Files logs\" & "BanDetail.dat", name, "BannedBy", "NOBODY")
+Call WriteVar(App.Path & "\Data\Files logs\" & "BanDetail.dat", name, "Reason", "NO REASON")
 End Function
 
 Public Function MD5ok(ByVal md5formateado As String) As Boolean
@@ -295,12 +287,12 @@ End Function
 Public Sub MD5sCarga()
 Dim LoopC As Integer
 
-MD5ClientesActivado = val(GetVar(IniPath & "Server.ini", "MD5Hush", "Activado"))
+MD5ClientesActivado = val(GetVar(IniPath & "IMPAOSV.ini", "MD5Hush", "Activado"))
 
 If MD5ClientesActivado = 1 Then
-    ReDim MD5s(val(GetVar(IniPath & "Server.ini", "MD5Hush", "MD5Aceptados")))
+    ReDim MD5s(val(GetVar(IniPath & "IMPAOSV.ini", "MD5Hush", "MD5Aceptados")))
     For LoopC = 0 To UBound(MD5s)
-        MD5s(LoopC) = GetVar(IniPath & "Server.ini", "MD5Hush", "MD5Aceptado" & (LoopC + 1))
+        MD5s(LoopC) = GetVar(IniPath & "IMPAOSV.ini", "MD5Hush", "MD5Aceptado" & (LoopC + 1))
         MD5s(LoopC) = txtOffset(hexMd52Asc(MD5s(LoopC)), 55)
     Next LoopC
 End If
@@ -320,7 +312,7 @@ Dim LoopC As Long
 Dale = True
 LoopC = 1
 Do While LoopC <= BanIps.count And Dale
-    Dale = (BanIps.item(LoopC) <> ip)
+    Dale = (BanIps.Item(LoopC) <> ip)
     LoopC = LoopC + 1
 Loop
 
@@ -353,13 +345,13 @@ Dim ArchivoBanIp As String
 Dim ArchN As Long
 Dim LoopC As Long
 
-ArchivoBanIp = App.Path & "\Dat\BanIps.dat"
+ArchivoBanIp = App.Path & "\Data\Files dat\BanIps.dat"
 
 ArchN = FreeFile()
 Open ArchivoBanIp For Output As #ArchN
 
 For LoopC = 1 To BanIps.count
-    Print #ArchN, BanIps.item(LoopC)
+    Print #ArchN, BanIps.Item(LoopC)
 Next LoopC
 
 Close #ArchN
@@ -371,7 +363,7 @@ Dim ArchN As Long
 Dim Tmp As String
 Dim ArchivoBanIp As String
 
-ArchivoBanIp = App.Path & "\Dat\BanIps.dat"
+ArchivoBanIp = App.Path & "\Data\Files dat\BanIps.dat"
 
 Do While BanIps.count > 0
     BanIps.Remove 1
@@ -485,24 +477,24 @@ Public Sub BanCharacter(ByVal bannerUserIndex As Integer, ByVal UserName As Stri
         If tUser <= 0 Then
             Call WriteConsoleMsg(bannerUserIndex, "El usuario no esta online.", FontTypeNames.FONTTYPE_TALK)
             
-            If FileExist(CharPath & UserName & ".chr", vbNormal) Then
+            If FileExist(CharPath & UserName & ".pjs", vbNormal) Then
                 userPriv = UserDarPrivilegioLevel(UserName)
                 
                 If (userPriv And rank) > (.flags.Privilegios And rank) Then
                     Call WriteConsoleMsg(bannerUserIndex, "No podes banear a al alguien de mayor jerarquia.", FontTypeNames.FONTTYPE_INFO)
                 Else
-                    If GetVar(CharPath & UserName & ".chr", "FLAGS", "Ban") <> "0" Then
+                    If GetVar(CharPath & UserName & ".pjs", "FLAGS", "Ban") <> "0" Then
                         Call WriteConsoleMsg(bannerUserIndex, "El personaje ya se encuentra baneado.", FontTypeNames.FONTTYPE_INFO)
                     Else
                         Call LogBanFromName(UserName, bannerUserIndex, reason)
                         Call SendData(SendTarget.ToAdmins, 0, PrepareMessageConsoleMsg("Servidor> " & .name & " ha baneado a " & UserName & ".", FontTypeNames.FONTTYPE_SERVER))
                         
                         'ponemos el flag de ban a 1
-                        Call WriteVar(CharPath & UserName & ".chr", "FLAGS", "Ban", "1")
+                        Call WriteVar(CharPath & UserName & ".pjs", "FLAGS", "Ban", "1")
                         'ponemos la pena
-                        cantPenas = val(GetVar(CharPath & UserName & ".chr", "PENAS", "Cant"))
-                        Call WriteVar(CharPath & UserName & ".chr", "PENAS", "Cant", cantPenas + 1)
-                        Call WriteVar(CharPath & UserName & ".chr", "PENAS", "P" & cantPenas + 1, LCase$(.name) & ": BAN POR " & LCase$(reason) & " " & Date & " " & time)
+                        cantPenas = val(GetVar(CharPath & UserName & ".pjs", "PENAS", "Cant"))
+                        Call WriteVar(CharPath & UserName & ".pjs", "PENAS", "Cant", cantPenas + 1)
+                        Call WriteVar(CharPath & UserName & ".pjs", "PENAS", "P" & cantPenas + 1, LCase$(.name) & ": BAN POR " & LCase$(reason) & " " & Date & " " & time)
                         
                         If (userPriv And rank) = (.flags.Privilegios And rank) Then
                             .flags.Ban = 1
@@ -536,11 +528,11 @@ Public Sub BanCharacter(ByVal bannerUserIndex As Integer, ByVal UserName As Stri
             Call LogGM(.name, "BAN a " & UserName)
             
             'ponemos el flag de ban a 1
-            Call WriteVar(CharPath & UserName & ".chr", "FLAGS", "Ban", "1")
+            Call WriteVar(CharPath & UserName & ".pjs", "FLAGS", "Ban", "1")
             'ponemos la pena
-            cantPenas = val(GetVar(CharPath & UserName & ".chr", "PENAS", "Cant"))
-            Call WriteVar(CharPath & UserName & ".chr", "PENAS", "Cant", cantPenas + 1)
-            Call WriteVar(CharPath & UserName & ".chr", "PENAS", "P" & cantPenas + 1, LCase$(.name) & ": BAN POR " & LCase$(reason) & " " & Date & " " & time)
+            cantPenas = val(GetVar(CharPath & UserName & ".pjs", "PENAS", "Cant"))
+            Call WriteVar(CharPath & UserName & ".pjs", "PENAS", "Cant", cantPenas + 1)
+            Call WriteVar(CharPath & UserName & ".pjs", "PENAS", "P" & cantPenas + 1, LCase$(.name) & ": BAN POR " & LCase$(reason) & " " & Date & " " & time)
             
             Call CloseSocket(tUser)
         End If

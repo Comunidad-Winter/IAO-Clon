@@ -1,5 +1,5 @@
 Attribute VB_Name = "modHexaStrings"
-'AoshaoServer 0.11.6
+'ImperiumAO 0.11.6
 '
 'Copyright (C) 2002 Márquez Pablo Ignacio
 'Copyright (C) 2002 Otto Perez
@@ -17,7 +17,7 @@ Attribute VB_Name = "modHexaStrings"
 'You should have received a copy of the Affero General Public License
 'along with this program; if not, you can find it at http://www.affero.org/oagpl.html
 '
-'AoshaoServer is based on Baronsoft's VB6 Online RPG
+'ImperiumAO is based on Baronsoft's VB6 Online RPG
 'You can contact the original creator of ORE at aaron@baronsoft.com
 'for more information about ORE please visit http://www.baronsoft.com/
 '

@@ -177,6 +177,36 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
+'************************************************* ****************
+'ImperiumAO - v1.0
+'************************************************* ****************
+'Copyright (C) 2015 Gaston Jorge Martinez
+'Copyright (C) 2015 Alexis Rodriguez
+'Copyright (C) 2015 Luis Merino
+'Copyright (C) 2015 Girardi Luciano Valentin
+'
+'Respective portions copyright by taxpayers below.
+'
+'This library is free software; you can redistribute it and / or
+'Modify it under the terms of the GNU General Public
+'License as published by the Free Software Foundation version 2.1
+'The License
+'
+'This library is distributed in the hope that it will be useful,
+'But WITHOUT ANY WARRANTY; without even the implied warranty
+'MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+'Lesser General Public License for more details.
+'
+'You should have received a copy of the GNU General Public
+'License along with this library; if not, write to the Free Software
+'Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+'************************************************* ****************
+'
+'************************************************* ****************
+'You can contact me at:
+'Gaston Jorge Martinez (Zenitram@Hotmail.com)
+'************************************************* ****************
+
 Option Explicit
 
 Public LastIndex1 As Integer
@@ -184,7 +214,7 @@ Public LastIndex2 As Integer
 Public LasActionBuy As Boolean
 Private lIndex As Byte
 
-Private Sub Cantidad_Change()
+Private Sub cantidad_Change()
     If Val(Cantidad.Text) < 1 Then
         Cantidad.Text = 1
     End If
@@ -208,34 +238,34 @@ If (KeyAscii <> 8) Then
 End If
 End Sub
 
-Private Sub cmdMasMenos_MouseDown(Index As Integer, Button As Integer, Shift As Integer, x As Single, y As Single)
+Private Sub cmdMasMenos_MouseDown(Index As Integer, Button As Integer, Shift As Integer, X As Single, Y As Single)
 
 Call Audio.PlayWave(SND_CLICK)
 
 Select Case Index
     Case 0
-        cmdMasMenos(Index).Picture = LoadPicture(App.path & "\Recursos\Interface\menos-down.jpg")
+        cmdMasMenos(Index).Picture = LoadPicture(App.path & "\Resources\Interface\menos-down.jpg")
         cmdMasMenos(Index).Tag = "1"
         Cantidad.Text = Val(Cantidad.Text - 1)
     Case 1
-        cmdMasMenos(Index).Picture = LoadPicture(App.path & "\Recursos\Interface\mas-down.jpg")
+        cmdMasMenos(Index).Picture = LoadPicture(App.path & "\Resources\Interface\mas-down.jpg")
         cmdMasMenos(Index).Tag = "1"
         Cantidad.Text = Val(Cantidad.Text + 1)
 End Select
 
 End Sub
 
-Private Sub cmdMasMenos_MouseMove(Index As Integer, Button As Integer, Shift As Integer, x As Single, y As Single)
+Private Sub cmdMasMenos_MouseMove(Index As Integer, Button As Integer, Shift As Integer, X As Single, Y As Single)
 
 Select Case Index
     Case 0
         If cmdMasMenos(Index).Tag = "0" Then
-            cmdMasMenos(Index).Picture = LoadPicture(App.path & "\Recursos\Interface\menos-over.jpg")
+            cmdMasMenos(Index).Picture = LoadPicture(App.path & "\Resources\Interface\menos-over.jpg")
             cmdMasMenos(Index).Tag = "1"
         End If
     Case 1
         If cmdMasMenos(Index).Tag = "0" Then
-            cmdMasMenos(Index).Picture = LoadPicture(App.path & "\Recursos\Interface\mas-over.jpg")
+            cmdMasMenos(Index).Picture = LoadPicture(App.path & "\Resources\Interface\mas-over.jpg")
             cmdMasMenos(Index).Tag = "1"
         End If
 End Select
@@ -248,17 +278,17 @@ End Sub
 
 Private Sub Form_Load()
 'Cargamos la interfase
-Me.Picture = LoadPicture(App.path & "\Recursos\Interface\comercio.jpg")
+Me.Picture = LoadPicture(App.path & "\Resources\Interface\comercio.jpg")
 
 End Sub
 
-Private Sub Form_MouseMove(Button As Integer, Shift As Integer, x As Single, y As Single)
+Private Sub Form_MouseMove(Button As Integer, Shift As Integer, X As Single, Y As Single)
 If Image1(0).Tag = 0 Then
-    Image1(0).Picture = LoadPicture(App.path & "\Recursos\Graficos\BotónComprar.jpg")
+    Image1(0).Picture = LoadPicture(App.path & "\Resources\graphics\BotónComprar.jpg")
     Image1(0).Tag = 1
 End If
 If Image1(1).Tag = 0 Then
-    Image1(1).Picture = LoadPicture(App.path & "\Recursos\Graficos\Botónvender.jpg")
+    Image1(1).Picture = LoadPicture(App.path & "\Resources\graphics\Botónvender.jpg")
     Image1(1).Tag = 1
 End If
 End Sub
@@ -313,7 +343,7 @@ Select Case Index
         
         Label1(0).Caption = NPCInventory(List1(0).ListIndex + 1).name
         Label1(1).Caption = Round(NPCInventory(List1(0).ListIndex + 1).Valor * Val(Cantidad.Text), 0) 'No mostramos numeros reales
-        Label1(2).Caption = NPCInventory(List1(0).ListIndex + 1).amount
+        Label1(2).Caption = NPCInventory(List1(0).ListIndex + 1).Amount
         
         If Label1(2).Caption <> 0 Then
         
@@ -335,7 +365,7 @@ Select Case Index
     Case 1
         Label1(0).Caption = Inventario.ItemName(List1(1).ListIndex + 1)
         Label1(1).Caption = Round(Inventario.Valor(List1(1).ListIndex + 1) * Val(Cantidad.Text), 0) 'No mostramos numeros reales
-        Label1(2).Caption = Inventario.amount(List1(1).ListIndex + 1)
+        Label1(2).Caption = Inventario.Amount(List1(1).ListIndex + 1)
         
         If Label1(2).Caption <> 0 Then
         
@@ -369,13 +399,14 @@ End Sub
 '<-------------------------NUEVO-------------------------->
 '<-------------------------NUEVO-------------------------->
 '<-------------------------NUEVO-------------------------->
-Private Sub List1_MouseMove(Index As Integer, Button As Integer, Shift As Integer, x As Single, y As Single)
+Private Sub List1_MouseMove(Index As Integer, Button As Integer, Shift As Integer, X As Single, Y As Single)
 If Image1(0).Tag = 0 Then
-    Image1(0).Picture = LoadPicture(App.path & "\Recursos\Graficos\BotónComprar.jpg")
+    Image1(0).Picture = LoadPicture(App.path & "\Resources\graphics\BotónComprar.jpg")
     Image1(0).Tag = 1
 End If
 If Image1(1).Tag = 0 Then
-    Image1(1).Picture = LoadPicture(App.path & "\Recursos\Graficos\Botónvender.jpg")
+    Image1(1).Picture = LoadPicture(App.path & "\Resources\graphics\Botónvender.jpg")
     Image1(1).Tag = 1
 End If
 End Sub
+

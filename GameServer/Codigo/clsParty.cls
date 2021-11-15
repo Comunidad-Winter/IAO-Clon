@@ -11,6 +11,25 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
+'**************************************************************
+' clsParty.cls
+'
+'**************************************************************
+
+'**************************************************************************
+'This program is free software; you can redistribute it and/or modify
+'it under the terms of the Affero General Public License;
+'either version 1 of the License, or any later version.
+'
+'This program is distributed in the hope that it will be useful,
+'but WITHOUT ANY WARRANTY; without even the implied warranty of
+'MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+'Affero General Public License for more details.
+'
+'You should have received a copy of the Affero General Public License
+'along with this program; if not, you can find it at http://www.affero.org/oagpl.html
+'**************************************************************************
+
 Option Explicit
 
 Private p_members(1 To PARTY_MAXMEMBERS) As tPartyMember
@@ -26,9 +45,19 @@ Private p_CantMiembros As Integer
 'cantidad de miembros
 
 Private p_SumaNivelesElevados As Single
+'suma de todos los niveles elevados a la ExponenteNivelParty > Esta variable se usa para calcular la experiencia repartida en la Party.
 
+'datos en los pjs: | indexParty(indice en p_members), partyLeader(userindex del lider) |
+
+'Constructor de clase
 Public Sub Class_Initialize()
-
+'***************************************************
+'Author: Unknown
+'Last Modification: 07/04/08
+'Last Modification By: Marco Vanotti (MarKoxX)
+' - 09/29/07 p_SumaNiveles added (Tavo)
+' - 07/04/08 p_SumaNiveles changed to p_SumaNivelesElevados (MarKoxX)
+'***************************************************
     p_expTotal = 0
     p_CantMiembros = 0
     p_SumaNivelesElevados = 0
@@ -38,19 +67,18 @@ End Sub
 Public Sub Class_Terminate()
 End Sub
 
-Public Sub UpdateSumaNivelesElevados(ByVal Lvl As Integer)
-'*************************************************
-'Author: Marco Vanotti (MarKoxX)
-'Last modified: 11/24/09
-'11/24/09: Pato - Change the exponent to a variable with the exponent
-'*************************************************
-    p_SumaNivelesElevados = p_SumaNivelesElevados - ((Lvl - 1) ^ ExponenteNivelParty) + Lvl ^ ExponenteNivelParty
-End Sub
 
 Public Function MiExperiencia(ByVal UserIndex As Integer) As Long
-
+'***************************************************
+'Author: Unknown
+'Last Modification: 09/29/07
+'Last Modification By: Lucas Tavolaro Ortiz (Tavo)
+' - 09/29/07 Experience is round to the biggest number less than that number
+' - 09/29/07 Now experience is a real-number
+'***************************************************
+'Me dice cuanta experiencia tengo colectada ya en la party
 Dim i As Integer
-i = 1
+i = 0
 
 While i <= PARTY_MAXMEMBERS And p_members(i).UserIndex <> UserIndex
     i = i + 1
@@ -65,7 +93,17 @@ End If
 End Function
 
 Public Sub ObtenerExito(ByVal ExpGanada As Long, ByVal mapa As Integer, X As Integer, Y As Integer)
-
+'***************************************************
+'Author: Unknown
+'Last Modification: 07/04/08
+'Last Modification By: Marco Vanotti (MarKoxX)
+' - 09/29/07 New formula for calculating the experience point of each user
+' - 09/29/07 Experience is round to the biggest number less than that number
+' - 09/29/07 Now experience is a real-number
+' - 04/04/08 Ahora antes de calcular la experiencia a X usuario se fija si ese usuario existe (MarKoxX)
+' - 07/04/08 New formula to calculate Experience for each user. (MarKoxX)
+'***************************************************
+'Se produjo un evento que da experiencia en la wp referenciada
 Dim i As Integer
 Dim UI As Integer
 Dim expThisUser As Double
@@ -75,9 +113,10 @@ p_expTotal = p_expTotal + ExpGanada
 For i = 1 To PARTY_MAXMEMBERS
     UI = p_members(i).UserIndex
     If UI > 0 Then
+        ' Formula: Exp* (Nivel ^ ExponenteNivelParty) / sumadeNivelesElevados
         expThisUser = CDbl(ExpGanada * (UserList(p_members(i).UserIndex).Stats.ELV ^ ExponenteNivelParty) / p_SumaNivelesElevados)
         
-        If mapa = UserList(UI).Pos.map And UserList(UI).flags.Muerto = 0 Then
+        If mapa = UserList(UI).Pos.Map And UserList(UI).flags.Muerto = 0 Then
             If Distance(UserList(UI).Pos.X, UserList(UI).Pos.Y, X, Y) <= PARTY_MAXDISTANCIA Then
                 p_members(i).Experiencia = p_members(i).Experiencia + expThisUser
                 If p_members(i).Experiencia < 0 Then
@@ -103,7 +142,7 @@ Dim i As Integer
 
 For i = 1 To PARTY_MAXMEMBERS
     If p_members(i).UserIndex > 0 Then
-        Call WriteConsoleMsg(p_members(i).UserIndex, " [" & Sender & "] " & texto, FontTypeNames.FONTTYPE_INFO)
+        Call WriteConsoleMsg(p_members(i).UserIndex, " [" & Sender & "] " & texto, FontTypeNames.FONTTYPE_PARTY)
     End If
 Next i
 
@@ -114,6 +153,13 @@ Public Function EsPartyLeader(ByVal UserIndex As Integer) As Boolean
 End Function
 
 Public Function NuevoMiembro(ByVal UserIndex As Integer) As Boolean
+'***************************************************
+'Author: Unknown
+'Last Modification: 07/04/08
+'Last Modification By: Marco Vanotti (MarKoxX)
+' - 09/29/07 There is no level prohibition (Tavo)
+' - 07/04/08 Added const ExponenteNivelParty. (MarKoxX)
+'***************************************************
 
 Dim i As Integer
 i = 1
@@ -134,7 +180,15 @@ End If
 End Function
 
 Public Function SaleMiembro(ByVal UserIndex As Integer) As Boolean
-
+'***************************************************
+'Author: Unknown
+'Last Modification: 07/04/08
+'Last Modification By: Marco Vanotti (MarKoxX)
+' - 09/29/07 Experience is round to the biggest number less than that number
+' - 09/29/07 Now experience is a real-number (Tavo)
+' - 07/04/08 Added const ExponenteNivelParty. (MarKoxX)
+'***************************************************
+'el valor de retorno representa si se disuelve la party
 Dim i As Integer
 Dim j As Integer
 i = 1
@@ -150,9 +204,9 @@ If i = 1 Then
     For j = PARTY_MAXMEMBERS To 1 Step -1
         If p_members(j).UserIndex > 0 Then
             
-            Call WriteConsoleMsg(p_members(j).UserIndex, " Abandonas el grupo liderado por " & UserList(p_members(1).UserIndex).name, FontTypeNames.FONTTYPE_INFO)
+            Call WriteConsoleMsg(p_members(j).UserIndex, " Abandonas la party liderada por " & UserList(p_members(1).UserIndex).name, FontTypeNames.FONTTYPE_PARTY)
     
-            Call WriteConsoleMsg(p_members(j).UserIndex, " Durante la misma has conseguido " & CStr(Fix(p_members(j).Experiencia)) & " puntos de experiencia!", FontTypeNames.FONTTYPE_INFO)
+            Call WriteConsoleMsg(p_members(j).UserIndex, " Durante la misma has conseguido " & CStr(Fix(p_members(j).Experiencia)) & " puntos de experiencia!", FontTypeNames.FONTTYPE_PARTY)
     
             If Not PARTY_EXPERIENCIAPORGOLPE Then
                 UserList(p_members(j).UserIndex).Stats.Exp = UserList(p_members(j).UserIndex).Stats.Exp + Fix(p_members(j).Experiencia)
@@ -161,7 +215,7 @@ If i = 1 Then
                 Call CheckUserLevel(p_members(j).UserIndex)
                 Call WriteUpdateUserStats(p_members(j).UserIndex)
             End If
-            Call MandarMensajeAConsola(UserList(p_members(j).UserIndex).name & " abandona el grupo.", "Servidor")
+            Call MandarMensajeAConsola(UserList(p_members(j).UserIndex).name & " abandona la party.", "Servidor")
             UserList(p_members(j).UserIndex).PartyIndex = 0
             p_CantMiembros = p_CantMiembros - 1
             p_SumaNivelesElevados = p_SumaNivelesElevados - (UserList(UserIndex).Stats.ELV ^ ExponenteNivelParty)
@@ -179,8 +233,8 @@ Else
             Call WriteUpdateUserStats(p_members(i).UserIndex)
         End If
         Call MandarMensajeAConsola(UserList(p_members(i).UserIndex).name & " abandona la party.", "Servidor")
-        
-        Call WriteConsoleMsg(p_members(i).UserIndex, " Durante la misma has conseguido " & CStr(Fix(p_members(i).Experiencia)) & " puntos de experiencia!", FontTypeNames.FONTTYPE_INFO)
+        'TODO: Revisar que esto este bien, y no este faltando/sobrando un mensaje, ahora solo los estoy corrigiendo
+        Call WriteConsoleMsg(p_members(i).UserIndex, " Durante la misma has conseguido " & CStr(Fix(p_members(i).Experiencia)) & " puntos de experiencia!", FontTypeNames.FONTTYPE_PARTY)
         p_CantMiembros = p_CantMiembros - 1
         p_SumaNivelesElevados = p_SumaNivelesElevados - (UserList(UserIndex).Stats.ELV ^ ExponenteNivelParty)
         p_members(i).UserIndex = 0
@@ -192,7 +246,12 @@ End If
 End Function
 
 Public Function HacerLeader(ByVal UserIndex As Integer) As Boolean
-
+'***************************************************
+'Author: Unknown
+'Last Modification: 09/29/07
+'Last Modification By: Lucas Tavolaro Ortiz (Tavo)
+' - 09/29/07 There is no level prohibition
+'***************************************************
 Dim i As Integer
 Dim OldLeader As Integer
 Dim oldExp As Double
@@ -236,27 +295,27 @@ p_Fundador = p_members(1).UserIndex
 End Function
 
 
-Public Sub ObtenerMiembrosOnline(ByRef MemberList() As Integer)
-
+Public Sub ObtenerMiembrosOnline(ByRef MemberList As String)
+'***************************************************
+'Author: Unknown
+'Last Modification: 09/29/07
+'Last Modification By: Lucas Tavolaro Ortiz (Tavo)
+' - 09/29/07 Experience is round to the biggest number less than that number
+' - 09/29/07 Now experience is a real-number
+'***************************************************
+'esta funcion viola un poco la correcta forma de hacer la clase
+'pero bue...
 Dim i As Integer
-
+MemberList = "Nombre(Exp): "
 For i = 1 To PARTY_MAXMEMBERS
     If p_members(i).UserIndex > 0 Then
-        MemberList(i) = p_members(i).UserIndex
+        MemberList = MemberList & " - " & UserList(p_members(i).UserIndex).name & " (" & CStr(Fix(p_members(i).Experiencia)) & ")"
     End If
 Next i
 
+MemberList = MemberList & ". Experiencia total: " & CStr(p_expTotal)
+
 End Sub
-
-Public Function ObtenerExperienciaTotal() As Long
-'***************************************************
-'Author: Budi
-'Last Modification: 11/27/09
-'Retrieves the total experience acumulated in the party
-'***************************************************
-ObtenerExperienciaTotal = p_expTotal
-End Function
-
 
 
 Public Function PuedeEntrar(ByVal UserIndex As Integer, ByRef razon As String) As Boolean
@@ -267,18 +326,20 @@ Public Function PuedeEntrar(ByVal UserIndex As Integer, ByRef razon As String) A
 ' - 09/29/07 There is no level prohibition
 '***************************************************
 'DEFINE LAS REGLAS DEL JUEGO PARA DEJAR ENTRAR A MIEMBROS
-Dim esArmada As Boolean
-Dim esCaos As Boolean
+Dim esImperio As Boolean
+Dim esNeutral As Boolean
+Dim esRepubli As Boolean
 Dim MyLevel As Integer
 Dim i As Integer
 Dim rv As Boolean
 Dim UI As Integer
-
+ 
 rv = True
-esArmada = (UserList(UserIndex).Faccion.ArmadaReal = 1)
-esCaos = (UserList(UserIndex).Faccion.FuerzasCaos = 1)
+esImperio = (UserList(UserIndex).Faccion.ArmadaReal = 1 Or UserList(UserIndex).Faccion.Ciudadano = 1)
+esNeutral = (UserList(UserIndex).Faccion.FuerzasCaos = 1 Or UserList(UserIndex).Faccion.Renegado)
+esRepubli = (UserList(UserIndex).Faccion.Republicano = 1 Or UserList(UserIndex).Faccion.Milicia = 1)
 MyLevel = UserList(UserIndex).Stats.ELV
-
+ 
 rv = Distancia(UserList(p_members(1).UserIndex).Pos, UserList(UserIndex).Pos) <= MAXDISTANCIAINGRESOPARTY
 If rv Then
     rv = (p_members(PARTY_MAXMEMBERS).UserIndex = 0)
@@ -288,26 +349,23 @@ If rv Then
             'pongo los casos que evitarian que pueda entrar
             'aspirante armada en party crimi
             If UI > 0 Then
-                If esArmada And Criminal(UI) Then
-                    razon = "Los miembros de la armada no entran a una party con criminales."
+                If esImperio And (esRene(UI) Or esCaos(UI) Or esMili(UI) Or esRepu(UI)) Then
+                    razon = "Los miembros del imperio no entran a una party con bandos diferentes."
                     rv = False
                 End If
+               
                 'aspirante caos en party ciuda
-                If esCaos And Not Criminal(UI) Then
-                    razon = "Los miembros de la legión oscura no entran a una party con ciudadanos."
+                If esNeutral And (esArmada(UI) Or esCiuda(UI) Or esMili(UI) Or esRepu(UI)) Then
+                    razon = "Los miembros neutrales no entran a una party con bandos diferentes."
                     rv = False
                 End If
-                'aspirante crimi en party armada
-                If UserList(UI).Faccion.ArmadaReal = 1 And Criminal(UserIndex) Then
-                    razon = "Los criminales no entran a partys con miembros de la armada real."
+               
+                'aspirante caos en party ciuda
+                If esRepubli And (esArmada(UI) Or esCiuda(UI) Or esRene(UI) Or esCaos(UI)) Then
+                    razon = "Los miembros republicanos no entran a una party con bandos diferentes."
                     rv = False
                 End If
-                'aspirante ciuda en party caos
-                If UserList(UI).Faccion.FuerzasCaos = 1 And Not Criminal(UserIndex) Then
-                    razon = "Los miembros de la legión oscura no entran a una party con ciudadanos."
-                    rv = False
-                End If
-            
+           
                 If Not rv Then Exit For 'violate una programacion estructurada
             End If
         Next i
@@ -317,16 +375,25 @@ If rv Then
 Else
     razon = "Te encuentras muy lejos del fundador."
 End If
-
+ 
 PuedeEntrar = rv
-
+ 
 End Function
 
 
 Public Sub FlushExperiencia()
+'***************************************************
+'Author: Unknown
+'Last Modification: 09/29/07
+'Last Modification By: Lucas Tavolaro Ortiz (Tavo)
+' - 09/29/07 Experience is round to the biggest number less than that number
+' - 09/29/07 Now experience is a real-number
+'***************************************************
+'esta funcion se invoca frente a cerradas del servidor. Flushea la experiencia
+'acumulada a los usuarios.
 
 Dim i As Integer
-If Not PARTY_EXPERIENCIAPORGOLPE Then
+If Not PARTY_EXPERIENCIAPORGOLPE Then   'esto sirve SOLO cuando acumulamos la experiencia!
     For i = 1 To PARTY_MAXMEMBERS
         If p_members(i).UserIndex > 0 Then
             If p_members(i).Experiencia > 0 Then
@@ -348,6 +415,9 @@ If Not PARTY_EXPERIENCIAPORGOLPE Then
 End If
 
 End Sub
+
+
+
 
 Private Sub CompactMemberList()
 Dim i As Integer
@@ -373,7 +443,3 @@ End Sub
 Public Function CantMiembros() As Integer
 CantMiembros = p_CantMiembros
 End Function
-
-
-
-

@@ -11,7 +11,7 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
-'AoshaoServer 0.11.6
+'ImperiumAO 0.11.6
 'Copyright (C) 2002 Márquez Pablo Ignacio
 '
 'This program is free software; you can redistribute it and/or modify
@@ -26,7 +26,7 @@ Attribute VB_Exposed = False
 'You should have received a copy of the Affero General Public License
 'along with this program; if not, you can find it at http://www.affero.org/oagpl.html
 '
-'AoshaoServer is based on Baronsoft's VB6 Online RPG
+'ImperiumAO is based on Baronsoft's VB6 Online RPG
 'You can contact the original creator of ORE at aaron@baronsoft.com
 'for more information about ORE please visit http://www.baronsoft.com/
 '
@@ -46,7 +46,7 @@ Private m_coleccion As New Collection
 Public Function MaxPersonajes(sIp As String) As Boolean
     Dim i As Long
 
-    For i = 1 To m_coleccion.Count
+    For i = 1 To m_coleccion.count
         If m_coleccion.Item(i).ip = sIp Then
             m_coleccion.Item(i).PersonajesCreados = m_coleccion.Item(i).PersonajesCreados + 1
             MaxPersonajes = (m_coleccion.Item(i).PersonajesCreados > MaximoPersonajesPorIP)
@@ -68,17 +68,17 @@ End Function
 
 Public Function VaciarColeccion()
 
-On Error GoTo Errhandler
+On Error GoTo errhandler
 
 Dim i As Integer
 
-For i = 1 To m_coleccion.Count
+For i = 1 To m_coleccion.count
    Call m_coleccion.Remove(1)
 Next
 
 
 Exit Function
-Errhandler:
+errhandler:
     Call LogError("Error en RestarConexion " & Err.description)
 End Function
 

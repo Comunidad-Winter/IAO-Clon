@@ -1,38 +1,82 @@
 Attribute VB_Name = "modDeclaraciones"
+'************************************************* ****************
+'ImperiumAO - v1.0
+'************************************************* ****************
+'Copyright (C) 2015 Gaston Jorge Martinez
+'Copyright (C) 2015 Alexis Rodriguez
+'Copyright (C) 2015 Luis Merino
+'Copyright (C) 2015 Girardi Luciano Valentin
+'
+'Respective portions copyright by taxpayers below.
+'
+'This library is free software; you can redistribute it and / or
+'Modify it under the terms of the GNU General Public
+'License as published by the Free Software Foundation version 2.1
+'The License
+'
+'This library is distributed in the hope that it will be useful,
+'But WITHOUT ANY WARRANTY; without even the implied warranty
+'MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+'Lesser General Public License for more details.
+'
+'You should have received a copy of the GNU General Public
+'License along with this library; if not, write to the Free Software
+'Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+'************************************************* ****************
+'
+'************************************************* ****************
+'You can contact me at:
+'Gaston Jorge Martinez (Zenitram@Hotmail.com)
+'************************************************* ****************
+
 Option Explicit
 
+Public UserWeaponEqpSlot As Byte
+Public UserArmourEqpSlot As Byte
+Public UserHelmEqpSlot As Byte
+Public UserShieldEqpSlot As Byte
 
-
+'Modo De Habla
 Public ModoHabla As Byte
 Public PrivateTo As String
 
-Public picMouseIcon As Picture
+'Declaracion module clsDialogs
+Public Dialogos As New clsDialogs
 
-Public FxNavega As Byte
-'Caminata Fluida - Dunkansan
-Public Movement_Speed As Single
+'Declaracion de Cursor Grafico
+Public Const GLC_HCURSOR = (-12)
+Public hSwapCursor As Long
+Public Declare Function LoadCursorFromFile Lib "user32" Alias "LoadCursorFromFileA" (ByVal lpfilename As String) As Long
+Public Declare Function SetClassLong Lib "user32" Alias "SetClassLongA" (ByVal hWnd As Long, ByVal nIndex As Long, ByVal dwNewLong As Long) As Long
 
-Public MostrarFPS As Boolean
-'Velocidad de los grhs al caminar
-Public Velocidad As Byte
-'Macros--------------------------
-Type tBoton
-    TipoAccion As Integer
-    SendString As String
-    hlist As Integer
-    invslot As Integer
-    amount As Integer
+Public MouseS As Long
+
+Type tListaFamiliares
+    name As String
+    desc As String
+    Imagen As String
 End Type
 
-Public MacroKeys() As tBoton
-Public BotonElegido As Integer
-'--------------------------------
-Public isCapturePending As Boolean
-Public Const CentroInventario As Byte = 1
-Public Const CentroHechizos As Byte = 2
-Public Const CentroMenu As Byte = 3
-Public Const Solapas As Byte = 4
-Public EstadoLogin As E_MODO
+Public ListaFamiliares() As tListaFamiliares
+
+Type tServerInfo
+    port As Integer
+    Ip As String
+    name As String
+End Type
+
+Public lServer(1 To 2) As tServerInfo
+
+'FPS EN RENDER CON BOTON " * "
+Public MostrarFPS As Boolean
+
+'Velocidad de los grhs al caminar
+Public Velocidad As Single
+
+Public ColorTecho As Byte
+Public temp_rgb(3) As Long
+
+
 Public day_r_old As Byte
 Public day_g_old As Byte
 Public day_b_old As Byte
@@ -43,11 +87,23 @@ Type luzxhora
     g As Long
     b As Long
 End Type
-Public CurServerIp As String
-Public CurServerPort As Integer
+
 'Declaramos las luces
 Public luz_dia(0 To 24) As luzxhora '¬¬ la hora 24 dura 1 minuto entre las 24 y las 0
 'Fin
+
+'Macros--------------------------
+Type tBoton
+    TipoAccion As Integer
+    SendString As String
+    hlist As Integer
+    invslot As Integer
+    Amount As Integer
+End Type
+
+Public MacroKeys() As tBoton
+Public BotonElegido As Integer
+'--------------------------------
 Public lblexpactivo As Boolean
 Public InfoMapAct As Boolean
 
@@ -73,31 +129,24 @@ Public Const CANT_GRH_INDEX As Long = 40000
 Public Const SND_CLICK As String = "190.Wav"
 Public Const SND_PASOS1 As String = "23.Wav"
 Public Const SND_PASOS2 As String = "24.Wav"
-Public Const SND_RETIRAR As String = "172.Wav"
+Public Const SND_PASOS3 As String = "201.Wav"
+Public Const SND_PASOS4 As String = "202.Wav"
+Public Const SND_PASOS5 As String = "197.Wav"
+Public Const SND_PASOS6 As String = "198.Wav"
+Public Const SND_PASOS7 As String = "199.Wav"
+Public Const SND_PASOS8 As String = "200.Wav"
 Public Const SND_NAVEGANDO As String = "50.wav"
-
-Public Const SND_PASOS3 As String = "197.Wav" 'Pie 1 de Arena
-Public Const SND_PASOS4 As String = "198.Wav" 'Pie 2 de arena
-Public Const SND_PASOS5 As String = "199.Wav" 'Pie 3 de  arena
-Public Const SND_PASOS6 As String = "200.Wav" 'Pie nieve
-Public Const SND_PASOS7 As String = "201.Wav" 'Pie nieve
-Public Const SND_PASOS8 As String = "202.Wav" 'Pie  de pasto
-
-Public Const SND_OVER As String = "0.Wav"
+Public Const SND_OVER As String = "click2.Wav"
 Public Const SND_DICE As String = "cupdice.Wav"
-Public Const SND_LLUVIAINEND As String = "191.wav"
-Public Const SND_LLUVIAOUTEND As String = "194.wav"
-Public Const SND_CUERVO As Integer = 126
-Public Const SND_TRUENO1 As Integer = 60
-Public Const SND_TRUENO2 As Integer = 61
-Public Const SND_TRUENO3 As Integer = 62
-Public Const SND_TRUENO4 As Integer = 63
-Public Const SND_TRUENO5 As Integer = 64
+Public Const SND_LLUVIAINEND As String = "lluviainend.wav"
+Public Const SND_LLUVIAOUTEND As String = "lluviaoutend.wav"
+Public Const SND_PORTAL As String = "3.wav"
+
 ' Head index of the casper. Used to know if a char is killed
 
 ' Constantes de intervalo
 Public Const INT_MACRO_HECHIS As Integer = 2788
-Public Const INT_MACRO_TRABAJO As Integer = 600
+Public Const INT_MACRO_TRABAJO As Integer = 900
 
 Public Const INT_ATTACK As Integer = 1500
 Public Const INT_ARROWS As Integer = 1400
@@ -105,7 +154,7 @@ Public Const INT_CAST_SPELL As Integer = 1400
 Public Const INT_CAST_ATTACK As Integer = 1000
 Public Const INT_WORK As Integer = 700
 Public Const INT_USEITEMU As Integer = 450
-Public Const INT_USEITEMDCK As Integer = 220
+Public Const INT_USEITEMDCK As Integer = 125
 Public Const INT_SENTRPU As Integer = 2000
 
 Public MacroBltIndex As Integer
@@ -127,14 +176,10 @@ Public Type tColor
     b As Byte
 End Type
 
-Public ColoresPJ(0 To 50) As tColor
+Public ColoresPJ(0 To 53) As tColor
 
-Type tServerInfo
-    port As Integer
-    Ip As String
-    name As String
-End Type
-Public lServer(1 To 1) As tServerInfo
+
+
 Public ServersLst() As tServerInfo
 Public ServersRecibidos As Boolean
 
@@ -171,13 +216,12 @@ Public NumEscudosAnims As Integer
 Public ArmasHerrero(0 To 100) As Integer
 Public ArmadurasHerrero(0 To 100) As Integer
 Public ObjCarpintero(0 To 100) As Integer
-Public ObjSastreria(0 To 100) As Integer
-Public objalquimia(0 To 100) As Integer
+
 Public UsaMacro As Boolean
 Public CnTd As Byte
 
 'Musica
-Public Const MP3_Inicio As Byte = 54
+Public Const MP3_Inicio As Byte = 1
 
 '[KEVIN]
 Public Const MAX_BANCOINVENTORY_SLOTS As Byte = 40
@@ -191,7 +235,7 @@ Public Const LoopAdEternum As Integer = 999
 'Direcciones
 Public Enum E_Heading
     north = 1
-    EAST = 2
+    east = 2
     SOUTH = 3
     WEST = 4
 End Enum
@@ -210,33 +254,24 @@ Public Const FOgata As Integer = 1521
 
 
 Public Enum eClass
-    Mage = 1    'Mago
-    Cleric      'Clérigo
-    Warrior     'Guerrero
-    Assasin     'Asesino
-    Thief       'Ladrón
-    Bard        'Bardo
-    Druid       'Druida
-    Bandit      'Bandido
-    Paladin     'Paladín
-    Hunter      'Cazador
-    Fisher      'Pescador
-    Blacksmith  'Herrero
-    Lumberjack  'Leñador
-    Miner       'Minero
-    Carpenter   'Carpintero
-    drakkar       'drakkar
-    BountyHunter 'Nigromante
-    Sastre 'Sastre
-    Nigromante 'Nigromante
+    MAGO = 1
+    Clerigo
+    Guerrero
+    Asesino
+    Ladron
+    Bardo
+    DRUIDA
+    Gladiador
+    Paladin
+    CAZADOR
+    Mercenario
+    Nigromante
 End Enum
 
 Public Enum eCiudad
-    cUllathorpe = 1
-    cNix
-    cBanderbill
-    CRinkel
-    cArghal
+    cBanderbill = 1
+    cRinkel
+    cSuramei
 End Enum
 
 Enum eRaza
@@ -256,7 +291,7 @@ Public Enum eSkill
     Arrojadizas = 5
     Proyectiles = 6
     DefensaEscudos = 7
-    magia = 8
+    Magia = 8
     Resistencia = 9
     Meditar = 10
     Ocultarse = 11
@@ -331,12 +366,12 @@ Public Enum eObjType
     otFlechas = 32
     otBotellaVacia = 33
     otBotellaLlena = 34
-    otManchas = 35          'No se usa
-    otMapa = 38
+    otManchas = 35 'No se usa
+    otruna = 38
     otMonturas = 44
     otCualquiera = 1000
-    Otnudillos = 46
 End Enum
+
 Type tHeadRange
     mStart As Integer
     mEnd As Integer
@@ -358,11 +393,11 @@ Public Const MENSAJE_CRIATURA_MATADO As String = "La criatura te ha matado!!!"
 Public Const MENSAJE_RECHAZO_ATAQUE_ESCUDO As String = "Has rechazado el ataque con el escudo!!!"
 Public Const MENSAJE_USUARIO_RECHAZO_ATAQUE_ESCUDO  As String = "El usuario rechazo el ataque con su escudo!!!"
 Public Const MENSAJE_FALLADO_GOLPE As String = "Has fallado el golpe!!!"
-Public Const MENSAJE_SEGURO_ACTIVADO As String = "¡Has activado el seguro!"
-Public Const MENSAJE_SEGURO_DESACTIVADO As String = "¡Has desactivado el Seguro!"
+Public Const MENSAJE_SEGURO_ACTIVADO As String = ">>SEGURO ACTIVADO<<"
+Public Const MENSAJE_SEGURO_DESACTIVADO As String = ">>SEGURO DESACTIVADO<<"
 Public Const MENSAJE_PIERDE_NOBLEZA As String = "¡¡Has perdido puntaje de nobleza y ganado puntaje de criminalidad!! Si sigues ayudando a criminales te convertirás en uno de ellos y serás perseguido por las tropas de las ciudades."
 Public Const MENSAJE_USAR_MEDITANDO As String = "¡Estás meditando! Debes dejar de meditar para usar objetos."
-Public Const MENSAJE_ENVIAR_PENA As String = "Tiempo restante en la carcel & .penacarcel"
+
 Public Const MENSAJE_SEGURO_RESU_ON As String = "SEGURO DE RESURRECCION ACTIVADO"
 Public Const MENSAJE_SEGURO_RESU_OFF As String = "SEGURO DE RESURRECCION DESACTIVADO"
 
@@ -416,22 +451,22 @@ Type Inventory
     OBJIndex As Integer
     name As String
     grhindex As Integer
-    '[Alejo]: tipo de datos ahora es Long
-    amount As Long
-    '[/Alejo]
+    Amount As Long
     Equipped As Byte
     Valor As Single
     OBJType As Integer
     Def As Integer
     MaxHit As Integer
     MinHit As Integer
+    PuedeUsar As Byte
 End Type
+
 
 Type NpCinV
     OBJIndex As Integer
     name As String
     grhindex As Integer
-    amount As Integer
+    Amount As Integer
     Valor As Single
     OBJType As Integer
     Def As Integer
@@ -459,14 +494,16 @@ End Type
 
 Type tEstadisticasUsu
     CiudadanosMatados As Long
-    CriminalesMatados As Long
+    RenegadosMatados As Long
+    RepublicanosMatados As Long
+    ArmadaMatados As Long
+    MiliciaMatados As Long
+    CaosMatados As Long
     UsuariosMatados As Long
-    NpcsMatados As Long
-    Clase As String
-     Raza As Byte
+    NpcMatados As Long
+    Clase As Byte
+    Raza As Byte
     Genero As Byte
-    VecesMuerto As Integer
-    PenaCarcel As Long
 End Type
 
 Public Nombres As Boolean
@@ -474,11 +511,16 @@ Public Nombres As Boolean
 'User status vars
 Global OtroInventario(1 To MAX_INVENTORY_SLOTS) As Inventory
 
+Public UserInventory(1 To MAX_INVENTORY_SLOTS) As Inventory
+
 Public UserHechizos(1 To MAXHECHI) As Integer
 
 Public NPCInventory(1 To MAX_NPC_INVENTORY_SLOTS) As NpCinV
 Public UserMeditar As Boolean
 Public UserName As String
+Public UserAccount As String
+Public UserQuestion As Byte
+Public UserAnswer As String
 Public UserPassword As String
 Public UserMaxHP As Integer
 Public UserMinHP As Integer
@@ -491,11 +533,6 @@ Public UserMinAGU As Byte
 Public UserMaxHAM As Byte
 Public UserMinHAM As Byte
 Public UserGLD As Long
-Public Usuarios As Integer
-Public Offline As Byte
-Public Sendingtype As Byte
-Public OB As Long
-Public UserBOVItem As Long
 Public UserLvl As Integer
 Public UserPort As Integer
 Public UserServerIP As String
@@ -511,10 +548,9 @@ Public pausa As Boolean
 Public IScombate As Boolean
 Public UserParalizado As Boolean
 Public UserNavegando As Boolean
-Public UserMontando As Boolean
 Public UserHogar As eCiudad
+Public UserMontando As Boolean
 Public UserAvisado As Boolean
-Public MapExt As Byte
 '<-------------------------NUEVO-------------------------->
 Public Comerciando As Boolean
 '<-------------------------NUEVO-------------------------->
@@ -524,16 +560,15 @@ Public UserSexo As eGenero
 Public UserRaza As eRaza
 Public UserEmail As String
 
-Public Const NUMCIUDADES As Byte = 5
+Public Const NUMCIUDADES As Byte = 3
 Public Const NUMSKILLS As Byte = 27
 Public Const NUMATRIBUTOS As Byte = 5
-Public Const NUMCLASES As Byte = 19
+Public Const NUMCLASES As Byte = 12
 Public Const NUMRAZAS As Byte = 6
-Public Const NUMRESOLUTIONS As Byte = 1
 
 Public UserSkills(1 To NUMSKILLS) As Byte
-Public SkillsNames(1 To NUMSKILLS) As String
 Public SkillsOrig(1 To NUMSKILLS) As Byte
+Public SkillsNames(1 To NUMSKILLS) As String
 
 Public UserAtributos(1 To NUMATRIBUTOS) As Byte
 Public AtributosNames(1 To NUMATRIBUTOS) As String
@@ -542,9 +577,7 @@ Public Ciudades(1 To NUMCIUDADES) As String
 
 Public ListaRazas(1 To NUMRAZAS) As String
 Public ListaClases(1 To NUMCLASES) As String
-Public ListaRes1(NUMRESOLUTIONS) As String
 
-Public ListaRes2 As String
 Public SkillPoints As Integer
 Public Alocados As Integer
 Public flags() As Integer
@@ -561,8 +594,11 @@ Public Enum E_MODO
     Normal = 1
     CrearNuevoPj = 2
     Dados = 3
+    CrearNuevaCuenta = 4
+    ConectarCuenta = 5
 End Enum
 
+Public EstadoLogin As E_MODO
    
 Public Enum FxMeditar
     CHICO = 4
@@ -598,6 +634,7 @@ Public Enum eEditOptions
     eo_Raza
 End Enum
 
+
 ''
 ' TRIGGERS
 '
@@ -617,6 +654,7 @@ Public Enum eTrigger
     ZONASEGURA = 4
     ANTIPIQUETE = 5
     ZONAPELEA = 6
+    AutoResu = 7
 End Enum
 
 'Server stuff
@@ -641,8 +679,8 @@ Public Win2kXP As Boolean
 Public Declare Function GetTickCount Lib "kernel32" () As Long
 
 'para escribir y leer variables
-Public Declare Function writeprivateprofilestring Lib "kernel32" Alias "WritePrivateProfileStringA" (ByVal lpApplicationname As String, ByVal lpKeyname As Any, ByVal lpString As String, ByVal lpFileName As String) As Long
-Public Declare Function getprivateprofilestring Lib "kernel32" Alias "GetPrivateProfileStringA" (ByVal lpApplicationname As String, ByVal lpKeyname As Any, ByVal lpdefault As String, ByVal lpreturnedstring As String, ByVal nsize As Long, ByVal lpFileName As String) As Long
+Public Declare Function writeprivateprofilestring Lib "kernel32" Alias "WritePrivateProfileStringA" (ByVal lpApplicationname As String, ByVal lpKeyname As Any, ByVal lpString As String, ByVal lpfilename As String) As Long
+Public Declare Function getprivateprofilestring Lib "kernel32" Alias "GetPrivateProfileStringA" (ByVal lpApplicationname As String, ByVal lpKeyname As Any, ByVal lpdefault As String, ByVal lpreturnedstring As String, ByVal nsize As Long, ByVal lpfilename As String) As Long
 
 'Teclado
 Public Declare Function GetKeyState Lib "user32" (ByVal nVirtKey As Long) As Integer
@@ -679,10 +717,10 @@ Public Type Stream
     NumOfParticles As Long
     NumGrhs As Long
     id As Long
-    X1 As Long
-    Y1 As Long
-    X2 As Long
-    Y2 As Long
+    x1 As Long
+    y1 As Long
+    x2 As Long
+    y2 As Long
     angle As Long
     vecx1 As Long
     vecx2 As Long
@@ -709,11 +747,40 @@ Public Type Stream
     
     speed As Single
     life_counter As Long
+    
     grh_resize As Boolean
     grh_resizex As Integer
     grh_resizey As Integer
 End Type
+
 Public meteo_particle As Integer
+
+'****************************************************************
+'****************************************************************
+'**********************SISTEMA DE CUENTAS************************
+'****************************************************************
+'****************************************************************
+Public Type PjCuenta
+    Nombre      As String
+    Head        As Integer
+    body        As Integer
+    Shield      As Byte
+    Casco       As Byte
+    Weapon      As Byte
+    Nivel       As Byte
+    Mapa        As Integer
+    Clase       As Byte
+    color       As Byte
+End Type
+
+Public cPJ(0 To 9) As PjCuenta
+'****************************************************************
+'****************************************************************
+'****************************************************************
+'****************************************************************
+'****************************************************************
+
+
 '*****************************
 'GAMEINI
 Public Type tCabecera 'Cabecera de los con

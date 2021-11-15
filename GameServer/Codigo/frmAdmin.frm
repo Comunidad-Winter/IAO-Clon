@@ -1,6 +1,6 @@
 VERSION 5.00
 Begin VB.Form frmAdmin 
-   BackColor       =   &H00C0C0C0&
+   BackColor       =   &H80000004&
    Caption         =   "Administración del servidor"
    ClientHeight    =   3135
    ClientLeft      =   60
@@ -9,7 +9,7 @@ Begin VB.Form frmAdmin
    LinkTopic       =   "Form1"
    ScaleHeight     =   3135
    ScaleWidth      =   4680
-   StartUpPosition =   3  'Windows Default
+   StartUpPosition =   2  'CenterScreen
    Begin VB.Frame Frame1 
       Caption         =   "Personajes"
       BeginProperty Font 
@@ -109,7 +109,7 @@ Dim tIndex As Long
 
 tIndex = NameIndex(cboPjs.Text)
 If tIndex > 0 Then
-    Call SendData(SendTarget.ToAll, 0, PrepareMessageConsoleMsg("Servidor> " & UserList(tIndex).name & " ha sido hechado. ", FontTypeNames.FONTTYPE_SERVER))
+    Call SendData(SendTarget.toall, 0, PrepareMessageConsoleMsg("Servidor> " & UserList(tIndex).name & " ha sido hechado. ", FontTypeNames.FONTTYPE_SERVER))
     Call CloseSocket(tIndex)
 End If
 

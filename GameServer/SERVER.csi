@@ -1,3 +1,10 @@
 [History]
-1=#P0#=mb	#P1#=ClaseToEnum	#P2#=ServidorArgentum/Extra/ClaseToEnum	#P3#=	#P4#=	#P5#=MembMethodPublic	#P6#=20210131140130	#P7#=0	#P8#=2	.
-2=#P0#=mb	#P1#=LoadOBJData	#P2#=ServidorArgentum/ES/LoadOBJData	#P3#=	#P4#=	#P5#=MembMethodPublic	#P6#=20210131131937	#P7#=0	#P8#=216	.
+1=#P0#=mb	#P1#=CalcularDaño	#P2#=ImperiumAOSV/SistemaCombate/CalcularDaño	#P3#=	#P4#=	#P5#=MembMethodPublic	#P6#=20210316203831	#P7#=0	#P8#=77	.
+2=#P0#=mb	#P1#=DoHurtar	#P2#=ImperiumAOSV/Trabajo/DoHurtar	#P3#=	#P4#=	#P5#=MembMethodPublic	#P6#=20210316193515	#P7#=0	#P8#=2	.
+3=#P0#=mb	#P1#=LoadOBJData	#P2#=ImperiumAOSV/ES/LoadOBJData	#P3#=	#P4#=	#P5#=MembMethodPublic	#P6#=20210316183833	#P7#=0	#P8#=74	.
+4=#P0#=mb	#P1#=ModCarpinteria	#P2#=ImperiumAOSV/Trabajo/ModCarpinteria	#P3#=	#P4#=	#P5#=MembMethodPublic	#P6#=20210312203810	#P7#=0	#P8#=1	.
+5=#P0#=mb	#P1#=DoTalar	#P2#=ImperiumAOSV/Trabajo/DoTalar	#P3#=	#P4#=	#P5#=MembMethodPublic	#P6#=20210312200836	#P7#=0	#P8#=1	.
+6=#P0#=mb	#P1#=DoMineria	#P2#=ImperiumAOSV/Trabajo/DoMineria	#P3#=	#P4#=	#P5#=MembMethodPublic	#P6#=20210312193652	#P7#=0	#P8#=7	.
+7=#P0#=mb	#P1#=HandleWorkLeftClick	#P2#=ImperiumAOSV/Protocol/HandleWorkLeftClick	#P3#=	#P4#=	#P5#=MembMethodPublic	#P6#=20210312184858	#P7#=0	#P8#=292	.
+8=#P0#=mb	#P1#=ConnectNewUser	#P2#=ImperiumAOSV/TCP/ConnectNewUser	#P3#=	#P4#=	#P5#=MembMethodPublic	#P6#=20210311174541	#P7#=0	#P8#=11	.
+9=#P0#=mb	#P1#=HandleLoginNewChar	#P2#=ImperiumAOSV/Protocol/HandleLoginNewChar	#P3#=	#P4#=	#P5#=MembMethodPublic	#P6#=20210311173823	#P7#=0	#P8#=61	.

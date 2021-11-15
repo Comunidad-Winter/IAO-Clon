@@ -1,27 +1,33 @@
 Attribute VB_Name = "modProtocolCmdParse"
-
-'Argentum Online
+'************************************************* ****************
+'ImperiumAO - v1.0
+'************************************************* ****************
+'Copyright (C) 2015 Gaston Jorge Martinez
+'Copyright (C) 2015 Alexis Rodriguez
+'Copyright (C) 2015 Luis Merino
+'Copyright (C) 2015 Girardi Luciano Valentin
 '
-'Copyright (C) 2006 Juan Martín Sotuyo Dodero (Maraxus)
-'Copyright (C) 2006 Alejandro Santos (AlejoLp)
-
+'Respective portions copyright by taxpayers below.
 '
-'This program is free software; you can redistribute it and/or modify
-'it under the terms of the Affero General Public License;
-'either version 1 of the License, or any later version.
+'This library is free software; you can redistribute it and / or
+'Modify it under the terms of the GNU General Public
+'License as published by the Free Software Foundation version 2.1
+'The License
 '
-'This program is distributed in the hope that it will be useful,
-'but WITHOUT ANY WARRANTY; without even the implied warranty of
-'MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-'Affero General Public License for more details.
+'This library is distributed in the hope that it will be useful,
+'But WITHOUT ANY WARRANTY; without even the implied warranty
+'MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+'Lesser General Public License for more details.
 '
-'You should have received a copy of the Affero General Public License
-'along with this program; if not, you can find it at http://www.affero.org/oagpl.html
+'You should have received a copy of the GNU General Public
+'License along with this library; if not, write to the Free Software
+'Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+'************************************************* ****************
 '
-'Argentum Online is based on Baronsoft's VB6 Online RPG
-'You can contact the original creator of ORE at aaron@baronsoft.com
-'for more information about ORE please visit http://www.baronsoft.com/
-'
+'************************************************* ****************
+'You can contact me at:
+'Gaston Jorge Martinez (Zenitram@Hotmail.com)
+'************************************************* ****************
 
 Option Explicit
 
@@ -47,7 +53,7 @@ Public Sub AuxWriteWhisper(ByVal UserName As String, ByVal Mensaje As String)
     
     i = 1
     Do While i <= LastChar
-        If UCase$(charlist(i).nombre) = UserName Or UCase$(Left$(charlist(i).nombre, nameLength + 2)) = UserName & " <" Then
+        If UCase$(charlist(i).Nombre) = UserName Or UCase$(Left$(charlist(i).Nombre, nameLength + 2)) = UserName & " <" Then
             Exit Do
         Else
             i = i + 1
@@ -76,8 +82,6 @@ Public Sub ParseUserCommand(ByVal RawCommand As String)
     Dim Comando As String
     Dim ArgumentosAll() As String
     Dim ArgumentosRaw As String
-    Dim Precio As Long
-    Dim Oferta As Long
     Dim Argumentos2() As String
     Dim Argumentos3() As String
     Dim Argumentos4() As String
@@ -133,13 +137,41 @@ Public Sub ParseUserCommand(ByVal RawCommand As String)
                 
             Case "/ONLINE"
                 Call WriteOnline
-
-             Case "/QUESTINFO"
-             Call WriteQuestInformacion
-
-             Case "/QUESTABANDONAR"
-            Call WriteQuestAbandonar
-
+                
+             Case "/FADD"
+                If notNullArguments Then
+                    Call WriteAddAmigo(ArgumentosRaw, 1)
+                Else
+                    'Avisar que falta el parametro
+                    Call ShowConsoleMsg("Faltan parámetros. Utilice /FADD NICKNAME.")
+                End If
+            
+            Case "/FACCEPT"
+            
+            If notNullArguments Then
+                    Call WriteAddAmigo(ArgumentosRaw, 2)
+                Else
+                    'Avisar que falta el parametro
+                    Call ShowConsoleMsg("Faltan parámetros. Utilice /FADD NICKNAME.")
+                End If
+ 
+  Case "/FMSG"
+  If notNullArguments Then
+  Call WriteMsgAmigo(ArgumentosRaw)
+  Else
+  'Avisar que falta el parametro
+  Call ShowConsoleMsg("Faltan parámetros. Utilice /FMSG MENSAJE.")
+  End If
+ 
+  Case "/FON"
+  Call WriteOnAmigo
+                
+            Case "/RETIRAR"
+                frmRetirar.Show
+                
+            Case "/HOGAR"
+                Call WriteHogar(1)
+                
             Case "/SALIR"
                 If UserParalizado Then 'Inmo
                     With FontTypes(FontTypeNames.FONTTYPE_WARNING)
@@ -147,7 +179,6 @@ Public Sub ParseUserCommand(ByVal RawCommand As String)
                     End With
                     Exit Sub
                 End If
-                                If frmMain.macrotrabajo.Enabled Then Call frmMain.DesactivarMacroTrabajo
                 Call WriteQuit
                 
             Case "/SALIRCLAN"
@@ -198,15 +229,26 @@ Public Sub ParseUserCommand(ByVal RawCommand As String)
                 End If
                 Call WriteRest
                 
-            Case "/PRIV"
-                 If notNullArguments And CantidadArgumentos >= 2 Then
-                    If Not ArgumentosAll(1) <> " " Then
-                        Call ShowConsoleMsg("Escribe un chat")
-                    Else
-                        Call WritepPrivate(ArgumentosAll(0), ArgumentosAll(1))
-                    End If
-                 End If
-                 
+            Case "/DONAON"
+                If notNullArguments Then
+                    Call WriteHacerVipAUsuario(ArgumentosRaw)
+                Else
+                    'Avisar que le falto escribir algoo =P
+                    With FontTypes(FontTypeNames.FONTTYPE_INFO)
+                    Call ShowConsoleMsg("Faltan parámetros. Utilice /DONAON NICKNAME.", .red, .green, .blue, .bold, .italic)
+                    End With
+                End If
+ 
+            Case "/DONAOFF"
+                If notNullArguments Then
+                    Call WriteQuitarVipAUsuario(ArgumentosRaw)
+                Else
+                    'Avisar que le falto escribir algoo =P
+                    With FontTypes(FontTypeNames.FONTTYPE_INFO)
+                    Call ShowConsoleMsg("Faltan parámetros. Utilice /DONAOFF NICKNAME.", .red, .green, .blue, .bold, .italic)
+                    End With
+                End If
+                
             Case "/MEDITAR"
                 If UserMinMAN = UserMaxMAN Then Exit Sub
                 
@@ -226,12 +268,9 @@ Public Sub ParseUserCommand(ByVal RawCommand As String)
                               
             Case "/EST"
                 Call WriteRequestStats
-                
-             Case "/Pena"
-                Call writeEnviarPena
-    
+            
             Case "/AYUDA"
-               Call WriteIniciarAyuda
+                Call WriteHelp
                 
             Case "/COMERCIAR"
                 If UserEstado = 1 Then 'Muerto
@@ -259,11 +298,12 @@ Public Sub ParseUserCommand(ByVal RawCommand As String)
                 
             Case "/ENLISTAR"
                 Call WriteEnlist
+                    
             Case "/INFORMACION"
                 Call WriteInformation
                 
-            Case "/MOTD"
-                Call WriteRequestMOTD
+            Case "/RECOMPENSA"
+                Call WriteReward
                 
             Case "/UPTIME"
                 Call WriteUpTime
@@ -415,7 +455,7 @@ Public Sub ParseUserCommand(ByVal RawCommand As String)
                     Call ShowConsoleMsg("Faltan parámetros. Utilice /apostar CANTIDAD.")
                 End If
                 
-            Case "/RETIRAR"
+            Case "/RETIRARORO"
                 If UserEstado = 1 Then 'Muerto
                     With FontTypes(FontTypeNames.FONTTYPE_INFO)
                         Call ShowConsoleMsg("¡¡Estás muerto!!", .red, .green, .blue, .bold, .italic)
@@ -464,7 +504,7 @@ Public Sub ParseUserCommand(ByVal RawCommand As String)
                 End If
                 
             Case "/FUNDARCLAN"
-                frmEligeAlineacion.Show vbModeless, frmMain
+                Call WriteGuildFundate(eClanType.ct_Evil Or ct_GM Or ct_Legal Or ct_Neutral Or ct_RoyalArmy)
             
             Case "/FUNDARCLANGM"
                 Call WriteGuildFundate(eClanType.ct_GM)
@@ -556,11 +596,6 @@ Public Sub ParseUserCommand(ByVal RawCommand As String)
                 
             Case "/TELEPLOC"
                 Call WriteWarpMeToTarget
-                
-            Case "/ACTIVARGLOBAL"
-                Call WriteGlobalStatus
-                
-          
                 
             Case "/TELEP"
                 If notNullArguments And CantidadArgumentos >= 4 Then
@@ -840,6 +875,8 @@ Public Sub ParseUserCommand(ByVal RawCommand As String)
             Case "/RESETINV"
                 Call WriteResetNPCInventory
                 
+            Case "/LIMPIAR"
+                Call WriteCleanWorld
                 
             Case "/RMSG"
                 If notNullArguments Then
@@ -1101,17 +1138,17 @@ Public Sub ParseUserCommand(ByVal RawCommand As String)
                     Call ShowConsoleMsg("Faltan parámetros. Utilice /unbanip IP.")
                 End If
                 
-            Case "/CI"
+            Case "/OBJ"
                 If notNullArguments Then
                     If ValidNumber(ArgumentosAll(0), eNumber_Types.ent_Long) Then
                         Call WriteCreateItem(ArgumentosAll(0))
                     Else
                         'No es numerico
-                        Call ShowConsoleMsg("Objeto incorrecto. Utilice /ci OBJETO.")
+                        Call ShowConsoleMsg("Objeto incorrecto. Utilice /OBJ OBJETO.")
                     End If
                 Else
                     'Avisar que falta el parametro
-                    Call ShowConsoleMsg("Faltan parámetros. Utilice /ci OBJETO.")
+                    Call ShowConsoleMsg("Faltan parámetros. Utilice /OBJ OBJETO.")
                 End If
                 
             Case "/DEST"
@@ -1189,9 +1226,6 @@ Public Sub ParseUserCommand(ByVal RawCommand As String)
                     'Avisar que falta el parametro
                     Call ShowConsoleMsg("Faltan parámetros. Utilice /lastip NICKNAME.")
                 End If
-    
-            Case "/MOTDCAMBIA"
-                Call WriteChangeMOTD
                 
             Case "/SMSG"
                 If notNullArguments Then
@@ -1295,24 +1329,6 @@ Public Sub ParseUserCommand(ByVal RawCommand As String)
                     'Avisar que falta el parametro
                     Call ShowConsoleMsg("Faltan parámetros. Utilice /aemail NICKNAME-NUEVOMAIL.")
                 End If
-                Case "/DARORO"
-                If notNullArguments Then
-                    tmpArr = Split(ArgumentosRaw, "@", 2)
-                    If UBound(tmpArr) = 1 Then
-                        If ValidNumber(tmpArr(1), eNumber_Types.ent_Long) Then
-                            Call WriteTransferGLD(tmpArr(0), tmpArr(1))
-                        Else
-                            'Faltan o sobran los parametros con el formato propio
-                            Call ShowConsoleMsg("Formato incorrecto. Utilice /DARORO NICK@AMOUNT.")
-                        End If
-                    Else
-                        'Faltan o sobran los parametros con el formato propio
-                        Call ShowConsoleMsg("Formato incorrecto. Utilice /DARORO NICK@AMOUNT.")
-                    End If
-                Else
-                    'Avisar que falta el parametro
-                    Call ShowConsoleMsg("Formato incorrecto. Utilice /DARORO NICK@AMOUNT.")
-                End If
                 
             Case "/ANAME"
                 If notNullArguments Then
@@ -1407,13 +1423,21 @@ Public Sub ParseUserCommand(ByVal RawCommand As String)
                             
                     End Select
                 End If
+                
+            Case "/MAÑANA"
+              Call WriteNoche(0)
+             
+            Case "/MEDIODIA"
+              Call WriteNoche(1)
               
-       Case "/ofertar"
-Call WriteOfertar(ArgumentosRaw)
-
-Case "/subastar"
-Call WriteSubastar(ArgumentosRaw)
-         
+            Case "/TARDE"
+              Call WriteNoche(2)
+               
+            Case "/NOCHE"
+              Call WriteNoche(3)
+                
+            Case "/NOCHE"
+                Call WriteNight
                 
             Case "/ECHARTODOSPJS"
                 Call WriteKickAllChars
@@ -1485,14 +1509,7 @@ Call WriteSubastar(ArgumentosRaw)
         End If
         ' Gritar
         Call WriteYell(mid$(RawCommand, 2))
-          ElseIf Left$(Comando, 1) = ";" Then
-        If UserEstado = 1 Then 'Muerto
-            With FontTypes(FontTypeNames.FONTTYPE_INFO)
-                Call ShowConsoleMsg("¡¡Estás muerto!!", .red, .green, .blue, .bold, .italic)
-            End With
-            Exit Sub
-        End If
-        Call WriteGlobalMessage(ArgumentosRaw)
+        
     Else
         Select Case ModoHabla
             Case 1 'normal
@@ -1501,18 +1518,11 @@ Call WriteSubastar(ArgumentosRaw)
                 Call WriteYell(RawCommand)
             Case 3 'privado
                 If PrivateTo = vbNullString Then Exit Sub
-                Call WritepPrivate(PrivateTo, RawCommand)
+                Call AuxWriteWhisper(PrivateTo, RawCommand)
             Case 4 'clan
                 Call ParseUserCommand("/CMSG " & RawCommand)
-            Case 5 'Grupo
-                Call ParseUserCommand("/PMSG " & RawCommand)
-            Case 6 'Global
-                Call WriteGlobalMessage(RawCommand)
-            Case 7 'Gms
-                Call ParseUserCommand("/GMSG " & RawCommand)
         End Select
     End If
-    
 End Sub
 
 ''
@@ -1634,7 +1644,7 @@ End Function
 ' @param text All the comand without the /aemail
 ' @return An bidimensional array with user and mail
 
-Private Function AEMAILSplit(ByRef text As String) As String()
+Private Function AEMAILSplit(ByRef Text As String) As String()
 '***************************************************
 'Author: Lucas Tavolaro Ortuz (Tavo)
 'Useful for AEMAIL BUG FIX
@@ -1647,19 +1657,14 @@ Private Function AEMAILSplit(ByRef text As String) As String()
     Dim tmpArr(0 To 1) As String
     Dim Pos As Byte
     
-    Pos = InStr(1, text, "-")
+    Pos = InStr(1, Text, "-")
     
     If Pos <> 0 Then
-        tmpArr(0) = mid$(text, 1, Pos - 1)
-        tmpArr(1) = mid$(text, Pos + 1)
+        tmpArr(0) = mid$(Text, 1, Pos - 1)
+        tmpArr(1) = mid$(Text, Pos + 1)
     Else
         tmpArr(0) = vbNullString
     End If
     
     AEMAILSplit = tmpArr
 End Function
-'
-' Writes the "GlobalStatus" message to the outgoing data buffer.
-'
-' @remarks  The data is not actually sent until the buffer is properly flushed.
- 

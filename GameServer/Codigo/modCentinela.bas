@@ -1,38 +1,4 @@
 Attribute VB_Name = "modCentinela"
-'*****************************************************************
-'modCentinela.bas - ImperiumAO - v1.2
-'
-'Funciónes de control para usuarios que se encuentran trabajando
-'
-'*****************************************************************
-'Respective portions copyrighted by contributors listed below.
-'
-'This program is free software; you can redistribute it and/or modify
-'it under the terms of the Affero General Public License;
-'either version 1 of the License, or any later version.
-'
-'This program is distributed in the hope that it will be useful,
-'but WITHOUT ANY WARRANTY; without even the implied warranty of
-'MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-'Affero General Public License for more details.
-'
-'You should have received a copy of the Affero General Public License
-'along with this program; if not, you can find it at http://www.affero.org/oagpl.html
-
-'*****************************************************************
-'Augusto Rando(barrin@imperiumao.com.ar)
-'   ImperiumAO 1.2
-'   - First Relase
-'
-'Juan Martín Sotuyo Dodero (juansotuyo@gmail.com)
-'   Alkon AO 0.11.5
-'   - Small improvements and added logs to detect possible cheaters
-'
-'Juan Martín Sotuyo Dodero (juansotuyo@gmail.com)
-'   Alkon AO 0.12.0
-'   - Added several messages to spam users until they reply
-'*****************************************************************
-
 Option Explicit
 
 Private Const NPC_CENTINELA_TIERRA As Integer = 16  'Índice del NPC en el .dat
@@ -54,16 +20,13 @@ Public centinelaActivado As Boolean
 Public Centinela As tCentinela
 
 Public Sub CallUserAttention()
-'############################################################
-'Makes noise and FX to call the user's attention.
-'############################################################
     If (GetTickCount() And &H7FFFFFFF) - Centinela.spawnTime >= 5000 Then
         If Centinela.RevisandoUserIndex <> 0 And centinelaActivado Then
             If Not UserList(Centinela.RevisandoUserIndex).flags.CentinelaOK Then
                 Call WritePlayWave(Centinela.RevisandoUserIndex, SND_WARP, Npclist(CentinelaNPCIndex).Pos.X, Npclist(CentinelaNPCIndex).Pos.Y)
                 Call WriteCreateFX(Centinela.RevisandoUserIndex, Npclist(CentinelaNPCIndex).Char.CharIndex, FXIDs.FXWARP, 0)
                 
-                'Resend the key
+
                 Call CentinelaSendClave(Centinela.RevisandoUserIndex)
                 
                 Call FlushBuffer(Centinela.RevisandoUserIndex)
@@ -133,11 +96,11 @@ On Error GoTo Error_Handler
         Call SendData(SendTarget.ToAdmins, 0, PrepareMessageConsoleMsg("Servidor> El centinela ha baneado a " & name, FontTypeNames.FONTTYPE_SERVER))
         
         'ponemos el flag de ban a 1
-        Call WriteVar(CharPath & name & ".chr", "FLAGS", "Ban", "1")
+        Call WriteVar(CharPath & name & ".pjs", "FLAGS", "Ban", "1")
         'ponemos la pena
-        numPenas = val(GetVar(CharPath & name & ".chr", "PENAS", "Cant"))
-        Call WriteVar(CharPath & name & ".chr", "PENAS", "Cant", numPenas + 1)
-        Call WriteVar(CharPath & name & ".chr", "PENAS", "P" & numPenas + 1, "CENTINELA : BAN POR MACRO INASISTIDO " & Date & " " & time)
+        numPenas = val(GetVar(CharPath & name & ".pjs", "PENAS", "Cant"))
+        Call WriteVar(CharPath & name & ".pjs", "PENAS", "Cant", numPenas + 1)
+        Call WriteVar(CharPath & name & ".pjs", "PENAS", "P" & numPenas + 1, "CENTINELA : BAN POR MACRO INASISTIDO " & Date & " " & time)
         
         'Evitamos loguear el logout
         Dim index As Integer
@@ -262,7 +225,7 @@ Private Sub WarpCentinela(ByVal UserIndex As Integer)
         CentinelaNPCIndex = 0
     End If
     
-    If HayAgua(UserList(UserIndex).Pos.map, UserList(UserIndex).Pos.X, UserList(UserIndex).Pos.Y) Then
+    If HayAgua(UserList(UserIndex).Pos.Map, UserList(UserIndex).Pos.X, UserList(UserIndex).Pos.Y) Then
         CentinelaNPCIndex = SpawnNpc(NPC_CENTINELA_AGUA, UserList(UserIndex).Pos, True, False)
     Else
         CentinelaNPCIndex = SpawnNpc(NPC_CENTINELA_TIERRA, UserList(UserIndex).Pos, True, False)
@@ -299,15 +262,15 @@ Private Sub LogCentinela(ByVal texto As String)
 'Last modified: 03/15/2006
 'Loguea un evento del centinela
 '*************************************************
-On Error GoTo Errhandler
+On Error GoTo errhandler
 
     Dim nfile As Integer
     nfile = FreeFile ' obtenemos un canal
     
-    Open App.Path & "\logs\Centinela.log" For Append Shared As #nfile
+    Open App.Path & "\Data\Files logs\Centinela.log" For Append Shared As #nfile
     Print #nfile, Date & " " & time & " " & texto
     Close #nfile
 Exit Sub
 
-Errhandler:
+errhandler:
 End Sub

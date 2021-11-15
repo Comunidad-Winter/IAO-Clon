@@ -11,55 +11,35 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
-'**************************************************************
-' clsAudio.cls - Controls all audio using DirectSound and DirectMusic
+'************************************************* ****************
+'ImperiumAO - v1.0
+'************************************************* ****************
+'Copyright (C) 2015 Gaston Jorge Martinez
+'Copyright (C) 2015 Alexis Rodriguez
+'Copyright (C) 2015 Luis Merino
+'Copyright (C) 2015 Girardi Luciano Valentin
 '
-' Designed and implemented by Juan Martín Sotuyo Dodero (Maraxus)
-' (juansotuyo@hotmail.com)
-'**************************************************************
-
-'**************************************************************************
-'This program is free software; you can redistribute it and/or modify
-'it under the terms of the GNU General Public License as published by
-'the Free Software Foundation; either version 2 of the License, or
-'(at your option) any later version.
+'Respective portions copyright by taxpayers below.
 '
-'This program is distributed in the hope that it will be useful,
-'but WITHOUT ANY WARRANTY; without even the implied warranty of
-'MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-'Affero General Public License for more details.
+'This library is free software; you can redistribute it and / or
+'Modify it under the terms of the GNU General Public
+'License as published by the Free Software Foundation version 2.1
+'The License
 '
-'You should have received a copy of the GNU General Public License
-'along with this program; if not, write to the Free Software
-'Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-'**************************************************************************
-
-'16/03/2004 - Juan Martín Sotuyo Dodero (Maraxus) - (juansotuyo@gmail.com)
-'   - First Release
+'This library is distributed in the hope that it will be useful,
+'But WITHOUT ANY WARRANTY; without even the implied warranty
+'MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+'Lesser General Public License for more details.
 '
-'03/03/2007 - Juan Martín Sotuyo Dodero (Maraxus) - (juansotuyo@gmail.com)
-'   - Add: Sound and Music activation / deactivation from within the class.
-'   - Add: Documentation
-'   - Change: Volume is no longer the dB amplification / atenuation to be
-'           applied but a percentage for easier interaction with user.
+'You should have received a copy of the GNU General Public
+'License along with this library; if not, write to the Free Software
+'Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+'************************************************* ****************
 '
-'30/03/2008 - Juan Martín Sotuyo Dodero (Maraxus) - (juansotuyo@gmail.com)
-'   - Add: 3D-like sound effects by altering frequency to emulate Doppler effect,
-'           volume to emulate distance and panning for position.
-'
-'28/07/2008 - Franco Zeoli (Noich) - (zeolifranco@gmail.com)
-'   -Add: Optional sound effects
-'
-'23/03/2010 - Torres Patricio(Pato) - (paatoo.torres@gmail.com)
-'   -Add: ORE code to reproduce MP3
-
-''
-' Controls all audio using DirectSound and DirectMusic 7.
-'
-' @file     clsAudio.cls
-' @author   Juan Martín Sotuyo Dodero (Maraxus) juansotuyo@gmail.com
-' @version  1.2.1
-' @date     20070303
+'************************************************* ****************
+'You can contact me at:
+'Gaston Jorge Martinez (Zenitram@Hotmail.com)
+'************************************************* ****************
 
 Option Explicit
 
@@ -87,8 +67,8 @@ Private Const DELTA_FQ As Integer = 75
 Private Type SoundBuffer
     FileName As String
     looping As Boolean
-    x As Byte
-    y As Byte
+    X As Byte
+    Y As Byte
     normalFq As Long
     Buffer As DirectSoundSecondaryBuffer8
 End Type
@@ -370,8 +350,8 @@ On Error GoTo ErrHandler
         Call .Buffer.SetVolume(SndVolume)
         
         'Store position
-        .x = srcX
-        .y = srcY
+        .X = srcX
+        .Y = srcY
         
         'Get standard frequency
         .normalFq = .Buffer.GetFrequency()
@@ -427,8 +407,8 @@ Private Sub Update3DSound(ByVal bufferIndex As Long, ByVal deltaX As Integer, By
     Dim perceivedFq As Long
     
     With DSBuffers(bufferIndex)
-        distanceXOld = .x - lastPosX
-        distanceYOld = .y - lastPosY
+        distanceXOld = .X - lastPosX
+        distanceYOld = .Y - lastPosY
         
         distanceXNew = distanceXOld + deltaX
         distanceYNew = distanceYOld + deltaY
@@ -467,7 +447,7 @@ End Sub
 '
 ' @return   The buffer index in which the sound is playing, or 0 in case of error.
 
-Public Sub MoveListener(ByVal x As Integer, ByVal y As Integer)
+Public Sub MoveListener(ByVal X As Integer, ByVal Y As Integer)
 '***************************************************
 'Author: Juan Martín Sotuyo Dodero (Maraxus)
 'Last Modification: 28/07/08
@@ -480,21 +460,21 @@ Public Sub MoveListener(ByVal x As Integer, ByVal y As Integer)
     
     If Not sEffectsActivated Then Exit Sub
     
-    deltaX = x - lastPosX
-    deltaY = y - lastPosY
+    deltaX = X - lastPosX
+    deltaY = Y - lastPosY
     
     For i = 1 To NumSoundBuffers
         If Not DSBuffers(i).Buffer Is Nothing Then
             If DSBuffers(i).Buffer.GetStatus And DSBSTATUS_PLAYING Then
-                If DSBuffers(i).x <> 0 And DSBuffers(i).y <> 0 Then
+                If DSBuffers(i).X <> 0 And DSBuffers(i).Y <> 0 Then
                     Call Update3DSound(i, deltaX, deltaY)
                 End If
             End If
         End If
     Next i
     
-    lastPosX = x
-    lastPosY = y
+    lastPosX = X
+    lastPosY = Y
 End Sub
 
 ''
@@ -818,7 +798,7 @@ Public Property Let MusicVolume(ByVal Volume As Long)
 '***************************************************
     If Not Music Then Exit Property
     
-    If Volume < 0 Or Volume > 100 Then Exit Property
+    If Volume > 100 Then Exit Property
     
     ' Volume ranges from -10000 to 10000
     Call Performance.SetMasterVolume(Volume * 200 - 10000)
@@ -1185,8 +1165,8 @@ Public Sub Music_Load(ByVal Music As String, Optional ByVal Loops As Long = -1)
     If Music = Music_Actual Then Exit Sub
 
     'Musica del mapa
-    If FileExist(App.path & "/Recursos\MP3\" & Val(Music) & ".mp3", vbNormal) Then
-        Call Audio.MusicMP3Play(App.path & "/recursos\MP3\" & Val(Music) & ".mp3")
+    If FileExist(App.path & "\Resources\MP3\" & Val(Music) & ".mp3", vbNormal) Then
+        Call Audio.MusicMP3Play(App.path & "\Resources\MP3\" & Val(Music) & ".mp3")
     Else
         Call Audio.PlayMIDI(Val(Music) & ".mid", Loops)
     End If
@@ -1378,25 +1358,25 @@ Public Function RenderSounds()
 'Last Modify Date: 3/30/2008
 'Actualiza todos los sonidos del mapa.
 '**************************************************************
-    'If bLluvia(UserMap) = 1 Then
-        If bRain Then
-            If bTecho Then
-                If frmMain.IsPlaying <> PlayLoop.plLluviain Then
-                    If RainBufferIndex Then _
-                        Call Audio.StopWave(RainBufferIndex)
-                    RainBufferIndex = Audio.PlayWave("191.wav", 0, 0, LoopStyle.Enabled)
-                    frmMain.IsPlaying = PlayLoop.plLluviain
-                End If
-           Else
-                If frmMain.IsPlaying <> PlayLoop.plLluviaout Then
-                    If RainBufferIndex Then _
-                        Call Audio.StopWave(RainBufferIndex)
-                    RainBufferIndex = Audio.PlayWave("194.wav", 0, 0, LoopStyle.Enabled)
-                    frmMain.IsPlaying = PlayLoop.plLluviaout
-               End If
-            End If
-       End If
-    'End If
+'    If bLluvia(UserMap) = 1 Then
+'        If bRain Then
+'            If bTecho Then
+'                If frmMain.IsPlaying <> PlayLoop.plLluviain Then
+'                    If RainBufferIndex Then _
+'                        Call Audio.StopWave(RainBufferIndex)
+'                    RainBufferIndex = Audio.PlayWave("lluviain.wav", 0, 0, LoopStyle.Enabled)
+'                    frmMain.IsPlaying = PlayLoop.plLluviain
+'                End If
+'            Else
+'                If frmMain.IsPlaying <> PlayLoop.plLluviaout Then
+'                    If RainBufferIndex Then _
+'                        Call Audio.StopWave(RainBufferIndex)
+'                    RainBufferIndex = Audio.PlayWave("lluviaout.wav", 0, 0, LoopStyle.Enabled)
+'                    frmMain.IsPlaying = PlayLoop.plLluviaout
+'                End If
+'            End If
+'        End If
+'    End If
     
     DoFogataFx
     Call RenderAmbient
@@ -1409,27 +1389,13 @@ Public Sub RenderAmbient()
 
     '¿Esta los Ambient activados?
     If Audio.AmbientActivated = False Then Exit Sub
+    
+    If RTrim$(MapDat.zone) = "CIUDAD" Then
+    Ambient = 70
+    End If
 
-    '¿Hay Tormenta?
-    'If bRain = True And Not Terreno = "1" And Not Terreno = "2" And Not Zona = "DUNGEON" Then
-    '    '¿Esta en techo?
-    '    If bTecho = True Then
-    '        Ambient = "22"
-    '    Else
-    '        Ambient = "23"
-    '    End If
-    '¿Es de noche?
-    'ElseIf Anocheceria = 3 Then
-        '¿Esta en un bosque?
-    '    If Zona = "CAMPO" Then
-    '        Ambient = "20"
-        '¿Esta en ciudad?
-    '    ElseIf Zona = "CIUDAD" Then
-    '        Ambient = "21"
-    '    End If
     If Not MapDat.Ambient = "" Then
-        'Si no hay tormenta ni hay noche reproducimos el Ambient default
-         Ambient = MapDat.Ambient
+        'Si no hay tormenta ni hay noche reproducimos el Ambient deafault
     End If
     
     '¿El ambient a reproducir es el mismo que el actual?
@@ -1445,6 +1411,4 @@ Public Sub RenderAmbient()
     'Le damos valor al ambient actual
     ActualAmbient = Ambient
 End Sub
-
-
 

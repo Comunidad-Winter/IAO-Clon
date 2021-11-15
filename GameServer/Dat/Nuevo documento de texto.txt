@@ -1,1 +1,0 @@
-UserList(UserIndex).Stats.MinHP = UserList(UserIndex).Stats.MaxHP

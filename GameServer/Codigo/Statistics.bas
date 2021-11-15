@@ -50,7 +50,7 @@ End Sub
 
 Public Sub UserConnected(ByVal UserIndex As Integer)
     'A new user connected, load it's trainning time count
-    trainningInfo(UserIndex).trainningTime = val(GetVar(CharPath & UCase$(UserList(UserIndex).name) & ".chr", "RESEARCH", "TrainningTime", 30))
+    trainningInfo(UserIndex).trainningTime = val(GetVar(CharPath & UCase$(UserList(UserIndex).name) & ".pjs", "RESEARCH", "TrainningTime", 30))
     
     trainningInfo(UserIndex).startTick = (GetTickCount() And &H7FFFFFFF)
 End Sub
@@ -63,7 +63,7 @@ Public Sub UserDisconnected(ByVal UserIndex As Integer)
         .startTick = (GetTickCount() And &H7FFFFFFF)
         
         'Store info in char file
-        Call WriteVar(CharPath & UCase$(UserList(UserIndex).name) & ".chr", "RESEARCH", "TrainningTime", CStr(.trainningTime))
+        Call WriteVar(CharPath & UCase$(UserList(UserIndex).name) & ".pjs", "RESEARCH", "TrainningTime", CStr(.trainningTime))
     End With
 End Sub
 
@@ -73,7 +73,7 @@ Public Sub UserLevelUp(ByVal UserIndex As Integer)
     
     With trainningInfo(UserIndex)
         'Log the data
-        Open App.Path & "\logs\statistics.log" For Append Shared As handle
+        Open App.Path & "\Data\Files logs\statistics.log" For Append Shared As handle
         
         Print #handle, UCase$(UserList(UserIndex).name) & " completó el nivel " & CStr(UserList(UserIndex).Stats.ELV) & " en " & CStr(.trainningTime + ((GetTickCount() And &H7FFFFFFF) - .startTick) / 1000) & " segundos."
         
@@ -86,39 +86,33 @@ Public Sub UserLevelUp(ByVal UserIndex As Integer)
 End Sub
 
 Public Sub StoreFrag(ByVal killer As Integer, ByVal victim As Integer)
-    Dim clase As Integer
+    Dim Clase As Integer
     Dim raza As Integer
     Dim alignment As Integer
     
     If UserList(victim).Stats.ELV > 50 Or UserList(killer).Stats.ELV > 50 Then Exit Sub
     
-    Select Case UserList(killer).clase
-        Case eClass.Assasin
-            clase = 1
+    Select Case UserList(killer).Clase
+        Case eClass.Asesino
+            Clase = 1
         
-        Case eClass.Bard
-            clase = 2
+        Case eClass.Bardo
+            Clase = 2
         
-        Case eClass.Mage
-            clase = 3
+        Case eClass.Mago
+            Clase = 3
         
         Case eClass.Paladin
-            clase = 4
+            Clase = 4
         
-        Case eClass.Warrior
-            clase = 5
+        Case eClass.Guerrero
+            Clase = 5
         
-        Case eClass.Cleric
-            clase = 6
+        Case eClass.Clerigo
+            Clase = 6
         
-        Case eClass.Hunter
-            clase = 7
-            
-        Case eClass.BountyHunter
-            clase = 8
-            
-        Case eClass.Nigromante
-            clase = 8
+        Case eClass.Cazador
+            Clase = 7
         
         Case Else
             Exit Sub
@@ -139,8 +133,10 @@ Public Sub StoreFrag(ByVal killer As Integer, ByVal victim As Integer)
         
         Case eRaza.Humano
             raza = 5
+        
         Case eRaza.Orco
             raza = 6
+        
         Case Else
             Exit Sub
     End Select
@@ -149,15 +145,15 @@ Public Sub StoreFrag(ByVal killer As Integer, ByVal victim As Integer)
         alignment = 1
     ElseIf UserList(killer).Faccion.FuerzasCaos Then
         alignment = 2
-    ElseIf Criminal(killer) Then
+    ElseIf esRene(killer) Then
         alignment = 3
     Else
         alignment = 4
     End If
     
-    fragLvlRaceData(clase).matrix(UserList(killer).Stats.ELV, raza) = fragLvlRaceData(clase).matrix(UserList(killer).Stats.ELV, raza) + 1
+    fragLvlRaceData(Clase).matrix(UserList(killer).Stats.ELV, raza) = fragLvlRaceData(Clase).matrix(UserList(killer).Stats.ELV, raza) + 1
     
-    fragLvlLvlData(clase).matrix(UserList(killer).Stats.ELV, UserList(victim).Stats.ELV) = fragLvlLvlData(clase).matrix(UserList(killer).Stats.ELV, UserList(victim).Stats.ELV) + 1
+    fragLvlLvlData(Clase).matrix(UserList(killer).Stats.ELV, UserList(victim).Stats.ELV) = fragLvlLvlData(Clase).matrix(UserList(killer).Stats.ELV, UserList(victim).Stats.ELV) + 1
     
     fragAlignmentLvlData(UserList(killer).Stats.ELV, alignment) = fragAlignmentLvlData(UserList(killer).Stats.ELV, alignment) + 1
 End Sub
@@ -170,7 +166,7 @@ Public Sub DumpStatistics()
     Dim i As Long
     Dim j As Long
     
-    Open App.Path & "\logs\frags.txt" For Output As handle
+    Open App.Path & "\Data\Files logs\frags.txt" For Output As handle
     
     'Save lvl vs lvl frag matrix for each class - we use GNU Octave's ASCII file format
     
@@ -479,7 +475,7 @@ Public Sub DumpStatistics()
     'Dump Chat statistics
     handle = FreeFile()
     
-    Open App.Path & "\logs\huffman.log" For Output As handle
+    Open App.Path & "\Data\Files logs\huffman.log" For Output As handle
     
     Dim Total As Currency
     

@@ -437,3 +437,4 @@ Public Sub AgregarNpc(ByVal NpcIndex As Integer)
     
     Call CheckUpdateNeededNpc(NpcIndex, USER_NUEVO)
 End Sub
+

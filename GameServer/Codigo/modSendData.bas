@@ -31,7 +31,7 @@ Attribute VB_Name = "modSendData"
 Option Explicit
 
 Public Enum SendTarget
-    ToAll = 1
+    toall = 1
     toMap
     ToPCArea
     ToAllButIndex
@@ -84,7 +84,7 @@ On Error Resume Next
             Next LoopC
             Exit Sub
         
-        Case SendTarget.ToAll
+        Case SendTarget.toall
             For LoopC = 1 To LastUser
                 If UserList(LoopC).ConnID <> -1 Then
                     If UserList(LoopC).flags.UserLogged Then 'Esta logeado como usuario?
@@ -198,7 +198,7 @@ On Error Resume Next
         Case SendTarget.ToCiudadanos
             For LoopC = 1 To LastUser
                 If (UserList(LoopC).ConnID <> -1) Then
-                    If Not criminal(LoopC) Then
+                    If Not esRene(LoopC) Then
                         Call EnviarDatosASlot(LoopC, sndData)
                     End If
                 End If
@@ -208,7 +208,7 @@ On Error Resume Next
         Case SendTarget.ToCriminales
             For LoopC = 1 To LastUser
                 If (UserList(LoopC).ConnID <> -1) Then
-                    If criminal(LoopC) Then
+                    If esRene(LoopC) Then
                         Call EnviarDatosASlot(LoopC, sndData)
                     End If
                 End If
@@ -238,7 +238,7 @@ On Error Resume Next
         Case SendTarget.ToCiudadanosYRMs
             For LoopC = 1 To LastUser
                 If (UserList(LoopC).ConnID <> -1) Then
-                    If Not criminal(LoopC) Or (UserList(LoopC).flags.Privilegios And PlayerType.RoleMaster) <> 0 Then
+                    If Not esRene(LoopC) Or (UserList(LoopC).flags.Privilegios And PlayerType.RoleMaster) <> 0 Then
                         Call EnviarDatosASlot(LoopC, sndData)
                     End If
                 End If
@@ -248,7 +248,7 @@ On Error Resume Next
         Case SendTarget.ToCriminalesYRMs
             For LoopC = 1 To LastUser
                 If (UserList(LoopC).ConnID <> -1) Then
-                    If criminal(LoopC) Or (UserList(LoopC).flags.Privilegios And PlayerType.RoleMaster) <> 0 Then
+                    If esRene(LoopC) Or (UserList(LoopC).flags.Privilegios And PlayerType.RoleMaster) <> 0 Then
                         Call EnviarDatosASlot(LoopC, sndData)
                     End If
                 End If
@@ -398,14 +398,14 @@ Private Sub SendToUserGuildArea(ByVal UserIndex As Integer, ByVal sdData As Stri
     
     If Not MapaValido(map) Then Exit Sub
     
-    If UserList(UserIndex).guildIndex = 0 Then Exit Sub
+    If UserList(UserIndex).GuildIndex = 0 Then Exit Sub
     
     For LoopC = 1 To ConnGroups(map).CountEntrys
         tempIndex = ConnGroups(map).UserEntrys(LoopC)
         
         If UserList(tempIndex).AreasInfo.AreaReciveX And AreaX Then  'Esta en el area?
             If UserList(tempIndex).AreasInfo.AreaReciveY And AreaY Then
-                If UserList(tempIndex).ConnIDValida And UserList(tempIndex).guildIndex = UserList(UserIndex).guildIndex Then
+                If UserList(tempIndex).ConnIDValida And UserList(tempIndex).GuildIndex = UserList(UserIndex).GuildIndex Then
                     Call EnviarDatosASlot(tempIndex, sdData)
                 End If
             End If

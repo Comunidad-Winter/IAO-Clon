@@ -36,7 +36,7 @@ Public Const PRKING_NPC As Integer = 904   ''"Rey Pretoriano"
 ''Esta constante identifica en que mapa esta
 ''la fortaleza pretoriana (no es lo mismo de
 ''donde estan los NPCs!).
-''Se extrae el dato del server.ini en sub LoadSIni
+''Se extrae el dato del IMPAOSV.ini en sub LoadSIni
 Public MAPA_PRETORIANO As Integer
 ''''''''''''''''''''''''''''''''''''''''''''''
 ''Estos numeros son necesarios por cuestiones de
@@ -93,7 +93,7 @@ errorh:
 End Function
 
 
-Sub CrearClanPretoriano(ByVal x As Integer)
+Sub CrearClanPretoriano(ByVal X As Integer)
 '********************************************************
 'Author: EL OSO
 'Inicializa el clan Pretoriano.
@@ -116,30 +116,30 @@ On Error GoTo errorh
     Dim wp2 As WorldPos
     Dim TeleFrag As Integer
     
-    wp.map = MAPA_PRETORIANO
-    Select Case x   ''forma burda de ver que alcoba es
+    wp.Map = MAPA_PRETORIANO
+    Select Case X   ''forma burda de ver que alcoba es
         Case Is < 50
-            wp.x = ALCOBA2_X
+            wp.X = ALCOBA2_X
             wp.Y = ALCOBA2_Y
         Case Is >= 50
-            wp.x = ALCOBA1_X
+            wp.X = ALCOBA1_X
             wp.Y = ALCOBA1_Y
     End Select
     pretorianosVivos = 7 'Hay 7 + el Rey.
-    TeleFrag = MapData(wp.map, wp.x, wp.Y).NpcIndex
+    TeleFrag = MapData(wp.Map, wp.X, wp.Y).NpcIndex
     
     If TeleFrag > 0 Then
         ''El rey va a pisar a un npc de antiguo rey
         ''Obtengo en WP2 la mejor posicion cercana
         Call ClosestLegalPos(wp, wp2)
-        If (LegalPos(wp2.map, wp2.x, wp2.Y)) Then
+        If (LegalPos(wp2.Map, wp2.X, wp2.Y)) Then
             ''mover al actual
             
-            Call SendData(SendTarget.ToNPCArea, TeleFrag, PrepareMessageCharacterMove(Npclist(TeleFrag).Char.CharIndex, wp2.x, wp2.Y))
+            Call SendData(SendTarget.ToNPCArea, TeleFrag, PrepareMessageCharacterMove(Npclist(TeleFrag).Char.CharIndex, wp2.X, wp2.Y))
             'Update map and user pos
-            MapData(wp.map, wp.x, wp.Y).NpcIndex = 0
+            MapData(wp.Map, wp.X, wp.Y).NpcIndex = 0
             Npclist(TeleFrag).Pos = wp2
-            MapData(wp2.map, wp2.x, wp2.Y).NpcIndex = TeleFrag
+            MapData(wp2.Map, wp2.X, wp2.Y).NpcIndex = TeleFrag
         Else
             ''TELEFRAG!!!
             Call QuitarNPC(TeleFrag)
@@ -148,20 +148,20 @@ On Error GoTo errorh
     ''ya limpié el lugar para el rey (wp)
     ''Los otros no necesitan este caso ya que respawnan lejos
     Call CrearNPC(PRKING_NPC, MAPA_PRETORIANO, wp)
-    wp.x = wp.x + 3
+    wp.X = wp.X + 3
     Call CrearNPC(PRCLER_NPC, MAPA_PRETORIANO, wp)
-    wp.x = wp.x - 6
+    wp.X = wp.X - 6
     Call CrearNPC(PRCLER_NPC, MAPA_PRETORIANO, wp)
     wp.Y = wp.Y + 3
     Call CrearNPC(PRGUER_NPC, MAPA_PRETORIANO, wp)
-    wp.x = wp.x + 3
+    wp.X = wp.X + 3
     Call CrearNPC(PRGUER_NPC, MAPA_PRETORIANO, wp)
-    wp.x = wp.x + 3
+    wp.X = wp.X + 3
     Call CrearNPC(PRGUER_NPC, MAPA_PRETORIANO, wp)
     wp.Y = wp.Y - 6
-    wp.x = wp.x - 1
+    wp.X = wp.X - 1
     Call CrearNPC(PRCAZA_NPC, MAPA_PRETORIANO, wp)
-    wp.x = wp.x - 4
+    wp.X = wp.X - 4
     Call CrearNPC(PRMAGO_NPC, MAPA_PRETORIANO, wp)
     
 Exit Sub
@@ -178,7 +178,7 @@ On Error GoTo errorh
     '' HECHIZOS: 1- FLECHA
     
 
-    Dim x As Integer
+    Dim X As Integer
     Dim Y As Integer
     Dim NPCPosX As Integer
     Dim NPCPosY As Integer
@@ -198,12 +198,12 @@ On Error GoTo errorh
     Dim quehacer As Byte
         ''1- Ataca usuarios
     
-    NPCPosX = Npclist(npcind).Pos.x
+    NPCPosX = Npclist(npcind).Pos.X
     NPCPosY = Npclist(npcind).Pos.Y
-    NPCPosM = Npclist(npcind).Pos.map
+    NPCPosM = Npclist(npcind).Pos.Map
     
     PJBestTarget = False
-    x = 0
+    X = 0
     Y = 0
     quehacer = 0
     
@@ -221,10 +221,10 @@ On Error GoTo errorh
     '   our primary target
     '2) in any other case, our nearest enemy will be attacked
     
-    For x = NPCPosX + (azar * 8) To NPCPosX + (azar * -8) Step -azar
+    For X = NPCPosX + (azar * 8) To NPCPosX + (azar * -8) Step -azar
         For Y = NPCPosY + (azar2 * 7) To NPCPosY + (azar2 * -7) Step -azar2
-            NPCAlInd = MapData(NPCPosM, x, Y).NpcIndex  ''por si implementamos algo contra NPCs
-            PJEnInd = MapData(NPCPosM, x, Y).UserIndex
+            NPCAlInd = MapData(NPCPosM, X, Y).NpcIndex  ''por si implementamos algo contra NPCs
+            PJEnInd = MapData(NPCPosM, X, Y).UserIndex
             If (PJEnInd > 0) And (Npclist(npcind).CanAttack = 1) Then
                 If (UserList(PJEnInd).flags.invisible = 0 Or UserList(PJEnInd).flags.Oculto = 0) And Not (UserList(PJEnInd).flags.Muerto = 1) And Not UserList(PJEnInd).flags.AdminInvisible = 1 And UserList(PJEnInd).flags.AdminPerseguible Then
                 'ToDo: Borrar los GMs
@@ -234,13 +234,13 @@ On Error GoTo errorh
                         BestTarget = PJEnInd
                         quehacer = 1
                         'Call NpcLanzaSpellSobreUser(npcind, PJEnInd, Npclist(npcind).Spells(1)) ''flecha pasa como spell
-                        x = NPCPosX + (azar * -8)
+                        X = NPCPosX + (azar * -8)
                         Y = NPCPosY + (azar2 * -7)
                         ''forma espantosa de zafar del for
                      Else
                         If (BestTarget > 0) Then
                             ''ver el mas cercano a mi
-                            If Sqr((x - NPCPosX) ^ 2 + (Y - NPCPosY) ^ 2) < Sqr((NPCPosX - UserList(BestTarget).Pos.x) ^ 2 + (NPCPosY - UserList(BestTarget).Pos.Y) ^ 2) Then
+                            If Sqr((X - NPCPosX) ^ 2 + (Y - NPCPosY) ^ 2) < Sqr((NPCPosX - UserList(BestTarget).Pos.X) ^ 2 + (NPCPosY - UserList(BestTarget).Pos.Y) ^ 2) Then
                                 ''el nuevo esta mas cerca
                                 PJBestTarget = True
                                 BestTarget = PJEnInd
@@ -255,10 +255,9 @@ On Error GoTo errorh
                 End If
             End If  ''Fin analisis del tile
         Next Y
-    Next x
+    Next X
     
 Select Case quehacer
-
     Case 1  ''nearest target
         If (Npclist(npcind).CanAttack = 1) Then
             Call NpcLanzaSpellSobreUser(npcind, BestTarget, Npclist(npcind).Spells(1))
@@ -293,7 +292,7 @@ End If
 
 If (BestTarget > 0) Then
 
-    BTx = UserList(BestTarget).Pos.x
+    BTx = UserList(BestTarget).Pos.X
     BTy = UserList(BestTarget).Pos.Y
     
     If NPCPosX < 50 Then
@@ -309,21 +308,21 @@ Else
     If NPCPosX < 50 Then Xc = ALCOBA1_X Else Xc = ALCOBA2_X
     Yc = ALCOBA1_Y
     
-    For x = Xc - 16 To Xc + 16
+    For X = Xc - 16 To Xc + 16
         For Y = Yc - 14 To Yc + 14
-            If Not (x <= NPCPosX + 8 And x >= NPCPosX - 8 And Y >= NPCPosY - 7 And Y <= NPCPosY + 7) Then
+            If Not (X <= NPCPosX + 8 And X >= NPCPosX - 8 And Y >= NPCPosY - 7 And Y <= NPCPosY + 7) Then
                 ''si es un tile no analizado
-                PJEnInd = MapData(NPCPosM, x, Y).UserIndex    ''por si implementamos algo contra NPCs
+                PJEnInd = MapData(NPCPosM, X, Y).UserIndex    ''por si implementamos algo contra NPCs
                 If (PJEnInd > 0) Then
                     If Not (UserList(PJEnInd).flags.invisible = 1 Or UserList(PJEnInd).flags.Oculto = 1 Or UserList(PJEnInd).flags.Muerto = 1) Then
                         ''si no esta muerto.., ya encontro algo para ir a buscar
-                        Call GreedyWalkTo(npcind, MAPA_PRETORIANO, UserList(PJEnInd).Pos.x, UserList(PJEnInd).Pos.Y)
+                        Call GreedyWalkTo(npcind, MAPA_PRETORIANO, UserList(PJEnInd).Pos.X, UserList(PJEnInd).Pos.Y)
                         Exit Sub
                     End If
                 End If
             End If
         Next Y
-    Next x
+    Next X
     
     ''vuelve si no esta en proceso de ataque a usuarios
     If (Npclist(npcind).CanAttack = 1) Then Call VolverAlCentro(npcind)
@@ -353,7 +352,7 @@ On Error GoTo errorh
     ''inventario.barcoobjind parameter. Ese no es usado nunca.
     ''EL objetivo es no modificar al TAD NPC utilizando una propiedad
     ''que nunca va a ser utilizada por un NPC (espero)
-    Dim x As Integer
+    Dim X As Integer
     Dim Y As Integer
     Dim NPCPosX As Integer
     Dim NPCPosY As Integer
@@ -371,14 +370,14 @@ On Error GoTo errorh
         ''2- remover invisibilidades
         ''3- rotura de vara
 
-    NPCPosX = Npclist(npcind).Pos.x   ''store current position
+    NPCPosX = Npclist(npcind).Pos.X   ''store current position
     NPCPosY = Npclist(npcind).Pos.Y   ''for direct access
-    NPCPosM = Npclist(npcind).Pos.map
+    NPCPosM = Npclist(npcind).Pos.Map
     
     PJBestTarget = False
     BestTarget = 0
     quehacer = 0
-    x = 0
+    X = 0
     Y = 0
     
     
@@ -408,10 +407,10 @@ On Error GoTo errorh
         
 '        azar = 1
         
-        For x = NPCPosX + (azar * 8) To NPCPosX + (azar * -8) Step -azar
+        For X = NPCPosX + (azar * 8) To NPCPosX + (azar * -8) Step -azar
             For Y = NPCPosY + (azar2 * 7) To NPCPosY + (azar2 * -7) Step -azar2
-                NPCAlInd = MapData(NPCPosM, x, Y).NpcIndex  ''por si implementamos algo contra NPCs
-                PJEnInd = MapData(NPCPosM, x, Y).UserIndex
+                NPCAlInd = MapData(NPCPosM, X, Y).NpcIndex  ''por si implementamos algo contra NPCs
+                PJEnInd = MapData(NPCPosM, X, Y).UserIndex
                 
                 If (PJEnInd > 0) And (Npclist(npcind).CanAttack = 1) Then
                     If Not (UserList(PJEnInd).flags.Muerto = 1) And Not (UserList(PJEnInd).flags.AdminInvisible = 1) And UserList(PJEnInd).flags.AdminPerseguible Then
@@ -452,7 +451,7 @@ On Error GoTo errorh
                     End If  ''endif:    not muerto
                 End If  ''endif: es un tile con PJ y puede atacar
             Next Y
-        Next x
+        Next X
     End If  ''endif esta muriendo
     
     
@@ -476,8 +475,8 @@ On Error GoTo errorh
             If bs = 0 Then
                 Call MuereNpc(npcind, 0)
             Else
-             Npclist(npcind).Invent.MonturaSlot = bs
                 Npclist(npcind).Invent.BarcoSlot = bs
+                Npclist(npcind).Invent.MonturaSlot = bs
             End If
         End If
     End Select
@@ -564,7 +563,7 @@ On Error GoTo errorh
     
     
     Dim UI As Integer
-    Dim x As Integer
+    Dim X As Integer
     Dim Y As Integer
     Dim NPCPosX As Integer
     Dim NPCPosY As Integer
@@ -583,8 +582,8 @@ On Error GoTo errorh
         ''2- remueve veneno
         ''3- cura
     
-    NPCPosM = Npclist(npcind).Pos.map
-    NPCPosX = Npclist(npcind).Pos.x
+    NPCPosM = Npclist(npcind).Pos.Map
+    NPCPosX = Npclist(npcind).Pos.X
     NPCPosY = Npclist(npcind).Pos.Y
     BestTarget = 0
     distBestTarget = 0
@@ -596,11 +595,11 @@ On Error GoTo errorh
     'as to aid his loyal army.
     'If his army has been annihilated, the king will pick the
     'closest enemy an chase it using his special 'weapon speedhack' ability
-    For x = NPCPosX - 8 To NPCPosX + 8
+    For X = NPCPosX - 8 To NPCPosX + 8
         For Y = NPCPosY - 7 To NPCPosY + 7
             'scan combat field
-            NPCAlInd = MapData(NPCPosM, x, Y).NpcIndex
-            PJEnInd = MapData(NPCPosM, x, Y).UserIndex
+            NPCAlInd = MapData(NPCPosM, X, Y).NpcIndex
+            PJEnInd = MapData(NPCPosM, X, Y).UserIndex
             If (Npclist(npcind).CanAttack = 1) Then   ''saltea el analisis si no puede atacar para evitar cuentas
                 If (NPCAlInd > 0) Then
                     e_p = esPretoriano(NPCAlInd)
@@ -639,7 +638,7 @@ On Error GoTo errorh
                 If PJEnInd > 0 And Not hayPretorianos Then
                     If Not (UserList(PJEnInd).flags.Muerto = 1 Or UserList(PJEnInd).flags.invisible = 1 Or UserList(PJEnInd).flags.Oculto = 1 Or UserList(PJEnInd).flags.Ceguera = 1) And UserList(PJEnInd).flags.AdminPerseguible Then
                         ''si no esta muerto o invisible o ciego... o tiene el /ignorando
-                        dist = Sqr((UserList(PJEnInd).Pos.x - NPCPosX) ^ 2 + (UserList(PJEnInd).Pos.Y - NPCPosY) ^ 2)
+                        dist = Sqr((UserList(PJEnInd).Pos.X - NPCPosX) ^ 2 + (UserList(PJEnInd).Pos.Y - NPCPosY) ^ 2)
                         If (dist < distBestTarget Or BestTarget = 0) Then
                             BestTarget = PJEnInd
                             distBestTarget = dist
@@ -648,7 +647,7 @@ On Error GoTo errorh
                 End If
             End If  ''canattack = 1
         Next Y
-    Next x
+    Next X
     
     If Not hayPretorianos Then
         ''si estoy aca es porque no hay pretorianos cerca!!!
@@ -656,7 +655,7 @@ On Error GoTo errorh
         ''Salgo a atacar a todos a lo loco a espadazos
         If BestTarget > 0 Then
             If EsAlcanzable(npcind, BestTarget) Then
-                Call GreedyWalkTo(npcind, UserList(BestTarget).Pos.map, UserList(BestTarget).Pos.x, UserList(BestTarget).Pos.Y)
+                Call GreedyWalkTo(npcind, UserList(BestTarget).Pos.Map, UserList(BestTarget).Pos.X, UserList(BestTarget).Pos.Y)
                 'GreedyWalkTo npcind, UserList(BestTarget).Pos.Map, UserList(BestTarget).Pos.X, UserList(BestTarget).Pos.Y
             Else
                 ''el chabon es piola y ataca desde lejos entonces lo castigamos!
@@ -669,8 +668,8 @@ On Error GoTo errorh
             For headingloop = eHeading.NORTH To eHeading.WEST
                 nPos = Npclist(npcind).Pos
                 Call HeadtoPos(headingloop, nPos)
-                If InMapBounds(nPos.map, nPos.x, nPos.Y) Then
-                    UI = MapData(nPos.map, nPos.x, nPos.Y).UserIndex
+                If InMapBounds(nPos.Map, nPos.X, nPos.Y) Then
+                    UI = MapData(nPos.Map, nPos.X, nPos.Y).UserIndex
                     If UI > 0 Then
                         If NpcAtacaUser(npcind, UI) Then
                             Call ChangeNPCChar(npcind, Npclist(npcind).Char.body, Npclist(npcind).Char.Head, headingloop)
@@ -706,7 +705,7 @@ On Error GoTo errorh
 
     Dim headingloop As Byte
     Dim nPos As WorldPos
-    Dim x As Integer
+    Dim X As Integer
     Dim Y As Integer
     Dim dist As Integer
     Dim distBestTarget As Integer
@@ -717,34 +716,34 @@ On Error GoTo errorh
     Dim UI As Integer
     Dim PJEnInd As Integer
     Dim BestTarget As Integer
-    NPCPosM = Npclist(npcind).Pos.map
-    NPCPosX = Npclist(npcind).Pos.x
+    NPCPosM = Npclist(npcind).Pos.Map
+    NPCPosX = Npclist(npcind).Pos.X
     NPCPosY = Npclist(npcind).Pos.Y
     BestTarget = 0
     dist = 0
     distBestTarget = 0
     
-    For x = NPCPosX - 8 To NPCPosX + 8
+    For X = NPCPosX - 8 To NPCPosX + 8
         For Y = NPCPosY - 7 To NPCPosY + 7
-            PJEnInd = MapData(NPCPosM, x, Y).UserIndex
+            PJEnInd = MapData(NPCPosM, X, Y).UserIndex
             If (PJEnInd > 0) Then
                 If (Not (UserList(PJEnInd).flags.invisible = 1 Or UserList(PJEnInd).flags.Oculto = 1 Or UserList(PJEnInd).flags.Muerto = 1)) And EsAlcanzable(npcind, PJEnInd) And UserList(PJEnInd).flags.AdminPerseguible Then
                     ''caluclo la distancia al PJ, si esta mas cerca q el actual
                     ''mejor besttarget entonces ataco a ese.
                     If (BestTarget > 0) Then
-                        dist = Sqr((UserList(PJEnInd).Pos.x - NPCPosX) ^ 2 + (UserList(PJEnInd).Pos.Y - NPCPosY) ^ 2)
+                        dist = Sqr((UserList(PJEnInd).Pos.X - NPCPosX) ^ 2 + (UserList(PJEnInd).Pos.Y - NPCPosY) ^ 2)
                         If (dist < distBestTarget) Then
                             BestTarget = PJEnInd
                             distBestTarget = dist
                         End If
                     Else
-                        distBestTarget = Sqr((UserList(PJEnInd).Pos.x - NPCPosX) ^ 2 + (UserList(PJEnInd).Pos.Y - NPCPosY) ^ 2)
+                        distBestTarget = Sqr((UserList(PJEnInd).Pos.X - NPCPosX) ^ 2 + (UserList(PJEnInd).Pos.Y - NPCPosY) ^ 2)
                         BestTarget = PJEnInd
                     End If
                 End If
             End If
         Next Y
-    Next x
+    Next X
     
     ''LLamo a esta funcion si lo llevaron muy lejos.
     ''La idea es que no lo "alejen" del rey y despues queden
@@ -759,7 +758,7 @@ On Error GoTo errorh
         ElseIf BestTarget = 0 Or EstoyMuyLejos(npcind) Then
             Call VolverAlCentro(npcind)
         ElseIf BestTarget > 0 Then
-            Call GreedyWalkTo(npcind, UserList(BestTarget).Pos.map, UserList(BestTarget).Pos.x, UserList(BestTarget).Pos.Y)
+            Call GreedyWalkTo(npcind, UserList(BestTarget).Pos.Map, UserList(BestTarget).Pos.X, UserList(BestTarget).Pos.Y)
         End If
     End If
 
@@ -767,8 +766,8 @@ On Error GoTo errorh
 For headingloop = eHeading.NORTH To eHeading.WEST
     nPos = Npclist(npcind).Pos
     Call HeadtoPos(headingloop, nPos)
-    If InMapBounds(nPos.map, nPos.x, nPos.Y) Then
-        UI = MapData(nPos.map, nPos.x, nPos.Y).UserIndex
+    If InMapBounds(nPos.Map, nPos.X, nPos.Y) Then
+        UI = MapData(nPos.Map, nPos.X, nPos.Y).UserIndex
         If UI > 0 Then
             If Not (UserList(UI).flags.Muerto = 1) Then
                 If NpcAtacaUser(npcind, UI) Then
@@ -810,7 +809,7 @@ On Error GoTo errorh
     DAT_CURARGRAVES = 4
     DAT_TORMENTAAVANZADA = 5
 
-    Dim x As Integer
+    Dim X As Integer
     Dim Y As Integer
     Dim NPCPosX As Integer
     Dim NPCPosY As Integer
@@ -824,12 +823,12 @@ On Error GoTo errorh
     Dim azar, azar2 As Integer
     Dim quehacer As Byte
         ''1- paralizar enemigo,
-        ''2- bombardear enemigo
+        ''2- bomBardoear enemigo
         ''3- ataque a mascotas
         ''4- curar aliado
     quehacer = 0
-    NPCPosM = Npclist(npcind).Pos.map
-    NPCPosX = Npclist(npcind).Pos.x
+    NPCPosM = Npclist(npcind).Pos.Map
+    NPCPosX = Npclist(npcind).Pos.X
     NPCPosY = Npclist(npcind).Pos.Y
     PJBestTarget = False
     BestTarget = 0
@@ -843,11 +842,11 @@ On Error GoTo errorh
     '1) "hoaxed" friends MUST be released
     '2) enemy shall be annihilated no matter what
     '3) party healing if no threats
-    For x = NPCPosX + (azar * 8) To NPCPosX + (azar * -8) Step -azar
+    For X = NPCPosX + (azar * 8) To NPCPosX + (azar * -8) Step -azar
         For Y = NPCPosY + (azar2 * 7) To NPCPosY + (azar2 * -7) Step -azar2
             'scan combat field
-            NPCAlInd = MapData(NPCPosM, x, Y).NpcIndex
-            PJEnInd = MapData(NPCPosM, x, Y).UserIndex
+            NPCAlInd = MapData(NPCPosM, X, Y).NpcIndex
+            PJEnInd = MapData(NPCPosM, X, Y).UserIndex
             If (Npclist(npcind).CanAttack = 1) Then   ''saltea el analisis si no puede atacar para evitar cuentas
                 If (NPCAlInd > 0) Then  ''allie?
                     If (esPretoriano(NPCAlInd) = 0) Then
@@ -890,7 +889,7 @@ On Error GoTo errorh
                 End If  ''listo el analisis del tile
             End If  ''saltea el analisis si no puede atacar, en realidad no es lo "mejor" pero evita cuentas inútiles
         Next Y
-    Next x
+    Next X
             
     ''aqui (si llego) tiene el mejor target
     Select Case quehacer
@@ -908,23 +907,23 @@ On Error GoTo errorh
         ''Este doble for busca amigos paralizados lejos para ir a rescatarlos
         ''Entra aca solo si en el area cercana al rey no hay algo mejor que
         ''hacer.
-        For x = centroX - 16 To centroX + 16
+        For X = centroX - 16 To centroX + 16
             For Y = centroY - 15 To centroY + 15
-                If Not (x < NPCPosX + 8 And x > NPCPosX + 8 And Y < NPCPosY + 7 And Y > NPCPosY - 7) Then
+                If Not (X < NPCPosX + 8 And X > NPCPosX + 8 And Y < NPCPosY + 7 And Y > NPCPosY - 7) Then
                 ''si no es un tile ya analizado... (evito cuentas)
-                    NPCAlInd = MapData(NPCPosM, x, Y).NpcIndex
+                    NPCAlInd = MapData(NPCPosM, X, Y).NpcIndex
                     If NPCAlInd > 0 Then
                         If (esPretoriano(NPCAlInd) > 0 And Npclist(NPCAlInd).flags.Paralizado = 1) Then
                             ''si esta paralizado lo va a rescatar, sino
                             ''ya va a volver por su cuenta
-                            Call GreedyWalkTo(npcind, NPCPosM, Npclist(NPCAlInd).Pos.x, Npclist(NPCAlInd).Pos.Y)
+                            Call GreedyWalkTo(npcind, NPCPosM, Npclist(NPCAlInd).Pos.X, Npclist(NPCAlInd).Pos.Y)
 '                            GreedyWalkTo npcind, NPCPosM, Npclist(NPCAlInd).Pos.X, Npclist(NPCAlInd).Pos.Y
                             Exit Sub
                         End If
                     End If  ''endif npc
                 End If  ''endif tile analizado
             Next Y
-        Next x
+        Next X
         
         ''si estoy aca esta totalmente al cuete el clerigo o mal posicionado por rescate anterior
         If Npclist(npcind).Invent.ArmourEqpSlot = 0 Then
@@ -1014,10 +1013,10 @@ End Sub
 Function EsMagoOClerigo(ByVal PJEnInd As Integer) As Boolean
 On Error GoTo errorh
 
-    EsMagoOClerigo = UserList(PJEnInd).clase = eClass.Mage Or _
-                        UserList(PJEnInd).clase = eClass.Cleric Or _
-                        UserList(PJEnInd).clase = eClass.Druid Or _
-                        UserList(PJEnInd).clase = eClass.Bard
+    EsMagoOClerigo = UserList(PJEnInd).Clase = eClass.Mago Or _
+                        UserList(PJEnInd).Clase = eClass.Clerigo Or _
+                        UserList(PJEnInd).Clase = eClass.Druida Or _
+                        UserList(PJEnInd).Clase = eClass.Bardo
 Exit Function
 
 errorh:
@@ -1031,8 +1030,9 @@ On Error GoTo errorh
     indireccion = Npclist(npcind).Spells(indice)
     '' Envia las palabras magicas, fx y wav del indice-esimo hechizo del npc-hostiles.dat
     Call SendData(SendTarget.ToNPCArea, npcind, PrepareMessageChatOverHead(Hechizos(indireccion).PalabrasMagicas, Npclist(npcind).Char.CharIndex, vbCyan))
-    Call SendData(SendTarget.ToNPCArea, NPCAlInd, PrepareMessageCreateFX(Npclist(NPCAlInd).Char.CharIndex, Hechizos(indireccion).FXgrh, Hechizos(indireccion).loops))
-    Call SendData(SendTarget.ToNPCArea, NPCAlInd, PrepareMessagePlayWave(Hechizos(indireccion).WAV, Npclist(NPCAlInd).Pos.x, Npclist(NPCAlInd).Pos.Y))
+    If Hechizos(indireccion).FXgrh <> 0 Then Call SendData(SendTarget.ToNPCArea, NPCAlInd, PrepareMessageCreateFX(Npclist(NPCAlInd).Char.CharIndex, Hechizos(indireccion).FXgrh, Hechizos(indireccion).loops))
+    If Hechizos(indireccion).Particle <> 0 Then Call SendData(SendTarget.ToNPCArea, NPCAlInd, PrepareMessageCreateCharParticle(Npclist(NPCAlInd).Char.CharIndex, Hechizos(indireccion).Particle))
+    Call SendData(SendTarget.ToNPCArea, NPCAlInd, PrepareMessagePlayWave(Hechizos(indireccion).WAV, Npclist(NPCAlInd).Pos.X, Npclist(NPCAlInd).Pos.Y))
     Npclist(NPCAlInd).Veneno = 0
     Npclist(NPCAlInd).flags.Envenenado = 0
 
@@ -1050,8 +1050,9 @@ On Error GoTo errorh
     indireccion = Npclist(npcind).Spells(indice)
     '' Envia las palabras magicas, fx y wav del indice-esimo hechizo del npc-hostiles.dat
     Call SendData(SendTarget.ToNPCArea, npcind, PrepareMessageChatOverHead(Hechizos(indireccion).PalabrasMagicas, Npclist(npcind).Char.CharIndex, vbCyan))
-    Call SendData(SendTarget.ToNPCArea, NPCAlInd, PrepareMessagePlayWave(Hechizos(indireccion).WAV, Npclist(NPCAlInd).Pos.x, Npclist(NPCAlInd).Pos.Y))
-    Call SendData(SendTarget.ToNPCArea, NPCAlInd, PrepareMessageCreateFX(Npclist(NPCAlInd).Char.CharIndex, Hechizos(indireccion).FXgrh, Hechizos(indireccion).loops))
+    Call SendData(SendTarget.ToNPCArea, NPCAlInd, PrepareMessagePlayWave(Hechizos(indireccion).WAV, Npclist(NPCAlInd).Pos.X, Npclist(NPCAlInd).Pos.Y))
+    If Hechizos(indireccion).FXgrh <> 0 Then Call SendData(SendTarget.ToNPCArea, NPCAlInd, PrepareMessageCreateFX(Npclist(NPCAlInd).Char.CharIndex, Hechizos(indireccion).FXgrh, Hechizos(indireccion).loops))
+    If Hechizos(indireccion).Particle <> 0 Then Call SendData(SendTarget.ToNPCArea, NPCAlInd, PrepareMessageCreateCharParticle(Npclist(NPCAlInd).Char.CharIndex, Hechizos(indireccion).Particle))
     
     If (Npclist(NPCAlInd).Stats.MinHP + 5 < Npclist(NPCAlInd).Stats.MaxHP) Then
         Npclist(NPCAlInd).Stats.MinHP = Npclist(NPCAlInd).Stats.MinHP + 5
@@ -1074,8 +1075,10 @@ On Error GoTo errorh
     indireccion = Npclist(npcind).Spells(indice)
     '' Envia las palabras magicas, fx y wav del indice-esimo hechizo del npc-hostiles.dat
     Call SendData(SendTarget.ToNPCArea, npcind, PrepareMessageChatOverHead(Hechizos(indireccion).PalabrasMagicas, Npclist(npcind).Char.CharIndex, vbCyan))
-    Call SendData(SendTarget.ToNPCArea, NPCAlInd, PrepareMessagePlayWave(Hechizos(indireccion).WAV, Npclist(NPCAlInd).Pos.x, Npclist(NPCAlInd).Pos.Y))
-    Call SendData(SendTarget.ToNPCArea, NPCAlInd, PrepareMessageCreateFX(Npclist(NPCAlInd).Char.CharIndex, Hechizos(indireccion).FXgrh, Hechizos(indireccion).loops))
+    Call SendData(SendTarget.ToNPCArea, NPCAlInd, PrepareMessagePlayWave(Hechizos(indireccion).WAV, Npclist(NPCAlInd).Pos.X, Npclist(NPCAlInd).Pos.Y))
+    If Hechizos(indireccion).FXgrh <> 0 Then Call SendData(SendTarget.ToNPCArea, NPCAlInd, PrepareMessageCreateFX(Npclist(NPCAlInd).Char.CharIndex, Hechizos(indireccion).FXgrh, Hechizos(indireccion).loops))
+    If Hechizos(indireccion).Particle <> 0 Then Call SendData(SendTarget.ToNPCArea, NPCAlInd, PrepareMessageCreateCharParticle(Npclist(NPCAlInd).Char.CharIndex, Hechizos(indireccion).Particle))
+    
     Npclist(NPCAlInd).Contadores.Paralisis = 0
     Npclist(NPCAlInd).flags.Paralizado = 0
 Exit Sub
@@ -1092,8 +1095,9 @@ On Error GoTo errorh
     indireccion = Npclist(paralizador).Spells(indice)
     '' Envia las palabras magicas, fx y wav del indice-esimo hechizo del npc-hostiles.dat
     Call SendData(SendTarget.ToNPCArea, paralizador, PrepareMessageChatOverHead(Hechizos(indireccion).PalabrasMagicas, Npclist(paralizador).Char.CharIndex, vbCyan))
-    Call SendData(SendTarget.ToNPCArea, Paralizado, PrepareMessagePlayWave(Hechizos(indireccion).WAV, Npclist(Paralizado).Pos.x, Npclist(Paralizado).Pos.Y))
-    Call SendData(SendTarget.ToNPCArea, Paralizado, PrepareMessageCreateFX(Npclist(Paralizado).Char.CharIndex, Hechizos(indireccion).FXgrh, Hechizos(indireccion).loops))
+    Call SendData(SendTarget.ToNPCArea, Paralizado, PrepareMessagePlayWave(Hechizos(indireccion).WAV, Npclist(Paralizado).Pos.X, Npclist(Paralizado).Pos.Y))
+    If Hechizos(indireccion).FXgrh <> 0 Then Call SendData(SendTarget.ToNPCArea, Paralizado, PrepareMessageCreateFX(Npclist(Paralizado).Char.CharIndex, Hechizos(indireccion).FXgrh, Hechizos(indireccion).loops))
+    If Hechizos(indireccion).Particle <> 0 Then Call SendData(SendTarget.ToNPCArea, Paralizado, PrepareMessageCreateCharParticle(Npclist(Paralizado).Char.CharIndex, Hechizos(indireccion).Particle))
     
     Npclist(Paralizado).flags.Paralizado = 1
     Npclist(Paralizado).Contadores.Paralisis = IntervaloParalizado * 2
@@ -1113,8 +1117,10 @@ On Error GoTo errorh
     indireccion = Npclist(curador).Spells(indice)
     '' Envia las palabras magicas, fx y wav del indice-esimo hechizo del npc-hostiles.dat
     Call SendData(SendTarget.ToNPCArea, curador, PrepareMessageChatOverHead(Hechizos(indireccion).PalabrasMagicas, Npclist(curador).Char.CharIndex, vbCyan))
-    Call SendData(SendTarget.ToNPCArea, curado, PrepareMessagePlayWave(Hechizos(indireccion).WAV, Npclist(curado).Pos.x, Npclist(curado).Pos.Y))
-    Call SendData(SendTarget.ToNPCArea, curado, PrepareMessageCreateFX(Npclist(curado).Char.CharIndex, Hechizos(indireccion).FXgrh, Hechizos(indireccion).loops))
+    Call SendData(SendTarget.ToNPCArea, curado, PrepareMessagePlayWave(Hechizos(indireccion).WAV, Npclist(curado).Pos.X, Npclist(curado).Pos.Y))
+    If Hechizos(indireccion).FXgrh <> 0 Then Call SendData(SendTarget.ToNPCArea, curado, PrepareMessageCreateFX(Npclist(curado).Char.CharIndex, Hechizos(indireccion).FXgrh, Hechizos(indireccion).loops))
+    If Hechizos(indireccion).Particle <> 0 Then Call SendData(SendTarget.ToNPCArea, curado, PrepareMessageCreateCharParticle(Npclist(curado).Char.CharIndex, Hechizos(indireccion).Particle))
+    
     If Npclist(curado).Stats.MinHP + 30 > Npclist(curado).Stats.MaxHP Then
         Npclist(curado).Stats.MinHP = Npclist(curado).Stats.MaxHP
     Else
@@ -1134,17 +1140,18 @@ On Error GoTo errorh
     indireccion = Npclist(npcind).Spells(indice)
     '' Envia las palabras magicas, fx y wav del indice-esimo hechizo del npc-hostiles.dat
     Call SendData(SendTarget.ToNPCArea, npcind, PrepareMessageChatOverHead(Hechizos(indireccion).PalabrasMagicas, Npclist(npcind).Char.CharIndex, vbCyan))
-    Call SendData(SendTarget.ToNPCArea, PJEnInd, PrepareMessagePlayWave(Hechizos(indireccion).WAV, UserList(PJEnInd).Pos.x, UserList(PJEnInd).Pos.Y))
-    Call SendData(SendTarget.ToPCArea, PJEnInd, PrepareMessageCreateFX(UserList(PJEnInd).Char.CharIndex, Hechizos(indireccion).FXgrh, Hechizos(indireccion).loops))
+    Call SendData(SendTarget.ToNPCArea, PJEnInd, PrepareMessagePlayWave(Hechizos(indireccion).WAV, UserList(PJEnInd).Pos.X, UserList(PJEnInd).Pos.Y))
+    If Hechizos(indireccion).FXgrh <> 0 Then Call SendData(SendTarget.ToPCArea, PJEnInd, PrepareMessageCreateFX(UserList(PJEnInd).Char.CharIndex, Hechizos(indireccion).FXgrh, Hechizos(indireccion).loops))
+    If Hechizos(indireccion).Particle <> 0 Then Call SendData(SendTarget.ToPCArea, PJEnInd, PrepareMessageCreateCharParticle(UserList(PJEnInd).Char.CharIndex, Hechizos(indireccion).Particle))
     
     UserList(PJEnInd).flags.Ceguera = 1
     UserList(PJEnInd).Counters.Ceguera = IntervaloInvisible
     ''Envia ceguera
     Call WriteBlind(PJEnInd)
-    ''bardea si es el rey
+    ''Bardoea si es el rey
     If Npclist(npcind).name = "Rey Pretoriano" Then
         Call WriteConsoleMsg(PJEnInd, "El rey pretoriano te ha vuelto ciego ", FontTypeNames.FONTTYPE_FIGHT)
-        Call WriteConsoleMsg(PJEnInd, "A la distancia escuchas las siguientes palabras: ¡Cobarde, no eres digno de luchar conmigo si escapas! ", FontTypeNames.FONTTYPE_VENENO)
+        Call WriteConsoleMsg(PJEnInd, "A la distancia escuchas las siguientes palabras: ¡CoBardoe, no eres digno de luchar conmigo si escapas! ", FontTypeNames.FONTTYPE_VENENO)
     End If
 
 Exit Sub
@@ -1161,14 +1168,16 @@ On Error GoTo errorh
     indireccion = Npclist(npcind).Spells(indice)
     '' Envia las palabras magicas, fx y wav del indice-esimo hechizo del npc-hostiles.dat
     Call SendData(SendTarget.ToNPCArea, npcind, PrepareMessageChatOverHead(Hechizos(indireccion).PalabrasMagicas, Npclist(npcind).Char.CharIndex, vbCyan))
-    Call SendData(SendTarget.ToNPCArea, PJEnInd, PrepareMessagePlayWave(Hechizos(indireccion).WAV, UserList(PJEnInd).Pos.x, UserList(PJEnInd).Pos.Y))
-    Call SendData(SendTarget.ToPCArea, PJEnInd, PrepareMessageCreateFX(UserList(PJEnInd).Char.CharIndex, Hechizos(indireccion).FXgrh, Hechizos(indireccion).loops))
+    Call SendData(SendTarget.ToNPCArea, PJEnInd, PrepareMessagePlayWave(Hechizos(indireccion).WAV, UserList(PJEnInd).Pos.X, UserList(PJEnInd).Pos.Y))
+    If Hechizos(indireccion).FXgrh <> 0 Then Call SendData(SendTarget.ToPCArea, PJEnInd, PrepareMessageCreateFX(UserList(PJEnInd).Char.CharIndex, Hechizos(indireccion).FXgrh, Hechizos(indireccion).loops))
+    If Hechizos(indireccion).Particle <> 0 Then Call SendData(SendTarget.ToPCArea, PJEnInd, PrepareMessageCreateCharParticle(UserList(PJEnInd).Char.CharIndex, Hechizos(indireccion).Particle))
+    
     UserList(PJEnInd).flags.Estupidez = 1
     UserList(PJEnInd).Counters.Estupidez = IntervaloInvisible
     'manda estupidez
     Call WriteDumb(PJEnInd)
 
-    'bardea si es el rey
+    'Bardoea si es el rey
     If Npclist(npcind).name = "Rey Pretoriano" Then
         Call WriteConsoleMsg(PJEnInd, "El rey pretoriano te ha vuelto estúpido ", FontTypeNames.FONTTYPE_FIGHT)
     End If
@@ -1185,8 +1194,9 @@ On Error GoTo errorh
     indireccion = Npclist(npcind).Spells(indice)
     '' Envia las palabras magicas, fx y wav del indice-esimo hechizo del npc-hostiles.dat
     Call SendData(SendTarget.ToNPCArea, npcind, PrepareMessageChatOverHead(Hechizos(indireccion).PalabrasMagicas, Npclist(npcind).Char.CharIndex, vbCyan))
-    Call SendData(SendTarget.ToNPCArea, PJEnInd, PrepareMessagePlayWave(Hechizos(indireccion).WAV, UserList(PJEnInd).Pos.x, UserList(PJEnInd).Pos.Y))
-    Call SendData(SendTarget.ToPCArea, PJEnInd, PrepareMessageCreateFX(UserList(PJEnInd).Char.CharIndex, Hechizos(indireccion).FXgrh, Hechizos(indireccion).loops))
+    Call SendData(SendTarget.ToNPCArea, PJEnInd, PrepareMessagePlayWave(Hechizos(indireccion).WAV, UserList(PJEnInd).Pos.X, UserList(PJEnInd).Pos.Y))
+    If Hechizos(indireccion).FXgrh <> 0 Then Call SendData(SendTarget.ToPCArea, PJEnInd, PrepareMessageCreateFX(UserList(PJEnInd).Char.CharIndex, Hechizos(indireccion).FXgrh, Hechizos(indireccion).loops))
+    If Hechizos(indireccion).Particle <> 0 Then Call SendData(SendTarget.ToPCArea, PJEnInd, PrepareMessageCreateCharParticle(UserList(PJEnInd).Char.CharIndex, Hechizos(indireccion).Particle))
     
     'Sacamos el efecto de ocultarse
     If UserList(PJEnInd).flags.Oculto = 1 Then
@@ -1222,9 +1232,10 @@ Dim daño As Integer
 If Hechizos(Spell).SubeHP = 1 Then
 
     daño = RandomNumber(Hechizos(Spell).MinHP, Hechizos(Spell).MaxHP)
-    Call SendData(SendTarget.ToPCArea, UserIndex, PrepareMessagePlayWave(Hechizos(Spell).WAV, UserList(UserIndex).Pos.x, UserList(UserIndex).Pos.Y))
-    Call SendData(SendTarget.ToPCArea, UserIndex, PrepareMessageCreateFX(UserList(UserIndex).Char.CharIndex, Hechizos(Spell).FXgrh, Hechizos(Spell).loops))
-
+    Call SendData(SendTarget.ToPCArea, UserIndex, PrepareMessagePlayWave(Hechizos(Spell).WAV, UserList(UserIndex).Pos.X, UserList(UserIndex).Pos.Y))
+    If Hechizos(Spell).FXgrh <> 0 Then Call SendData(SendTarget.ToPCArea, UserIndex, PrepareMessageCreateFX(UserList(UserIndex).Char.CharIndex, Hechizos(Spell).FXgrh, Hechizos(Spell).loops))
+    If Hechizos(Spell).Particle <> 0 Then Call SendData(SendTarget.ToPCArea, UserIndex, PrepareMessageCreateCharParticle(UserList(UserIndex).Char.CharIndex, Hechizos(Spell).Particle))
+    
     UserList(UserIndex).Stats.MinHP = UserList(UserIndex).Stats.MinHP + daño
     If UserList(UserIndex).Stats.MinHP > UserList(UserIndex).Stats.MaxHP Then UserList(UserIndex).Stats.MinHP = UserList(UserIndex).Stats.MaxHP
     
@@ -1233,9 +1244,10 @@ If Hechizos(Spell).SubeHP = 1 Then
 ElseIf Hechizos(Spell).SubeHP = 2 Then
     
     daño = RandomNumber(Hechizos(Spell).MinHP, Hechizos(Spell).MaxHP)
-    Call SendData(SendTarget.ToPCArea, UserIndex, PrepareMessagePlayWave(Hechizos(Spell).WAV, UserList(UserIndex).Pos.x, UserList(UserIndex).Pos.Y))
-    Call SendData(SendTarget.ToPCArea, UserIndex, PrepareMessageCreateFX(UserList(UserIndex).Char.CharIndex, Hechizos(Spell).FXgrh, Hechizos(Spell).loops))
-
+    Call SendData(SendTarget.ToPCArea, UserIndex, PrepareMessagePlayWave(Hechizos(Spell).WAV, UserList(UserIndex).Pos.X, UserList(UserIndex).Pos.Y))
+    If Hechizos(Spell).FXgrh <> 0 Then Call SendData(SendTarget.ToPCArea, UserIndex, PrepareMessageCreateFX(UserList(UserIndex).Char.CharIndex, Hechizos(Spell).FXgrh, Hechizos(Spell).loops))
+    If Hechizos(Spell).Particle <> 0 Then Call SendData(SendTarget.ToPCArea, UserIndex, PrepareMessageCreateCharParticle(UserList(UserIndex).Char.CharIndex, Hechizos(Spell).Particle))
+    
     If UserList(UserIndex).flags.Privilegios And PlayerType.User Then UserList(UserIndex).Stats.MinHP = UserList(UserIndex).Stats.MinHP - daño
     
     Call WriteConsoleMsg(UserIndex, Npclist(NpcIndex).name & " te ha quitado " & daño & " puntos de vida.", FontTypeNames.FONTTYPE_FIGHT)
@@ -1252,8 +1264,9 @@ If Hechizos(Spell).Paraliza = 1 Then
      If UserList(UserIndex).flags.Paralizado = 0 Then
           UserList(UserIndex).flags.Paralizado = 1
           UserList(UserIndex).Counters.Paralisis = IntervaloParalizado
-          Call SendData(SendTarget.ToPCArea, UserIndex, PrepareMessagePlayWave(Hechizos(Spell).WAV, UserList(UserIndex).Pos.x, UserList(UserIndex).Pos.Y))
-          Call SendData(SendTarget.ToPCArea, UserIndex, PrepareMessageCreateFX(UserList(UserIndex).Char.CharIndex, Hechizos(Spell).FXgrh, Hechizos(Spell).loops))
+          Call SendData(SendTarget.ToPCArea, UserIndex, PrepareMessagePlayWave(Hechizos(Spell).WAV, UserList(UserIndex).Pos.X, UserList(UserIndex).Pos.Y))
+          If Hechizos(Spell).FXgrh <> 0 Then Call SendData(SendTarget.ToPCArea, UserIndex, PrepareMessageCreateFX(UserList(UserIndex).Char.CharIndex, Hechizos(Spell).FXgrh, Hechizos(Spell).loops))
+          If Hechizos(Spell).Particle <> 0 Then Call SendData(SendTarget.ToPCArea, UserIndex, PrepareMessageCreateCharParticle(UserList(UserIndex).Char.CharIndex, Hechizos(Spell).Particle))
 
           Call WriteParalizeOK(UserIndex)
 
@@ -1274,7 +1287,7 @@ Sub MagoDestruyeWand(ByVal npcind As Integer, ByVal bs As Byte, ByVal indice As 
 On Error GoTo errorh
     ''sonidos: 30 y 32, y no los cambien sino termina siendo muy chistoso...
     ''Para el FX utiliza el del hechizos(indice)
-    Dim x As Integer
+    Dim X As Integer
     Dim Y As Integer
     Dim PJInd As Integer
     Dim NPCPosX As Integer
@@ -1289,42 +1302,43 @@ On Error GoTo errorh
     Select Case bs
         Case 5
             Call SendData(SendTarget.ToNPCArea, npcind, PrepareMessageChatOverHead("Rahma", Npclist(npcind).Char.CharIndex, vbGreen))
-            Call SendData(SendTarget.ToNPCArea, npcind, PrepareMessagePlayWave(SONIDO_Dragon_VIVO, Npclist(npcind).Pos.x, Npclist(npcind).Pos.Y))
+            Call SendData(SendTarget.ToNPCArea, npcind, PrepareMessagePlayWave(SONIDO_Dragon_VIVO, Npclist(npcind).Pos.X, Npclist(npcind).Pos.Y))
         Case 4
             Call SendData(SendTarget.ToNPCArea, npcind, PrepareMessageChatOverHead("vôrtax", Npclist(npcind).Char.CharIndex, vbGreen))
-            Call SendData(SendTarget.ToNPCArea, npcind, PrepareMessagePlayWave(SONIDO_Dragon_VIVO, Npclist(npcind).Pos.x, Npclist(npcind).Pos.Y))
+            Call SendData(SendTarget.ToNPCArea, npcind, PrepareMessagePlayWave(SONIDO_Dragon_VIVO, Npclist(npcind).Pos.X, Npclist(npcind).Pos.Y))
         Case 3
             Call SendData(SendTarget.ToNPCArea, npcind, PrepareMessageChatOverHead("Zill", Npclist(npcind).Char.CharIndex, vbGreen))
-            Call SendData(SendTarget.ToNPCArea, npcind, PrepareMessagePlayWave(SONIDO_Dragon_VIVO, Npclist(npcind).Pos.x, Npclist(npcind).Pos.Y))
+            Call SendData(SendTarget.ToNPCArea, npcind, PrepareMessagePlayWave(SONIDO_Dragon_VIVO, Npclist(npcind).Pos.X, Npclist(npcind).Pos.Y))
         Case 2
             Call SendData(SendTarget.ToNPCArea, npcind, PrepareMessageChatOverHead("yäkà E'nta", Npclist(npcind).Char.CharIndex, vbGreen))
-            Call SendData(SendTarget.ToNPCArea, npcind, PrepareMessagePlayWave(SONIDO_Dragon_VIVO, Npclist(npcind).Pos.x, Npclist(npcind).Pos.Y))
+            Call SendData(SendTarget.ToNPCArea, npcind, PrepareMessagePlayWave(SONIDO_Dragon_VIVO, Npclist(npcind).Pos.X, Npclist(npcind).Pos.Y))
         Case 1
             Call SendData(SendTarget.ToNPCArea, npcind, PrepareMessageChatOverHead("¡¡Koràtá!!", Npclist(npcind).Char.CharIndex, vbGreen))
-            Call SendData(SendTarget.ToNPCArea, npcind, PrepareMessagePlayWave(SONIDO_Dragon_VIVO, Npclist(npcind).Pos.x, Npclist(npcind).Pos.Y))
+            Call SendData(SendTarget.ToNPCArea, npcind, PrepareMessagePlayWave(SONIDO_Dragon_VIVO, Npclist(npcind).Pos.X, Npclist(npcind).Pos.Y))
         Case 0
             Call SendData(SendTarget.ToNPCArea, npcind, PrepareMessageChatOverHead(vbNullString, Npclist(npcind).Char.CharIndex, vbGreen))
-            Call SendData(SendTarget.ToNPCArea, npcind, PrepareMessagePlayWave(SONIDO_Dragon_VIVO, Npclist(npcind).Pos.x, Npclist(npcind).Pos.Y))
-            NPCPosX = Npclist(npcind).Pos.x
+            Call SendData(SendTarget.ToNPCArea, npcind, PrepareMessagePlayWave(SONIDO_Dragon_VIVO, Npclist(npcind).Pos.X, Npclist(npcind).Pos.Y))
+            NPCPosX = Npclist(npcind).Pos.X
             NPCPosY = Npclist(npcind).Pos.Y
-            NPCPosM = Npclist(npcind).Pos.map
+            NPCPosM = Npclist(npcind).Pos.Map
             PJInd = 0
             indireccion = Npclist(npcind).Spells(indice)
             ''Daño masivo por destruccion de wand
-            For x = 8 To 95
+            For X = 8 To 95
                 For Y = 8 To 95
-                    PJInd = MapData(NPCPosM, x, Y).UserIndex
-                    MascotaInd = MapData(NPCPosM, x, Y).NpcIndex
+                    PJInd = MapData(NPCPosM, X, Y).UserIndex
+                    MascotaInd = MapData(NPCPosM, X, Y).NpcIndex
                     If PJInd > 0 Then
-                        dist = Sqr((UserList(PJInd).Pos.x - NPCPosX) ^ 2 + (UserList(PJInd).Pos.Y - NPCPosY) ^ 2)
+                        dist = Sqr((UserList(PJInd).Pos.X - NPCPosX) ^ 2 + (UserList(PJInd).Pos.Y - NPCPosY) ^ 2)
                         danio = 880 / (dist ^ (3 / 7))
                         danioI = Abs(Int(danio))
                         ''efectiviza el danio
                         If UserList(PJInd).flags.Privilegios And PlayerType.User Then UserList(PJInd).Stats.MinHP = UserList(PJInd).Stats.MinHP - danioI
                         
                         Call WriteConsoleMsg(PJInd, Npclist(npcind).name & " te ha quitado " & danioI & " puntos de vida al romper su vara.", FontTypeNames.FONTTYPE_FIGHT)
-                        Call SendData(SendTarget.ToPCArea, PJInd, PrepareMessagePlayWave(Hechizos(indireccion).WAV, UserList(PJInd).Pos.x, UserList(PJInd).Pos.Y))
-                        Call SendData(SendTarget.ToPCArea, PJInd, PrepareMessageCreateFX(UserList(PJInd).Char.CharIndex, Hechizos(indireccion).FXgrh, Hechizos(indireccion).loops))
+                        Call SendData(SendTarget.ToPCArea, PJInd, PrepareMessagePlayWave(Hechizos(indireccion).WAV, UserList(PJInd).Pos.X, UserList(PJInd).Pos.Y))
+                        If Hechizos(indireccion).FXgrh <> 0 Then Call SendData(SendTarget.ToPCArea, PJInd, PrepareMessageCreateFX(UserList(PJInd).Char.CharIndex, Hechizos(indireccion).FXgrh, Hechizos(indireccion).loops))
+                        If Hechizos(indireccion).Particle <> 0 Then Call SendData(SendTarget.ToPCArea, PJInd, PrepareMessageCreateCharParticle(UserList(PJInd).Char.CharIndex, Hechizos(indireccion).Particle))
                         
                         If UserList(PJInd).Stats.MinHP < 1 Then
                             UserList(PJInd).Stats.MinHP = 0
@@ -1334,14 +1348,15 @@ On Error GoTo errorh
                     ElseIf (MascotaInd > 0) Then
                         If (Npclist(MascotaInd).MaestroUser > 0) Then
                         
-                            dist = Sqr((Npclist(MascotaInd).Pos.x - NPCPosX) ^ 2 + (Npclist(MascotaInd).Pos.Y - NPCPosY) ^ 2)
+                            dist = Sqr((Npclist(MascotaInd).Pos.X - NPCPosX) ^ 2 + (Npclist(MascotaInd).Pos.Y - NPCPosY) ^ 2)
                             danio = 880 / (dist ^ (3 / 7))
                             danioI = Abs(Int(danio))
                             ''efectiviza el danio
                             Npclist(MascotaInd).Stats.MinHP = Npclist(MascotaInd).Stats.MinHP - danioI
                             
-                            Call SendData(SendTarget.ToNPCArea, MascotaInd, PrepareMessagePlayWave(Hechizos(indireccion).WAV, Npclist(MascotaInd).Pos.x, Npclist(MascotaInd).Pos.Y))
-                            Call SendData(SendTarget.ToNPCArea, MascotaInd, PrepareMessageCreateFX(Npclist(MascotaInd).Char.CharIndex, Hechizos(indireccion).FXgrh, Hechizos(indireccion).loops))
+                            Call SendData(SendTarget.ToNPCArea, MascotaInd, PrepareMessagePlayWave(Hechizos(indireccion).WAV, Npclist(MascotaInd).Pos.X, Npclist(MascotaInd).Pos.Y))
+                            If Hechizos(indireccion).FXgrh <> 0 Then Call SendData(SendTarget.ToNPCArea, MascotaInd, PrepareMessageCreateFX(Npclist(MascotaInd).Char.CharIndex, Hechizos(indireccion).FXgrh, Hechizos(indireccion).loops))
+                            If Hechizos(indireccion).Particle <> 0 Then Call SendData(SendTarget.ToNPCArea, MascotaInd, PrepareMessageCreateCharParticle(Npclist(MascotaInd).Char.CharIndex, Hechizos(indireccion).Particle))
                             
                             If Npclist(MascotaInd).Stats.MinHP < 1 Then
                                 Npclist(MascotaInd).Stats.MinHP = 0
@@ -1351,7 +1366,7 @@ On Error GoTo errorh
                     End If  ''hay npc
                     
                 Next Y
-            Next x
+            Next X
     End Select
 
 Exit Sub
@@ -1362,7 +1377,7 @@ errorh:
 End Sub
 
 
-Sub GreedyWalkTo(ByVal npcorig As Integer, ByVal map As Integer, ByVal x As Integer, ByVal Y As Integer)
+Sub GreedyWalkTo(ByVal npcorig As Integer, ByVal Map As Integer, ByVal X As Integer, ByVal Y As Integer)
 On Error GoTo errorh
 ''  Este procedimiento es llamado cada vez que un NPC deba ir
 ''  a otro lugar en el mismo mapa. Utiliza una técnica
@@ -1381,18 +1396,18 @@ Dim USRy As Integer
 Dim dual As Integer
 Dim mapa As Integer
 
-If Not (Npclist(npcorig).Pos.map = map) Then Exit Sub   ''si son distintos mapas abort
+If Not (Npclist(npcorig).Pos.Map = Map) Then Exit Sub   ''si son distintos mapas abort
 
-NPCx = Npclist(npcorig).Pos.x
+NPCx = Npclist(npcorig).Pos.X
 NPCy = Npclist(npcorig).Pos.Y
 
-If (NPCx = x And NPCy = Y) Then Exit Sub    ''ya llegué!!
+If (NPCx = X And NPCy = Y) Then Exit Sub    ''ya llegué!!
 
 
 ''  Levanto las coordenadas del destino
-USRx = x
+USRx = X
 USRy = Y
-mapa = map
+mapa = Map
 
 ''  moverse
     If (NPCx > USRx) Then
@@ -1630,8 +1645,8 @@ On Error GoTo errorh
     Dim mapa As Integer
     Dim NPCx As Integer
     Dim NPCy As Integer
-    mapa = Npclist(npcorig).Pos.map
-    NPCx = Npclist(npcorig).Pos.x
+    mapa = Npclist(npcorig).Pos.Map
+    NPCx = Npclist(npcorig).Pos.X
     NPCy = Npclist(npcorig).Pos.Y
     
     Call SendData(SendTarget.ToNPCArea, npcorig, PrepareMessageCharacterMove(Npclist(npcorig).Char.CharIndex, NPCx, NPCy + 1))
@@ -1656,8 +1671,8 @@ On Error GoTo errorh
     Dim mapa As Integer
     Dim NPCx As Integer
     Dim NPCy As Integer
-    mapa = Npclist(npcorig).Pos.map
-    NPCx = Npclist(npcorig).Pos.x
+    mapa = Npclist(npcorig).Pos.Map
+    NPCx = Npclist(npcorig).Pos.X
     NPCy = Npclist(npcorig).Pos.Y
     
     Call SendData(SendTarget.ToNPCArea, npcorig, PrepareMessageCharacterMove(Npclist(npcorig).Char.CharIndex, NPCx, NPCy - 1))
@@ -1681,14 +1696,14 @@ On Error GoTo errorh
     Dim mapa As Integer
     Dim NPCx As Integer
     Dim NPCy As Integer
-    mapa = Npclist(npcorig).Pos.map
-    NPCx = Npclist(npcorig).Pos.x
+    mapa = Npclist(npcorig).Pos.Map
+    NPCx = Npclist(npcorig).Pos.X
     NPCy = Npclist(npcorig).Pos.Y
 
     Call SendData(SendTarget.ToNPCArea, npcorig, PrepareMessageCharacterMove(Npclist(npcorig).Char.CharIndex, NPCx - 1, NPCy))
     'Update map and npc pos
     MapData(mapa, NPCx, NPCy).NpcIndex = 0
-    Npclist(npcorig).Pos.x = NPCx - 1
+    Npclist(npcorig).Pos.X = NPCx - 1
     Npclist(npcorig).Char.heading = eHeading.WEST
     MapData(mapa, NPCx - 1, NPCy).NpcIndex = npcorig
     
@@ -1707,14 +1722,14 @@ On Error GoTo errorh
     Dim mapa As Integer
     Dim NPCx As Integer
     Dim NPCy As Integer
-    mapa = Npclist(npcorig).Pos.map
-    NPCx = Npclist(npcorig).Pos.x
+    mapa = Npclist(npcorig).Pos.Map
+    NPCx = Npclist(npcorig).Pos.X
     NPCy = Npclist(npcorig).Pos.Y
     
     Call SendData(SendTarget.ToNPCArea, npcorig, PrepareMessageCharacterMove(Npclist(npcorig).Char.CharIndex, NPCx + 1, NPCy))
     'Update map and npc pos
     MapData(mapa, NPCx, NPCy).NpcIndex = 0
-    Npclist(npcorig).Pos.x = NPCx + 1
+    Npclist(npcorig).Pos.X = NPCx + 1
     Npclist(npcorig).Char.heading = eHeading.EAST
     MapData(mapa, NPCx + 1, NPCy).NpcIndex = npcorig
     
@@ -1734,9 +1749,9 @@ On Error GoTo errorh
     Dim NPCPosX As Integer
     Dim NPCPosY As Integer
     Dim NpcMap As Integer
-    NPCPosX = Npclist(npcind).Pos.x
+    NPCPosX = Npclist(npcind).Pos.X
     NPCPosY = Npclist(npcind).Pos.Y
-    NpcMap = Npclist(npcind).Pos.map
+    NpcMap = Npclist(npcind).Pos.Map
     
     If NpcMap = MAPA_PRETORIANO Then
         ''35,25 y 67,25 son las posiciones del rey
@@ -1770,7 +1785,7 @@ Function EstoyMuyLejos(ByVal npcind) As Boolean
     
     retvalue = Npclist(npcind).Pos.Y > 39
     
-    If Not Npclist(npcind).Pos.map = MAPA_PRETORIANO Then
+    If Not Npclist(npcind).Pos.Map = MAPA_PRETORIANO Then
         EstoyMuyLejos = False
     Else
         EstoyMuyLejos = retvalue
@@ -1792,15 +1807,15 @@ On Error GoTo errorh
     
     Dim retvalue As Boolean
     
-    If Npclist(npcind).Pos.x < 50 Then
-        retvalue = Npclist(npcind).Pos.x < 43 And Npclist(npcind).Pos.x > 27
+    If Npclist(npcind).Pos.X < 50 Then
+        retvalue = Npclist(npcind).Pos.X < 43 And Npclist(npcind).Pos.X > 27
     Else
-        retvalue = Npclist(npcind).Pos.x < 75 And Npclist(npcind).Pos.x > 59
+        retvalue = Npclist(npcind).Pos.X < 75 And Npclist(npcind).Pos.X > 59
     End If
     
     retvalue = retvalue And Npclist(npcind).Pos.Y > 19 And Npclist(npcind).Pos.Y < 31
     
-    If Not Npclist(npcind).Pos.map = MAPA_PRETORIANO Then
+    If Not Npclist(npcind).Pos.Map = MAPA_PRETORIANO Then
         EstoyLejos = False
     Else
         EstoyLejos = Not retvalue
@@ -1834,12 +1849,12 @@ On Error GoTo errorh
     Dim NPCPosX As Integer
     Dim NPCPosY As Integer
     
-    PJPosX = UserList(PJEnInd).Pos.x
+    PJPosX = UserList(PJEnInd).Pos.X
     PJPosY = UserList(PJEnInd).Pos.Y
-    NPCPosX = Npclist(npcind).Pos.x
+    NPCPosX = Npclist(npcind).Pos.X
     NPCPosY = Npclist(npcind).Pos.Y
     
-    If (Npclist(npcind).Pos.map = MAPA_PRETORIANO) And (UserList(PJEnInd).Pos.map = MAPA_PRETORIANO) Then
+    If (Npclist(npcind).Pos.Map = MAPA_PRETORIANO) And (UserList(PJEnInd).Pos.Map = MAPA_PRETORIANO) Then
         ''los bounds del mapa pretoriano son fijos.
         ''Esta en una posicion alcanzable si esta dentro del
         ''espacio de las alcobas reales del mapa diseñado por mi.
@@ -1854,7 +1869,7 @@ On Error GoTo errorh
         retvalue = retvalue Or retValue2
         'If retvalue = False Then
         '    If Npclist(npcind).CanAttack = 1 Then
-        '        Call SendData(SendTarget.ToNPCArea, npcind, Npclist(npcind).Pos.Map, "||" & vbYellow & "°¡ Cobarde !°" & str(Npclist(npcind).Char.CharIndex))
+        '        Call SendData(SendTarget.ToNPCArea, npcind, Npclist(npcind).Pos.Map, "||" & vbYellow & "°¡ CoBardoe !°" & str(Npclist(npcind).Char.CharIndex))
         '        Npclist(npcind).CanAttack = 0
         '    End If
         'End If
@@ -1884,9 +1899,9 @@ On Error GoTo errorh
     
     Dim retvalue As Boolean
     
-    NPCPosX = Npclist(npc).Pos.x
+    NPCPosX = Npclist(npc).Pos.X
     NPCPosY = Npclist(npc).Pos.Y
-    NPCPosM = Npclist(npc).Pos.map
+    NPCPosM = Npclist(npc).Pos.Map
     
     retvalue = Not (LegalPos(NPCPosM, NPCPosX + 1, NPCPosY) Or _
                 LegalPos(NPCPosM, NPCPosX - 1, NPCPosY) Or _
@@ -1941,16 +1956,16 @@ On Error GoTo errorh
     Dim NPCPosY As Integer
     Dim NPCPosM As Integer
     
-    NPCPosX = Npclist(npcind).Pos.x
+    NPCPosX = Npclist(npcind).Pos.X
     NPCPosY = Npclist(npcind).Pos.Y
-    NPCPosM = Npclist(npcind).Pos.map
+    NPCPosM = Npclist(npcind).Pos.Map
     
     If LegalPos(NPCPosM, NPCPosX + 1, NPCPosY + 1) Then
         Call SendData(SendTarget.ToNPCArea, npcind, PrepareMessageCharacterMove(Npclist(npcind).Char.CharIndex, NPCPosX + 1, NPCPosY + 1))
         'Update map and npc pos
         MapData(NPCPosM, NPCPosX, NPCPosY).NpcIndex = 0
         Npclist(npcind).Pos.Y = NPCPosY + 1
-        Npclist(npcind).Pos.x = NPCPosX + 1
+        Npclist(npcind).Pos.X = NPCPosX + 1
         Npclist(npcind).Char.heading = eHeading.SOUTH
         MapData(NPCPosM, NPCPosX + 1, NPCPosY + 1).NpcIndex = npcind
         Call SendData(SendTarget.ToNPCArea, npcind, PrepareMessageChatOverHead("¡¡JA JA JA JA!!", Npclist(npcind).Char.CharIndex, vbYellow))
@@ -1962,7 +1977,7 @@ On Error GoTo errorh
         'Update map and npc pos
         MapData(NPCPosM, NPCPosX, NPCPosY).NpcIndex = 0
         Npclist(npcind).Pos.Y = NPCPosY - 1
-        Npclist(npcind).Pos.x = NPCPosX - 1
+        Npclist(npcind).Pos.X = NPCPosX - 1
         Npclist(npcind).Char.heading = eHeading.NORTH
         MapData(NPCPosM, NPCPosX - 1, NPCPosY - 1).NpcIndex = npcind
         Call SendData(SendTarget.ToNPCArea, npcind, PrepareMessageChatOverHead("¡¡JA JA JA JA!!", Npclist(npcind).Char.CharIndex, vbYellow))
@@ -1974,7 +1989,7 @@ On Error GoTo errorh
         'Update map and npc pos
         MapData(NPCPosM, NPCPosX, NPCPosY).NpcIndex = 0
         Npclist(npcind).Pos.Y = NPCPosY - 1
-        Npclist(npcind).Pos.x = NPCPosX + 1
+        Npclist(npcind).Pos.X = NPCPosX + 1
         Npclist(npcind).Char.heading = eHeading.EAST
         MapData(NPCPosM, NPCPosX + 1, NPCPosY - 1).NpcIndex = npcind
         Call SendData(SendTarget.ToNPCArea, npcind, PrepareMessageChatOverHead("¡¡JA JA JA JA!!", Npclist(npcind).Char.CharIndex, vbYellow))
@@ -1986,7 +2001,7 @@ On Error GoTo errorh
         'Update map and npc pos
         MapData(NPCPosM, NPCPosX, NPCPosY).NpcIndex = 0
         Npclist(npcind).Pos.Y = NPCPosY + 1
-        Npclist(npcind).Pos.x = NPCPosX - 1
+        Npclist(npcind).Pos.X = NPCPosX - 1
         Npclist(npcind).Char.heading = eHeading.WEST
         MapData(NPCPosM, NPCPosX - 1, NPCPosY + 1).NpcIndex = npcind
         Call SendData(SendTarget.ToNPCArea, npcind, PrepareMessageChatOverHead("¡¡JA JA JA JA!!", Npclist(npcind).Char.CharIndex, vbYellow))
@@ -2012,22 +2027,22 @@ On Error GoTo errorh
     Select Case Npclist(npcind).Invent.ArmourEqpSlot
         Case 2
             Call GreedyWalkTo(npcind, MAPA_PRETORIANO, 48, 70)
-            If Npclist(npcind).Pos.x = 48 And Npclist(npcind).Pos.Y = 70 Then Npclist(npcind).Invent.ArmourEqpSlot = Npclist(npcind).Invent.ArmourEqpSlot + 1
+            If Npclist(npcind).Pos.X = 48 And Npclist(npcind).Pos.Y = 70 Then Npclist(npcind).Invent.ArmourEqpSlot = Npclist(npcind).Invent.ArmourEqpSlot + 1
         Case 6
             Call GreedyWalkTo(npcind, MAPA_PRETORIANO, 52, 71)
-            If Npclist(npcind).Pos.x = 52 And Npclist(npcind).Pos.Y = 71 Then Npclist(npcind).Invent.ArmourEqpSlot = Npclist(npcind).Invent.ArmourEqpSlot + 1
+            If Npclist(npcind).Pos.X = 52 And Npclist(npcind).Pos.Y = 71 Then Npclist(npcind).Invent.ArmourEqpSlot = Npclist(npcind).Invent.ArmourEqpSlot + 1
         Case 1
             Call GreedyWalkTo(npcind, MAPA_PRETORIANO, 73, 56)
-            If Npclist(npcind).Pos.x = 73 And Npclist(npcind).Pos.Y = 56 Then Npclist(npcind).Invent.ArmourEqpSlot = Npclist(npcind).Invent.ArmourEqpSlot + 1
+            If Npclist(npcind).Pos.X = 73 And Npclist(npcind).Pos.Y = 56 Then Npclist(npcind).Invent.ArmourEqpSlot = Npclist(npcind).Invent.ArmourEqpSlot + 1
         Case 7
             Call GreedyWalkTo(npcind, MAPA_PRETORIANO, 73, 48)
-            If Npclist(npcind).Pos.x = 73 And Npclist(npcind).Pos.Y = 48 Then Npclist(npcind).Invent.ArmourEqpSlot = Npclist(npcind).Invent.ArmourEqpSlot + 1
+            If Npclist(npcind).Pos.X = 73 And Npclist(npcind).Pos.Y = 48 Then Npclist(npcind).Invent.ArmourEqpSlot = Npclist(npcind).Invent.ArmourEqpSlot + 1
         Case 5
             Call GreedyWalkTo(npcind, MAPA_PRETORIANO, 31, 56)
-            If Npclist(npcind).Pos.x = 31 And Npclist(npcind).Pos.Y = 56 Then Npclist(npcind).Invent.ArmourEqpSlot = Npclist(npcind).Invent.ArmourEqpSlot + 1
+            If Npclist(npcind).Pos.X = 31 And Npclist(npcind).Pos.Y = 56 Then Npclist(npcind).Invent.ArmourEqpSlot = Npclist(npcind).Invent.ArmourEqpSlot + 1
         Case 3
             Call GreedyWalkTo(npcind, MAPA_PRETORIANO, 31, 48)
-            If Npclist(npcind).Pos.x = 31 And Npclist(npcind).Pos.Y = 48 Then Npclist(npcind).Invent.ArmourEqpSlot = Npclist(npcind).Invent.ArmourEqpSlot + 1
+            If Npclist(npcind).Pos.X = 31 And Npclist(npcind).Pos.Y = 48 Then Npclist(npcind).Invent.ArmourEqpSlot = Npclist(npcind).Invent.ArmourEqpSlot + 1
         Case 4, 8
             Npclist(npcind).Invent.ArmourEqpSlot = 0
             Exit Sub

@@ -1,5 +1,5 @@
 Attribute VB_Name = "NPCs"
-'AoshaoServer 0.11.6
+'ImperiumAO 0.11.6
 'Copyright (C) 2002 Márquez Pablo Ignacio
 '
 'This program is free software; you can redistribute it and/or modify
@@ -14,7 +14,7 @@ Attribute VB_Name = "NPCs"
 'You should have received a copy of the Affero General Public License
 'along with this program; if not, you can find it at http://www.affero.org/oagpl.html
 '
-'AoshaoServer is based on Baronsoft's VB6 Online RPG
+'ImperiumAO is based on Baronsoft's VB6 Online RPG
 'You can contact the original creator of ORE at aaron@baronsoft.com
 'for more information about ORE please visit http://www.baronsoft.com/
 '
@@ -70,14 +70,14 @@ Sub MuereNpc(ByVal NpcIndex As Integer, ByVal UserIndex As Integer)
 '22/06/06: (Nacho) Chequeamos si es pretoriano
 '24/01/2007: Pablo (ToxicWaste): Agrego para actualización de tag si cambia de status.
 '********************************************************
-On Error GoTo ErrHandler
+On Error GoTo errhandler
     Dim MiNPC As npc
     MiNPC = Npclist(NpcIndex)
     Dim EraCriminal As Boolean
    
     If (esPretoriano(NpcIndex) = 4) Then
         'Solo nos importa si fue matado en el mapa pretoriano.
-        If Npclist(NpcIndex).Pos.map = MAPA_PRETORIANO Then
+        If Npclist(NpcIndex).Pos.Map = MAPA_PRETORIANO Then
             'seteamos todos estos 'flags' acorde para que cambien solos de alcoba
             Dim i As Integer
             Dim j As Integer
@@ -86,7 +86,7 @@ On Error GoTo ErrHandler
             For i = 8 To 90
                 For j = 8 To 90
                 
-                    NPCI = MapData(Npclist(NpcIndex).Pos.map, i, j).NpcIndex
+                    NPCI = MapData(Npclist(NpcIndex).Pos.Map, i, j).NpcIndex
                     If NPCI > 0 Then
                         If esPretoriano(NPCI) > 0 Then
                             Npclist(NPCI).Invent.ArmourEqpSlot = IIf(Npclist(NpcIndex).Pos.X > 50, 1, 5)
@@ -97,7 +97,7 @@ On Error GoTo ErrHandler
             Call CrearClanPretoriano(Npclist(NpcIndex).Pos.X)
         End If
     ElseIf esPretoriano(NpcIndex) > 0 Then
-        If Npclist(NpcIndex).Pos.map = MAPA_PRETORIANO Then
+        If Npclist(NpcIndex).Pos.Map = MAPA_PRETORIANO Then
             Npclist(NpcIndex).Invent.ArmourEqpSlot = 0
             pretorianosVivos = pretorianosVivos - 1
         End If
@@ -124,37 +124,26 @@ On Error GoTo ErrHandler
                   End If
             Next T
         End If
-        If UserList(UserIndex).Quest.QuestIndex <> 0 Then
-                If QuestList(UserList(UserIndex).Quest.QuestIndex).Tipo = 1 Then
-                    If QuestList(UserList(UserIndex).Quest.QuestIndex).TargetNPC = MiNPC.Numero Then
-                        UserList(UserIndex).Quest.CantidadMatada = UserList(UserIndex).Quest.CantidadMatada + 1
-                        If UserList(UserIndex).Quest.CantidadMatada >= QuestList(UserList(UserIndex).Quest.QuestIndex).CantObjetivos Then
-                            modQuestIAO.FinalizarQuest (UserIndex)
-                        Else
-                            Call WriteConsoleMsg(UserIndex, "Criaturas Restantes: " & UserList(UserIndex).Quest.CantidadMatada & "/" & QuestList(UserList(UserIndex).Quest.QuestIndex).CantObjetivos, FontTypeNames.FONTTYPE_QUEST)
-                        End If
-                    End If
-                End If
-            End If
-
+        
         '[KEVIN]
-            If MiNPC.flags.ExpCount > 0 Then
+        If MiNPC.flags.ExpCount > 0 Then
             If UserList(UserIndex).PartyIndex > 0 Then
-                Call mdParty.ObtenerExito(UserIndex, MiNPC.flags.ExpCount, MiNPC.Pos.map, MiNPC.Pos.X, MiNPC.Pos.Y)
+                Call mdParty.ObtenerExito(UserIndex, MiNPC.flags.ExpCount, MiNPC.Pos.Map, MiNPC.Pos.X, MiNPC.Pos.Y)
             Else
                 UserList(UserIndex).Stats.Exp = UserList(UserIndex).Stats.Exp + MiNPC.flags.ExpCount
                 If UserList(UserIndex).Stats.Exp > MAXEXP Then _
                     UserList(UserIndex).Stats.Exp = MAXEXP
-                Call WriteConsoleMsg(UserIndex, "Has ganado " & MiNPC.flags.ExpCount & " puntos de experiencia.", FontTypeNames.FONTTYPE_INFOBOLD)
+                Call WriteConsoleMsg(UserIndex, "Has ganado " & MiNPC.flags.ExpCount & " puntos de experiencia.", FontTypeNames.FONTTYPE_FIGHT)
             End If
             MiNPC.flags.ExpCount = 0
         End If
-       '[/KEVIN]
+        
+        '[/KEVIN]
         Call WriteConsoleMsg(UserIndex, "Has matado a la criatura!", FontTypeNames.FONTTYPE_FIGHT)
         If UserList(UserIndex).Stats.NPCsMuertos < 32000 Then _
             UserList(UserIndex).Stats.NPCsMuertos = UserList(UserIndex).Stats.NPCsMuertos + 1
         
-        EraCriminal = Criminal(UserIndex)
+        EraCriminal = esRene(UserIndex)
         
         If MiNPC.Stats.Alineacion = 0 Then
             If MiNPC.Numero = Guardias Then
@@ -182,12 +171,11 @@ On Error GoTo ErrHandler
             If UserList(UserIndex).Reputacion.PlebeRep > MAXREP Then _
                 UserList(UserIndex).Reputacion.PlebeRep = MAXREP
         End If
-        If Criminal(UserIndex) And esArmada(UserIndex) Then Call ExpulsarFaccionReal(UserIndex)
-        If Not Criminal(UserIndex) And esCaos(UserIndex) Then Call ExpulsarFaccionCaos(UserIndex)
+
         
-        If EraCriminal And Not Criminal(UserIndex) Then
+        If EraCriminal And Not esRene(UserIndex) Then
             Call RefreshCharStatus(UserIndex)
-        ElseIf Not EraCriminal And Criminal(UserIndex) Then
+        ElseIf Not EraCriminal And esRene(UserIndex) Then
             Call RefreshCharStatus(UserIndex)
         End If
         
@@ -196,9 +184,7 @@ On Error GoTo ErrHandler
    
     If MiNPC.MaestroUser = 0 Then
         'Tiramos el oro
-        
-        Call NPCTirarOro(MiNPC, UserIndex) ' si esta en 0 directo a la bille sin tirarlo
-       
+        Call NPCTirarOro(MiNPC)
         'Tiramos el inventario
         Call NPC_TIRAR_ITEMS(MiNPC)
         'ReSpawn o no
@@ -209,9 +195,10 @@ On Error GoTo ErrHandler
     
 Exit Sub
 
-ErrHandler:
+errhandler:
     Call LogError("Error en MuereNpc - Error: " & Err.Number & " - Desc: " & Err.description)
 End Sub
+
 Sub ResetNpcFlags(ByVal NpcIndex As Integer)
     'Clear the npc's flags
     
@@ -234,7 +221,6 @@ Sub ResetNpcFlags(ByVal NpcIndex As Integer)
         .OldHostil = 0
         .OldMovement = 0
         .Paralizado = 0
-        .incinerado = 0
         .Inmovilizado = 0
         .Respawn = 0
         .RespawnOrigPos = 0
@@ -305,7 +291,6 @@ Sub ResetNpcMainInfo(ByVal NpcIndex As Integer)
     Npclist(NpcIndex).Comercia = 0
     Npclist(NpcIndex).GiveEXP = 0
     Npclist(NpcIndex).GiveGLD = 0
-  ' Npclist(NpcIndex).DropMode = 0
     Npclist(NpcIndex).Hostile = 0
     Npclist(NpcIndex).InvReSpawn = 0
     Npclist(NpcIndex).level = 0
@@ -321,12 +306,12 @@ Sub ResetNpcMainInfo(ByVal NpcIndex As Integer)
     Npclist(NpcIndex).name = "NPC SIN INICIAR"
     Npclist(NpcIndex).NPCtype = 0
     Npclist(NpcIndex).Numero = 0
-    Npclist(NpcIndex).Orig.map = 0
+    Npclist(NpcIndex).Orig.Map = 0
     Npclist(NpcIndex).Orig.X = 0
     Npclist(NpcIndex).Orig.Y = 0
     Npclist(NpcIndex).PoderAtaque = 0
     Npclist(NpcIndex).PoderEvasion = 0
-    Npclist(NpcIndex).Pos.map = 0
+    Npclist(NpcIndex).Pos.Map = 0
     Npclist(NpcIndex).Pos.X = 0
     Npclist(NpcIndex).Pos.Y = 0
     Npclist(NpcIndex).SkillDomar = 0
@@ -350,11 +335,11 @@ End Sub
 
 Sub QuitarNPC(ByVal NpcIndex As Integer)
 
-On Error GoTo ErrHandler
+On Error GoTo errhandler
 
     Npclist(NpcIndex).flags.NPCActive = False
     
-    If InMapBounds(Npclist(NpcIndex).Pos.map, Npclist(NpcIndex).Pos.X, Npclist(NpcIndex).Pos.Y) Then
+    If InMapBounds(Npclist(NpcIndex).Pos.Map, Npclist(NpcIndex).Pos.X, Npclist(NpcIndex).Pos.Y) Then
         Call EraseNPCChar(NpcIndex)
     End If
     
@@ -380,7 +365,7 @@ On Error GoTo ErrHandler
 
 Exit Sub
 
-ErrHandler:
+errhandler:
     Npclist(NpcIndex).flags.NPCActive = False
     Call LogError("Error en QuitarNPC")
 
@@ -388,16 +373,16 @@ End Sub
 
 Function TestSpawnTrigger(Pos As WorldPos, Optional PuedeAgua As Boolean = False) As Boolean
     
-    If LegalPos(Pos.map, Pos.X, Pos.Y, PuedeAgua) Then
+    If LegalPos(Pos.Map, Pos.X, Pos.Y, PuedeAgua) Then
         TestSpawnTrigger = _
-        MapData(Pos.map, Pos.X, Pos.Y).trigger <> 3 And _
-        MapData(Pos.map, Pos.X, Pos.Y).trigger <> 2 And _
-        MapData(Pos.map, Pos.X, Pos.Y).trigger <> 1
+        MapData(Pos.Map, Pos.X, Pos.Y).Trigger <> 3 And _
+        MapData(Pos.Map, Pos.X, Pos.Y).Trigger <> 2 And _
+        MapData(Pos.Map, Pos.X, Pos.Y).Trigger <> 1
     End If
 
 End Function
 
-Sub CrearNPC(NroNPC As Integer, MAPA As Integer, OrigPos As WorldPos)
+Sub CrearNPC(NroNPC As Integer, mapa As Integer, OrigPos As WorldPos)
 'Call LogTarea("Sub CrearNPC")
 'Crea un NPC del tipo NRONPC
 
@@ -411,7 +396,7 @@ Dim PuedeAgua As Boolean
 Dim PuedeTierra As Boolean
 
 
-Dim map As Integer
+Dim Map As Integer
 Dim X As Integer
 Dim Y As Integer
 
@@ -422,9 +407,9 @@ Dim Y As Integer
     PuedeTierra = IIf(Npclist(nIndex).flags.TierraInvalida = 1, False, True)
     
     'Necesita ser respawned en un lugar especifico
-    If InMapBounds(OrigPos.map, OrigPos.X, OrigPos.Y) Then
+    If InMapBounds(OrigPos.Map, OrigPos.X, OrigPos.Y) Then
         
-        map = OrigPos.map
+        Map = OrigPos.Map
         X = OrigPos.X
         Y = OrigPos.Y
         Npclist(nIndex).Orig = OrigPos
@@ -432,8 +417,8 @@ Dim Y As Integer
        
     Else
         
-        Pos.map = MAPA 'mapa
-        altpos.map = MAPA
+        Pos.Map = mapa 'mapa
+        altpos.Map = mapa
         
         Do While Not PosicionValida
             Pos.X = RandomNumber(MinXBorder, MaxXBorder)    'Obtenemos posicion al azar en x
@@ -451,10 +436,10 @@ Dim Y As Integer
                 End If
             End If
             'Si X e Y son iguales a 0 significa que no se encontro posicion valida
-            If LegalPosNPC(newpos.map, newpos.X, newpos.Y, PuedeAgua) And _
+            If LegalPosNPC(newpos.Map, newpos.X, newpos.Y, PuedeAgua) And _
                Not HayPCarea(newpos) And TestSpawnTrigger(newpos, PuedeAgua) Then
                 'Asignamos las nuevas coordenas solo si son validas
-                Npclist(nIndex).Pos.map = newpos.map
+                Npclist(nIndex).Pos.Map = newpos.Map
                 Npclist(nIndex).Pos.X = newpos.X
                 Npclist(nIndex).Pos.Y = newpos.Y
                 PosicionValida = True
@@ -468,27 +453,27 @@ Dim Y As Integer
             Iteraciones = Iteraciones + 1
             If Iteraciones > MAXSPAWNATTEMPS Then
                 If altpos.X <> 0 And altpos.Y <> 0 Then
-                    map = altpos.map
+                    Map = altpos.Map
                     X = altpos.X
                     Y = altpos.Y
-                    Npclist(nIndex).Pos.map = map
+                    Npclist(nIndex).Pos.Map = Map
                     Npclist(nIndex).Pos.X = X
                     Npclist(nIndex).Pos.Y = Y
-                    Call MakeNPCChar(True, map, nIndex, map, X, Y)
+                    Call MakeNPCChar(True, Map, nIndex, Map, X, Y)
                     Exit Sub
                 Else
                     altpos.X = 50
                     altpos.Y = 50
                     Call ClosestLegalPos(altpos, newpos)
                     If newpos.X <> 0 And newpos.Y <> 0 Then
-                        Npclist(nIndex).Pos.map = newpos.map
+                        Npclist(nIndex).Pos.Map = newpos.Map
                         Npclist(nIndex).Pos.X = newpos.X
                         Npclist(nIndex).Pos.Y = newpos.Y
-                        Call MakeNPCChar(True, newpos.map, nIndex, newpos.map, newpos.X, newpos.Y)
+                        Call MakeNPCChar(True, newpos.Map, nIndex, newpos.Map, newpos.X, newpos.Y)
                         Exit Sub
                     Else
                         Call QuitarNPC(nIndex)
-                        Call LogError(MAXSPAWNATTEMPS & " iteraciones en CrearNpc Mapa:" & MAPA & " NroNpc:" & NroNPC)
+                        Call LogError(MAXSPAWNATTEMPS & " iteraciones en CrearNpc Mapa:" & mapa & " NroNpc:" & NroNPC)
                         Exit Sub
                     End If
                 End If
@@ -496,32 +481,14 @@ Dim Y As Integer
         Loop
         
         'asignamos las nuevas coordenas
-        map = newpos.map
+        Map = newpos.Map
         X = Npclist(nIndex).Pos.X
         Y = Npclist(nIndex).Pos.Y
     End If
     
     'Crea el NPC
-    Call MakeNPCChar(True, map, nIndex, map, X, Y)
+    Call MakeNPCChar(True, Map, nIndex, Map, X, Y)
 
-End Sub
-
-Sub MakeNPCChar(ByVal toMap As Boolean, sndIndex As Integer, NpcIndex As Integer, ByVal map As Integer, ByVal X As Integer, ByVal Y As Integer)
-Dim CharIndex As Integer
-    If Npclist(NpcIndex).Char.CharIndex = 0 Then
-        CharIndex = NextOpenCharIndex
-        Npclist(NpcIndex).Char.CharIndex = CharIndex
-        CharList(CharIndex) = NpcIndex
-    End If
-    
-    MapData(map, X, Y).NpcIndex = NpcIndex
-    
-    If Not toMap Then
-        Call WriteCharacterCreate(sndIndex, Npclist(NpcIndex).Char.body, Npclist(NpcIndex).Char.Head, Npclist(NpcIndex).Char.heading, Npclist(NpcIndex).Char.CharIndex, X, Y, 0, 0, 0, 0, 0, vbNullString, 0, 0)
-        Call FlushBuffer(sndIndex)
-    Else
-        Call AgregarNpc(NpcIndex)
-    End If
 End Sub
 
 Sub ChangeNPCChar(ByVal NpcIndex As Integer, ByVal body As Integer, ByVal Head As Integer, ByVal heading As eHeading)
@@ -546,7 +513,7 @@ If Npclist(NpcIndex).Char.CharIndex = LastChar Then
 End If
 
 'Quitamos del mapa
-MapData(Npclist(NpcIndex).Pos.map, Npclist(NpcIndex).Pos.X, Npclist(NpcIndex).Pos.Y).NpcIndex = 0
+MapData(Npclist(NpcIndex).Pos.Map, Npclist(NpcIndex).Pos.X, Npclist(NpcIndex).Pos.Y).NpcIndex = 0
 
 'Actualizamos los clientes
 Call SendData(SendTarget.ToNPCArea, NpcIndex, PrepareMessageCharacterRemove(Npclist(NpcIndex).Char.CharIndex))
@@ -571,28 +538,28 @@ On Error GoTo errh
     'Es mascota ????
     If Npclist(NpcIndex).MaestroUser > 0 Then
         ' es una posicion legal
-        If LegalPos(Npclist(NpcIndex).Pos.map, nPos.X, nPos.Y, Npclist(NpcIndex).flags.AguaValida = 1) Then
+        If LegalPos(Npclist(NpcIndex).Pos.Map, nPos.X, nPos.Y, Npclist(NpcIndex).flags.AguaValida = 1) Then
         
-            If Npclist(NpcIndex).flags.AguaValida = 0 And HayAgua(Npclist(NpcIndex).Pos.map, nPos.X, nPos.Y) Then Exit Sub
-            If Npclist(NpcIndex).flags.TierraInvalida = 1 And Not HayAgua(Npclist(NpcIndex).Pos.map, nPos.X, nPos.Y) Then Exit Sub
+            If Npclist(NpcIndex).flags.AguaValida = 0 And HayAgua(Npclist(NpcIndex).Pos.Map, nPos.X, nPos.Y) Then Exit Sub
+            If Npclist(NpcIndex).flags.TierraInvalida = 1 And Not HayAgua(Npclist(NpcIndex).Pos.Map, nPos.X, nPos.Y) Then Exit Sub
             
 
             Call SendData(SendTarget.ToNPCArea, NpcIndex, PrepareMessageCharacterMove(Npclist(NpcIndex).Char.CharIndex, nPos.X, nPos.Y))
             
             'Update map and user pos
-            MapData(Npclist(NpcIndex).Pos.map, Npclist(NpcIndex).Pos.X, Npclist(NpcIndex).Pos.Y).NpcIndex = 0
+            MapData(Npclist(NpcIndex).Pos.Map, Npclist(NpcIndex).Pos.X, Npclist(NpcIndex).Pos.Y).NpcIndex = 0
             Npclist(NpcIndex).Pos = nPos
             Npclist(NpcIndex).Char.heading = nHeading
-            MapData(Npclist(NpcIndex).Pos.map, Npclist(NpcIndex).Pos.X, Npclist(NpcIndex).Pos.Y).NpcIndex = NpcIndex
+            MapData(Npclist(NpcIndex).Pos.Map, Npclist(NpcIndex).Pos.X, Npclist(NpcIndex).Pos.Y).NpcIndex = NpcIndex
             Call CheckUpdateNeededNpc(NpcIndex, nHeading)
         End If
 Else ' No es mascota
         ' Controlamos que la posicion sea legal, los npc que
         ' no son mascotas tienen mas restricciones de movimiento.
-        If LegalPosNPC(Npclist(NpcIndex).Pos.map, nPos.X, nPos.Y, Npclist(NpcIndex).flags.AguaValida) Then
+        If LegalPosNPC(Npclist(NpcIndex).Pos.Map, nPos.X, nPos.Y, Npclist(NpcIndex).flags.AguaValida) Then
             
-            If Npclist(NpcIndex).flags.AguaValida = 0 And HayAgua(Npclist(NpcIndex).Pos.map, nPos.X, nPos.Y) Then Exit Sub
-            If Npclist(NpcIndex).flags.TierraInvalida = 1 And Not HayAgua(Npclist(NpcIndex).Pos.map, nPos.X, nPos.Y) Then Exit Sub
+            If Npclist(NpcIndex).flags.AguaValida = 0 And HayAgua(Npclist(NpcIndex).Pos.Map, nPos.X, nPos.Y) Then Exit Sub
+            If Npclist(NpcIndex).flags.TierraInvalida = 1 And Not HayAgua(Npclist(NpcIndex).Pos.Map, nPos.X, nPos.Y) Then Exit Sub
             
             '[Alejo-18-5]
             'server
@@ -601,10 +568,10 @@ Else ' No es mascota
 
             
             'Update map and user pos
-            MapData(Npclist(NpcIndex).Pos.map, Npclist(NpcIndex).Pos.X, Npclist(NpcIndex).Pos.Y).NpcIndex = 0
+            MapData(Npclist(NpcIndex).Pos.Map, Npclist(NpcIndex).Pos.X, Npclist(NpcIndex).Pos.Y).NpcIndex = 0
             Npclist(NpcIndex).Pos = nPos
             Npclist(NpcIndex).Char.heading = nHeading
-            MapData(Npclist(NpcIndex).Pos.map, Npclist(NpcIndex).Pos.X, Npclist(NpcIndex).Pos.Y).NpcIndex = NpcIndex
+            MapData(Npclist(NpcIndex).Pos.Map, Npclist(NpcIndex).Pos.X, Npclist(NpcIndex).Pos.Y).NpcIndex = NpcIndex
             
             Call CheckUpdateNeededNpc(NpcIndex, nHeading)
         
@@ -628,7 +595,7 @@ End Sub
 Function NextOpenNPC() As Integer
 'Call LogTarea("Sub NextOpenNPC")
 
-On Error GoTo ErrHandler
+On Error GoTo errhandler
 
 Dim LoopC As Integer
   
@@ -641,7 +608,7 @@ NextOpenNPC = LoopC
 
 
 Exit Function
-ErrHandler:
+errhandler:
     Call LogError("Error en NextOpenNPC")
 End Function
 
@@ -671,7 +638,7 @@ Dim PuedeAgua As Boolean
 Dim PuedeTierra As Boolean
 
 
-Dim map As Integer
+Dim Map As Integer
 Dim X As Integer
 Dim Y As Integer
 'Dim it As Integer
@@ -697,13 +664,13 @@ PuedeTierra = Not Npclist(nIndex).flags.TierraInvalida = 1
 
         If newpos.X <> 0 And newpos.Y <> 0 Then
             'Asignamos las nuevas coordenas solo si son validas
-            Npclist(nIndex).Pos.map = newpos.map
+            Npclist(nIndex).Pos.Map = newpos.Map
             Npclist(nIndex).Pos.X = newpos.X
             Npclist(nIndex).Pos.Y = newpos.Y
             PosicionValida = True
         Else
             If altpos.X <> 0 And altpos.Y <> 0 Then
-                Npclist(nIndex).Pos.map = altpos.map
+                Npclist(nIndex).Pos.Map = altpos.Map
                 Npclist(nIndex).Pos.X = altpos.X
                 Npclist(nIndex).Pos.Y = altpos.Y
                 PosicionValida = True
@@ -724,12 +691,12 @@ PuedeTierra = Not Npclist(nIndex).flags.TierraInvalida = 1
 'Loop
 
 'asignamos las nuevas coordenas
-map = newpos.map
+Map = newpos.Map
 X = Npclist(nIndex).Pos.X
 Y = Npclist(nIndex).Pos.Y
 
 'Crea el NPC
-Call MakeNPCChar(True, map, nIndex, map, X, Y)
+Call MakeNPCChar(True, Map, nIndex, Map, X, Y)
 
 If FX Then
     Call SendData(SendTarget.ToNPCArea, nIndex, PrepareMessagePlayWave(SND_WARP, X, Y))
@@ -742,12 +709,12 @@ End Function
 
 Sub ReSpawnNpc(MiNPC As npc)
 
-If (MiNPC.flags.Respawn = 0) Then Call CrearNPC(MiNPC.Numero, MiNPC.Pos.map, MiNPC.Orig)
+If (MiNPC.flags.Respawn = 0) Then Call CrearNPC(MiNPC.Numero, MiNPC.Pos.Map, MiNPC.Orig)
 
 End Sub
 
 'Devuelve el nro de enemigos que hay en el Mapa Map
-Function NPCHostiles(ByVal map As Integer) As Integer
+Function NPCHostiles(ByVal Map As Integer) As Integer
 
 Dim NpcIndex As Integer
 Dim cont As Integer
@@ -758,7 +725,7 @@ For NpcIndex = 1 To LastNPC
 
     '¿esta vivo?
     If Npclist(NpcIndex).flags.NPCActive _
-       And Npclist(NpcIndex).Pos.map = map _
+       And Npclist(NpcIndex).Pos.Map = Map _
        And Npclist(NpcIndex).Hostile = 1 And _
        Npclist(NpcIndex).Stats.Alineacion = 2 Then
             cont = cont + 1
@@ -771,43 +738,28 @@ NPCHostiles = cont
 
 End Function
 
-Sub NPCTirarOro(MiNPC As npc, UserIndex As Integer)
+Sub NPCTirarOro(MiNPC As npc)
 
-Dim MiObj As obj
-Dim MiAux As Double
-    
-If EventoActivo = True Then
-MiAux = MiNPC.GiveGLD * 2
-Else
-MiAux = MiNPC.GiveGLD ' ACA LE DA EL VALOR A MIA
-End If
-
-If MiNPC.GiveGLD = 0 Then
-Call WriteConsoleMsg(UserIndex, "La criatura no dropeo oro.", FontTypeNames.FONTTYPE_ORO)
-End If
-
-If MiNPC.DropMode = 0 Then ' NO DROPEA
+'SI EL NPC TIENE ORO LO TIRAMOS
+'Pablo (ToxicWaste): Ahora se puede poner más de 10k de drop de oro en los NPC.
 If MiNPC.GiveGLD > 0 Then
-   UserList(UserIndex).Stats.GLD = UserList(UserIndex).Stats.GLD + MiNPC.GiveGLD
-   Call WriteConsoleMsg(UserIndex, "Has ganado " & MiNPC.GiveGLD & " monedas de oro", FontTypeNames.FONTTYPE_ORO)
-    Call WriteUpdateUserStats(UserIndex)
-End If
-
-Else ' SINO
-
-
-Do While MiAux > 10000
-        MiObj.Amount = 10000
+    Dim MiObj As Obj
+    Dim MiAux As Double
+    MiAux = MiNPC.GiveGLD
+    Do While MiAux > 10000
+        MiObj.amount = 10000
         MiObj.ObjIndex = iORO
         Call TirarItemAlPiso(MiNPC.Pos, MiObj)
         MiAux = MiAux - 10000
     Loop
     If MiAux > 0 Then
-        MiObj.Amount = MiAux
+        MiObj.amount = MiAux
         MiObj.ObjIndex = iORO
         Call TirarItemAlPiso(MiNPC.Pos, MiObj)
     End If
+    
 End If
+
 End Sub
 
 Function OpenNPC(ByVal NpcNumber As Integer, Optional ByVal Respawn = True) As Integer
@@ -858,20 +810,22 @@ Npclist(NpcIndex).flags.Faccion = val(Leer.GetValue("NPC" & NpcNumber, "Faccion"
 Npclist(NpcIndex).NPCtype = val(Leer.GetValue("NPC" & NpcNumber, "NpcType"))
 
 Npclist(NpcIndex).Char.body = val(Leer.GetValue("NPC" & NpcNumber, "Body"))
+
+'NPC CON OBJETOS
+Npclist(NpcIndex).Char.ShieldAnim = val(Leer.GetValue("NPC" & NpcNumber, "EscudoAnim"))
+Npclist(NpcIndex).Char.WeaponAnim = val(Leer.GetValue("NPC" & NpcNumber, "ArmaAnim"))
+Npclist(NpcIndex).Char.CascoAnim = val(Leer.GetValue("NPC" & NpcNumber, "CascoAnim"))
+
 Npclist(NpcIndex).Char.Head = val(Leer.GetValue("NPC" & NpcNumber, "Head"))
 Npclist(NpcIndex).Char.heading = val(Leer.GetValue("NPC" & NpcNumber, "Heading"))
 
 Npclist(NpcIndex).Attackable = val(Leer.GetValue("NPC" & NpcNumber, "Attackable"))
 Npclist(NpcIndex).Comercia = val(Leer.GetValue("NPC" & NpcNumber, "Comercia"))
 Npclist(NpcIndex).Hostile = val(Leer.GetValue("NPC" & NpcNumber, "Hostile"))
-Npclist(NpcIndex).DropMode = val(Leer.GetValue("NPC" & NpcNumber, "DropMode"))
 Npclist(NpcIndex).flags.OldHostil = Npclist(NpcIndex).Hostile
-If hayexp2 = True Then
-Npclist(NpcIndex).GiveEXP = val(Leer.GetValue("NPC" & NpcNumber, "GiveEXP")) * 17 * exp2
-Else
-Npclist(NpcIndex).GiveEXP = val(Leer.GetValue("NPC" & NpcNumber, "GiveEXP")) * 17
-End If
-Npclist(NpcIndex).QuestIndex = val(Leer.GetValue("NPC" & NpcNumber, "QuestIndex"))
+
+Npclist(NpcIndex).GiveEXP = val(Leer.GetValue("NPC" & NpcNumber, "GiveEXP"))
+
 'Npclist(NpcIndex).flags.ExpDada = Npclist(NpcIndex).GiveEXP
 Npclist(NpcIndex).flags.ExpCount = Npclist(NpcIndex).GiveEXP
 
@@ -880,7 +834,7 @@ Npclist(NpcIndex).Veneno = val(Leer.GetValue("NPC" & NpcNumber, "Veneno"))
 Npclist(NpcIndex).flags.Domable = val(Leer.GetValue("NPC" & NpcNumber, "Domable"))
 
 
-Npclist(NpcIndex).GiveGLD = val(Leer.GetValue("NPC" & NpcNumber, "GiveGLD")) * 50
+Npclist(NpcIndex).GiveGLD = val(Leer.GetValue("NPC" & NpcNumber, "GiveGLD"))
 
 Npclist(NpcIndex).PoderAtaque = val(Leer.GetValue("NPC" & NpcNumber, "PoderAtaque"))
 Npclist(NpcIndex).PoderEvasion = val(Leer.GetValue("NPC" & NpcNumber, "PoderEvasion"))
@@ -903,7 +857,7 @@ Npclist(NpcIndex).Invent.NroItems = val(Leer.GetValue("NPC" & NpcNumber, "NROITE
 For LoopC = 1 To Npclist(NpcIndex).Invent.NroItems
     ln = Leer.GetValue("NPC" & NpcNumber, "Obj" & LoopC)
     Npclist(NpcIndex).Invent.Object(LoopC).ObjIndex = val(ReadField(1, ln, 45))
-    Npclist(NpcIndex).Invent.Object(LoopC).Amount = val(ReadField(2, ln, 45))
+    Npclist(NpcIndex).Invent.Object(LoopC).amount = val(ReadField(2, ln, 45))
 Next LoopC
 
 Npclist(NpcIndex).flags.LanzaSpells = val(Leer.GetValue("NPC" & NpcNumber, "LanzaSpells"))
@@ -998,3 +952,49 @@ Sub FollowAmo(ByVal NpcIndex As Integer)
 
 End Sub
 
+
+Public Sub MakeNPCChar(ByVal toMap As Boolean, sndIndex As Integer, NpcIndex As Integer, ByVal Map As Integer, ByVal X As Integer, ByVal Y As Integer)
+    Dim CharIndex As Integer
+    If Npclist(NpcIndex).Char.CharIndex = 0 Then
+        CharIndex = NextOpenCharIndex
+        Npclist(NpcIndex).Char.CharIndex = CharIndex
+        CharList(CharIndex) = NpcIndex
+    End If
+    Dim GG              As String
+    Dim showName    As Byte
+    showName = val(GetVar(DatPath & "NPCs.dat", "NPC" & Npclist(NpcIndex).Numero, "ShowName"))
+    GG = IIf(showName > 0, Npclist(NpcIndex).name, vbNullString)
+    MapData(Map, X, Y).NpcIndex = NpcIndex
+    
+    If Extra.isNPCResucitador(NpcIndex) Then
+        Call Extra.SetAreaResuTheNpc(NpcIndex)
+    End If
+    
+    With Npclist(NpcIndex)
+    If Not toMap Then
+        Call WriteCharacterCreate(sndIndex, Npclist(NpcIndex).Char.body, Npclist(NpcIndex).Char.Head, Npclist(NpcIndex).Char.heading, Npclist(NpcIndex).Char.CharIndex, X, Y, Npclist(NpcIndex).Char.WeaponAnim, Npclist(NpcIndex).Char.ShieldAnim, 0, 0, Npclist(NpcIndex).Char.CascoAnim, GG, 0, 0, Npclist(NpcIndex).Stats.MinHP, Npclist(NpcIndex).Stats.MaxHP)
+        
+        'Color en los Names de npc
+        If showName = 1 Then 'Imperiales
+        Call WriteCharStatus(sndIndex, Npclist(NpcIndex).Char.CharIndex, 6) 'Celeste
+        End If
+        If showName = 2 Then 'Caos
+        Call WriteCharStatus(sndIndex, Npclist(NpcIndex).Char.CharIndex, 3) 'Rojo
+        End If
+        If showName = 3 Then 'Rene
+        Call WriteCharStatus(sndIndex, Npclist(NpcIndex).Char.CharIndex, 1) 'Gris
+        End If
+        If showName = 4 Then 'Repu o MILI
+        Call WriteCharStatus(sndIndex, Npclist(NpcIndex).Char.CharIndex, 4) 'Naranja
+        End If
+        If showName = 5 Then 'Imperiales
+        Call WriteCharStatus(sndIndex, Npclist(NpcIndex).Char.CharIndex, 2) 'azul
+        End If
+        'Fin
+
+        Call FlushBuffer(sndIndex)
+    Else
+        Call AgregarNpc(NpcIndex)
+    End If
+    End With
+End Sub

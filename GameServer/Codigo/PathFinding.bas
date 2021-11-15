@@ -1,5 +1,5 @@
 Attribute VB_Name = "PathFinding"
-'AoshaoServer 0.11.6
+'ImperiumAO 0.11.6
 'Copyright (C) 2002 Márquez Pablo Ignacio
 '
 'This program is free software; you can redistribute it and/or modify
@@ -14,7 +14,7 @@ Attribute VB_Name = "PathFinding"
 'You should have received a copy of the Affero General Public License
 'along with this program; if not, you can find it at http://www.affero.org/oagpl.html
 '
-'AoshaoServer is based on Baronsoft's VB6 Online RPG
+'ImperiumAO is based on Baronsoft's VB6 Online RPG
 'You can contact the original creator of ORE at aaron@baronsoft.com
 'for more information about ORE please visit http://www.baronsoft.com/
 '
@@ -97,11 +97,11 @@ Private Function Limites(ByVal vfila As Integer, ByVal vcolu As Integer)
 Limites = vcolu >= 1 And vcolu <= COLUMS And vfila >= 1 And vfila <= ROWS
 End Function
 
-Private Function IsWalkable(ByVal map As Integer, ByVal row As Integer, ByVal Col As Integer, ByVal NpcIndex As Integer) As Boolean
-IsWalkable = MapData(map, row, Col).Blocked = 0 And MapData(map, row, Col).NpcIndex = 0
+Private Function IsWalkable(ByVal Map As Integer, ByVal row As Integer, ByVal Col As Integer, ByVal NpcIndex As Integer) As Boolean
+IsWalkable = MapData(Map, row, Col).Blocked = 0 And MapData(Map, row, Col).NpcIndex = 0
 
-If MapData(map, row, Col).UserIndex <> 0 Then
-     If MapData(map, row, Col).UserIndex <> Npclist(NpcIndex).PFINFO.TargetUser Then IsWalkable = False
+If MapData(Map, row, Col).UserIndex <> 0 Then
+     If MapData(Map, row, Col).UserIndex <> Npclist(NpcIndex).PFINFO.TargetUser Then IsWalkable = False
 End If
 
 End Function
@@ -194,7 +194,7 @@ Dim V As tVertice
 Dim NpcMap As Integer
 Dim steps As Integer
 
-NpcMap = Npclist(NpcIndex).Pos.map
+NpcMap = Npclist(NpcIndex).Pos.Map
 
 steps = 0
 

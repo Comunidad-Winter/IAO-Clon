@@ -42,8 +42,8 @@ Option Explicit
 '
 'Hecha por el oso
 
-Private Const ARCHIVOMAILS = "\logs\votaron.dat"
-Private Const ARCHIVOCONFIG = "\dat\consultas.dat"
+Private Const ARCHIVOMAILS = "\Data\Files logs\votaron.dat"
+Private Const ARCHIVOCONFIG = "\Data\Files dat\consultas.dat"
 
 Private pEncuestaActualNum As Integer
 Private pEncuestaActualTex As String
@@ -100,7 +100,7 @@ Dim sufragio As Integer
         Exit Function
     End If
 
-    CharFile = CharPath & UserList(UserIndex).name & ".chr"
+    CharFile = CharPath & UserList(UserIndex).name & ".pjs"
     
     
     
@@ -151,7 +151,7 @@ End Function
 
 
 Private Sub MarcarPjComoQueYaVoto(ByVal UserIndex As Integer)
-    Call WriteVar(CharPath & UserList(UserIndex).name & ".chr", "CONSULTAS", "Voto", str(pEncuestaActualNum))
+    Call WriteVar(CharPath & UserList(UserIndex).name & ".pjs", "CONSULTAS", "Voto", str(pEncuestaActualNum))
 End Sub
 
 

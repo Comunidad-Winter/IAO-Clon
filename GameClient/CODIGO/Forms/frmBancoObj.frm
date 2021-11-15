@@ -8,19 +8,16 @@ Begin VB.Form frmBancoObj
    ClientWidth     =   6945
    ClipControls    =   0   'False
    ControlBox      =   0   'False
+   Icon            =   "frmBancoObj.frx":0000
    LinkTopic       =   "Form1"
    MaxButton       =   0   'False
    MinButton       =   0   'False
-   Picture         =   "frmBancoObj.frx":0000
+   Picture         =   "frmBancoObj.frx":8D25A
    ScaleHeight     =   508
    ScaleMode       =   3  'Pixel
    ScaleWidth      =   463
    ShowInTaskbar   =   0   'False
    StartUpPosition =   2  'CenterScreen
-   Begin VB.Timer Tmrnumber 
-      Left            =   240
-      Top             =   360
-   End
    Begin VB.PictureBox Picture1 
       AutoRedraw      =   -1  'True
       BackColor       =   &H00000000&
@@ -33,6 +30,10 @@ Begin VB.Form frmBancoObj
       TabIndex        =   7
       Top             =   1620
       Width           =   480
+   End
+   Begin VB.Timer tmrNumber 
+      Left            =   120
+      Top             =   240
    End
    Begin VB.TextBox Cantidad 
       Alignment       =   2  'Center
@@ -123,17 +124,8 @@ Begin VB.Form frmBancoObj
    Begin VB.Label Label1 
       AutoSize        =   -1  'True
       BackStyle       =   0  'Transparent
-      BeginProperty Font 
-         Name            =   "Tahoma"
-         Size            =   8.25
-         Charset         =   0
-         Weight          =   700
-         Underline       =   0   'False
-         Italic          =   0   'False
-         Strikethrough   =   0   'False
-      EndProperty
       ForeColor       =   &H00FFFFFF&
-      Height          =   195
+      Height          =   210
       Index           =   3
       Left            =   1560
       TabIndex        =   5
@@ -144,15 +136,6 @@ Begin VB.Form frmBancoObj
    Begin VB.Label Label1 
       AutoSize        =   -1  'True
       BackStyle       =   0  'Transparent
-      BeginProperty Font 
-         Name            =   "Tahoma"
-         Size            =   8.25
-         Charset         =   0
-         Weight          =   700
-         Underline       =   0   'False
-         Italic          =   0   'False
-         Strikethrough   =   0   'False
-      EndProperty
       ForeColor       =   &H00FFFFFF&
       Height          =   195
       Index           =   4
@@ -160,47 +143,29 @@ Begin VB.Form frmBancoObj
       TabIndex        =   4
       Top             =   1995
       Visible         =   0   'False
-      Width           =   4605
+      Width           =   4020
    End
    Begin VB.Label Label1 
       AutoSize        =   -1  'True
       BackStyle       =   0  'Transparent
-      BeginProperty Font 
-         Name            =   "Tahoma"
-         Size            =   8.25
-         Charset         =   0
-         Weight          =   700
-         Underline       =   0   'False
-         Italic          =   0   'False
-         Strikethrough   =   0   'False
-      EndProperty
       ForeColor       =   &H00FFFFFF&
       Height          =   195
       Index           =   2
       Left            =   5520
       TabIndex        =   3
       Top             =   1560
-      Width           =   525
+      Width           =   645
    End
    Begin VB.Label Label1 
       AutoSize        =   -1  'True
       BackStyle       =   0  'Transparent
-      BeginProperty Font 
-         Name            =   "Tahoma"
-         Size            =   8.25
-         Charset         =   0
-         Weight          =   700
-         Underline       =   0   'False
-         Italic          =   0   'False
-         Strikethrough   =   0   'False
-      EndProperty
       ForeColor       =   &H00FFFFFF&
       Height          =   195
       Index           =   0
       Left            =   1560
       TabIndex        =   2
       Top             =   1560
-      Width           =   3045
+      Width           =   2925
    End
 End
 Attribute VB_Name = "frmBancoObj"
@@ -209,10 +174,13 @@ Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
 '************************************************* ****************
-'AOshao - v1.0
+'ImperiumAO - v1.0
 '************************************************* ****************
-'Luciano valentin girardi-varawel-crip
-
+'Copyright (C) 2015 Gaston Jorge Martinez
+'Copyright (C) 2015 Alexis Rodriguez
+'Copyright (C) 2015 Luis Merino
+'Copyright (C) 2015 Girardi Luciano Valentin
+'
 'Respective portions copyright by taxpayers below.
 '
 'This library is free software; you can redistribute it and / or
@@ -232,9 +200,8 @@ Attribute VB_Exposed = False
 '
 '************************************************* ****************
 'You can contact me at:
-'varawel123@gmail.com
+'Gaston Jorge Martinez (Zenitram@Hotmail.com)
 '************************************************* ****************
-'Based in ImperiumAO "Imperium Clan",Is Argentum Online,Noland studios.
 
 
 Option Explicit
@@ -248,13 +215,13 @@ Private m_Increment As Integer
 Private m_Interval As Integer
 
 
-Private Sub Cantidad_Change()
+Private Sub cantidad_Change()
 
-If Val(cantidad.text) < 1 Then
-    cantidad.text = 1
+If Val(Cantidad.Text) < 1 Then
+    Cantidad.Text = 1
 End If
-If Val(cantidad.text) > MAX_INVENTORY_OBJS Then
-    cantidad.text = 1
+If Val(Cantidad.Text) > MAX_INVENTORY_OBJS Then
+    Cantidad.Text = 1
 End If
 
 End Sub
@@ -270,11 +237,11 @@ End Sub
 Private Sub cmdMasMenos_MouseDown(Index As Integer, Button As Integer, Shift As Integer, X As Single, Y As Single)
 Select Case Index
     Case 0
-        cmdMasMenos(Index).Picture = LoadPicture(App.path & "\Recursos\Interface\menos-down.jpg")
+        'cmdMasMenos(Index).Picture = LoadInterface("menos-down")
         cmdMasMenos(Index).Tag = "1"
         m_Increment = -1
     Case 1
-        cmdMasMenos(Index).Picture = LoadPicture(App.path & "\Recursos\Interface\mas-down.jpg")
+        'cmdMasMenos(Index).Picture = LoadInterface("mas-down")
         cmdMasMenos(Index).Tag = "1"
         m_Increment = 1
 End Select
@@ -287,12 +254,12 @@ Private Sub cmdMasMenos_MouseMove(Index As Integer, Button As Integer, Shift As 
 Select Case Index
     Case 0
         If cmdMasMenos(Index).Tag = "0" Then
-            cmdMasMenos(Index).Picture = LoadPicture(App.path & "\Recursos\Interface\menos-over.jpg")
+            'cmdMasMenos(Index).Picture = LoadInterface("menos-over")
             cmdMasMenos(Index).Tag = "1"
         End If
     Case 1
         If cmdMasMenos(Index).Tag = "0" Then
-            cmdMasMenos(Index).Picture = LoadPicture(App.path & "\Recursos\Interface\mas-over.jpg")
+            'cmdMasMenos(Index).Picture = LoadInterface("mas-over")
             cmdMasMenos(Index).Tag = "1"
         End If
 End Select
@@ -316,28 +283,28 @@ Call Audio.PlayWave(SND_CLICK)
 If List1(Index).List(List1(Index).ListIndex) = "" Or _
    List1(Index).ListIndex < 0 Then Exit Sub
 
-If Not IsNumeric(cantidad.text) Then Exit Sub
+If Not IsNumeric(Cantidad.Text) Then Exit Sub
 
 Select Case Index
     Case 0
         frmBancoObj.List1(0).SetFocus
         LastIndex1 = List1(0).ListIndex
         LasActionBuy = True
-        Call WriteBankExtractItem(List1(0).ListIndex + 1, cantidad.text)
+        Call WriteBankExtractItem(List1(0).ListIndex + 1, Cantidad.Text)
         
    Case 1
         LastIndex2 = List1(1).ListIndex
         LasActionBuy = False
-        Call WriteBankDeposit(List1(1).ListIndex + 1, cantidad.text)
+        Call WriteBankDeposit(List1(1).ListIndex + 1, Cantidad.Text)
 End Select
 End Sub
 
 Private Sub Image1_MouseDown(Index As Integer, Button As Integer, Shift As Integer, X As Single, Y As Single)
 If Index = 0 Then
-    Image1(Index).Picture = LoadPicture(App.path & "\Recursos\Interface\retirar-down.jpg")
+    'Image1(Index).Picture = LoadInterface("retirar-down")
     Image1(Index).Tag = "1"
 ElseIf Index = 1 Then
-    Image1(Index).Picture = LoadPicture(App.path & "\Recursos\Interface\depositar-down.jpg")
+    'Image1(Index).Picture = LoadInterface("depositar-down")
     Image1(Index).Tag = "1"
 End If
 End Sub
@@ -345,12 +312,12 @@ End Sub
 Private Sub Image1_MouseMove(Index As Integer, Button As Integer, Shift As Integer, X As Single, Y As Single)
 If Index = 0 Then
     If Image1(Index).Tag = "0" Then
-        Image1(Index).Picture = LoadPicture(App.path & "\Recursos\Interface\retirar-over.jpg")
+        'Image1(Index).Picture = LoadInterface("retirar-over")
         Image1(Index).Tag = "1"
     End If
 ElseIf Index = 1 Then
     If Image1(Index).Tag = "0" Then
-        Image1(Index).Picture = LoadPicture(App.path & "\Recursos\Interface\depositar-over.jpg")
+        'Image1(Index).Picture = LoadInterface("depositar-over")
         Image1(Index).Tag = "1"
     End If
 End If
@@ -362,35 +329,24 @@ Call WriteBankEnd
 End Sub
 
 Private Sub Command2_MouseDown(Button As Integer, Shift As Integer, X As Single, Y As Single)
-Image2.Picture = LoadPicture(App.path & "\Recursos\Interface\salir-down.jpg")
+'Image2.Picture = LoadInterface("salir-down")
 Image2.Tag = "1"
 End Sub
 
 Private Sub Command2_MouseMove(Button As Integer, Shift As Integer, X As Single, Y As Single)
 If Image2.Tag = "0" Then
-    Image2.Picture = LoadPicture(App.path & "\Recursos\Interface\salir-over.jpg")
+    'Image2.Picture = LoadInterface("salir-over")
     Image2.Tag = "1"
 End If
 
 End Sub
 
 Private Sub list1_Click(Index As Integer)
-Dim SR As RECT, DR As RECT
-
-SR.Left = 0
-SR.Top = 0
-SR.Right = 32
-SR.bottom = 32
-
-DR.Left = 0
-DR.Top = 0
-DR.Right = 32
-DR.bottom = 32
 
 Select Case Index
     Case 0
         Label1(0).Caption = UserBancoInventory(List1(0).ListIndex + 1).name
-        Label1(2).Caption = UserBancoInventory(List1(0).ListIndex + 1).amount
+        Label1(2).Caption = UserBancoInventory(List1(0).ListIndex + 1).Amount
         Select Case UserBancoInventory(List1(0).ListIndex + 1).OBJType
             Case 2
                 Label1(3).Caption = "Max Golpe:" & UserBancoInventory(List1(0).ListIndex + 1).MaxHit
@@ -406,11 +362,12 @@ Select Case Index
                 Label1(4).Visible = False
         End Select
         
-        If UserBancoInventory(List1(0).ListIndex + 1).amount <> 0 Then _
-            Call Grh_Render_To_Hdc(Picture1.hdc, (UserBancoInventory(List1(0).ListIndex + 1).grhindex), 0, 0)
+        Picture1.Cls
+        If UserBancoInventory(List1(0).ListIndex + 1).Amount <> 0 Then _
+            Call Engine.DrawGrhToHdc(Picture1.hdc, NPCInventory(List1(0).ListIndex + 1).grhindex, 0, 0)
     Case 1
         Label1(0).Caption = Inventario.ItemName(List1(1).ListIndex + 1)
-        Label1(2).Caption = Inventario.amount(List1(1).ListIndex + 1)
+        Label1(2).Caption = Inventario.Amount(List1(1).ListIndex + 1)
         Select Case Inventario.OBJType(List1(1).ListIndex + 1)
             Case 2
                 Label1(3).Caption = "Max Golpe:" & Inventario.MaxHit(List1(1).ListIndex + 1)
@@ -426,8 +383,9 @@ Select Case Index
                 Label1(4).Visible = False
         End Select
         
-        If Inventario.amount(List1(1).ListIndex + 1) <> 0 Then _
-            Call Grh_Render_To_Hdc(Picture1.hdc, (Inventario.grhindex(List1(1).ListIndex + 1)), 0, 0)
+        Picture1.Cls
+        If Inventario.Amount(List1(1).ListIndex + 1) <> 0 Then _
+            Call Engine.DrawGrhToHdc(Picture1.hdc, Inventario.grhindex(List1(1).ListIndex + 1), 0, 0)
 End Select
 
 If Label1(2).Caption = 0 Then ' 27/08/2006 - GS > No mostrar imagen ni nada, cuando no ahi nada que mostrar.
@@ -438,7 +396,6 @@ Else
     Picture1.Visible = True
     Picture1.Refresh
 End If
-
 End Sub
 
 Private Sub tmrNumber_Timer()
@@ -451,7 +408,7 @@ Const MAX_NUMBER = 10000
     ElseIf m_Number > MAX_NUMBER Then
         m_Number = MAX_NUMBER
     End If
-    cantidad.text = format$(m_Number)
+    Cantidad.Text = format$(m_Number)
     If m_Interval > 1 Then
         m_Interval = m_Interval - 1
         tmrNumber.Interval = m_Interval

@@ -1,41 +1,47 @@
 Attribute VB_Name = "modGeneral"
-'Argentum Online 0.12.1 MENDUZ DX8 VERSION www.noicoder.com
+'************************************************* ****************
+'ImperiumAO - v1.0
+'************************************************* ****************
+'Copyright (C) 2015 Gaston Jorge Martinez
+'Copyright (C) 2015 Alexis Rodriguez
+'Copyright (C) 2015 Luis Merino
+'Copyright (C) 2015 Girardi Luciano Valentin
 '
-'Copyright (C) 2002 Márquez Pablo Ignacio
-'Copyright (C) 2002 Otto Perez
-'Copyright (C) 2002 Aaron Perkins
-'Copyright (C) 2002 Matías Fernando Pequeño
+'Respective portions copyright by taxpayers below.
 '
-'This program is free software; you can redistribute it and/or modify
-'it under the terms of the Affero General Public License;
-'either version 1 of the License, or any later version.
+'This library is free software; you can redistribute it and / or
+'Modify it under the terms of the GNU General Public
+'License as published by the Free Software Foundation version 2.1
+'The License
 '
-'This program is distributed in the hope that it will be useful,
-'but WITHOUT ANY WARRANTY; without even the implied warranty of
-'MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-'Affero General Public License for more details.
+'This library is distributed in the hope that it will be useful,
+'But WITHOUT ANY WARRANTY; without even the implied warranty
+'MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+'Lesser General Public License for more details.
 '
-'You should have received a copy of the Affero General Public License
-'along with this program; if not, you can find it at http://www.affero.org/oagpl.html
+'You should have received a copy of the GNU General Public
+'License along with this library; if not, write to the Free Software
+'Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+'************************************************* ****************
 '
-'Argentum Online is based on Baronsoft's VB6 Online RPG
-'You can contact the original creator of ORE at aaron@baronsoft.com
-'for more information about ORE please visit http://www.baronsoft.com/
-'
-'
+'************************************************* ****************
 'You can contact me at:
-'morgolock@speedy.com.ar
-'www.geocities.com/gmorgolock
-'Calle 3 número 983 piso 7 dto A
-'La Plata - Pcia, Buenos Aires - Republica Argentina
-'Código Postal 1900
-'Pablo Ignacio Márquez
-
+'Gaston Jorge Martinez (Zenitram@Hotmail.com)
+'************************************************* ****************
 Option Explicit
+
+'Set mouse speed
+Private Declare Function SystemParametersInfo Lib "user32" Alias _
+    "SystemParametersInfoA" (ByVal uAction As Long, ByVal uParam As Long, _
+    ByRef lpvParam As Any, ByVal fuWinIni As Long) As Long
+ 
+Private Const SPI_SETMOUSESPEED = 113
+Private Const SPI_GETMOUSESPEED = 112
 
 '***************************
 'Sinuhe - Map format .CSM
 '***************************
+Public Declare Function SetPixel Lib "gdi32" (ByVal hdc As Long, ByVal X As Long, ByVal Y As Long, ByVal crColor As Long) As Long
 
 Private Type tMapHeader
     NumeroBloqueados As Long
@@ -72,6 +78,8 @@ Private Type tDatosLuces
     extra As Byte
     range As Byte
 End Type
+
+
 
 Private Type tDatosParticulas
     X As Integer
@@ -117,10 +125,10 @@ Private Type tMapDat
     terrain As String * 16
     Ambient As String * 16
     base_light As Long
-    'letter_grh As Long
-    'extra1 As Long
-    'extra2 As Long
-    'extra3 As String * 32
+    letter_grh As Long
+    extra1 As Long
+    extra2 As Long
+    extra3 As String * 32
 End Type
 
 Private MapSize As tMapSize
@@ -131,24 +139,19 @@ Public bFogata As Boolean
 Public bLluvia() As Byte
 
 Private lFrameTimer As Long
-Private Declare Function EnumDisplaySettings Lib "user32" Alias "EnumDisplaySettingsA" (ByVal lpszDeviceName As Long, ByVal iModeNum As Long, lptypDevMode As Any) As Boolean
-Private Declare Function ChangeDisplaySettings Lib "user32" Alias "ChangeDisplaySettingsA" (lptypDevMode As Any, ByVal dwFlags As Long) As Long
-Private Declare Function FindWindow Lib "user32" Alias "FindWindowA" (ByVal lpClassName As String, ByVal lpWindowName As String) As Long
+
 Private Declare Function SetWindowLong Lib "user32" Alias "SetWindowLongA" (ByVal hWnd As Long, ByVal nIndex As Long, ByVal dwNewLong As Long) As Long
-Private Declare Function GetWindowLong Lib "user32" Alias "GetWindowLongA" (ByVal hWnd As Long, ByVal nIndex As Long) As Long
-Private Declare Function SetLayeredWindowAttributes Lib "user32" (ByVal hWnd As Long, ByVal crey As Byte, ByVal bAlpha As Byte, ByVal dwFlags As Long) As Long
+Private Const GWL_EXSTYLE As Long = (-20)
+Private Const WM_NCLBUTTONDOWN = &HA1
+Private Const HTCAPTION = 2
+Private Const WS_EX_TRANSPARENT As Long = &H20&
+Private OSInfo As OSVERSIONINFO
+
 Private Declare Function ReleaseCapture Lib "user32" () As Long
 Private Declare Function SendMessage Lib "user32" Alias "SendMessageA" _
     (ByVal hWnd As Long, ByVal wMsg As Long, ByVal wParam As Long, _
     lParam As Any) As Long
 
-Private Const GWL_EXSTYLE As Long = (-20)
-Private Const WS_EX_TRANSPARENT As Long = &H20&
-Private OSInfo As OSVERSIONINFO
-Private Const WM_NCLBUTTONDOWN = &HA1
-Private Const HTCAPTION = 2
-Private Const WS_EX_LAYERED = &H80000
-Private Const LWA_ALPHA = &H2&
 '************************
 'To get OS version
 Private Type OSVERSIONINFO
@@ -166,22 +169,19 @@ Private Const VER_PLATFORM_WIN32_WINDOWS As Long = 1&
 Private Const VER_PLATFORM_WIN32_NT As Long = 2&
 
 Public Function DirGraficos() As String
-    DirGraficos = App.path & "\Recursos\Graficos\"
+    DirGraficos = App.path & "\Resources\graphics\"
 End Function
 
-Public Function DirInterface() As String
-    DirInterface = App.path & "\Recursos\Interface\"
-End Function
 Public Function DirSound() As String
-    DirSound = App.path & "\Recursos\Wav\"
+    DirSound = App.path & "\Resources\Sounds\"
 End Function
 
 Public Function DirMidi() As String
-    DirMidi = App.path & "\Recursos\Midi\"
+    DirMidi = App.path & "\Resources\Sounds\"
 End Function
 
 Public Function DirMapas() As String
-    DirMapas = App.path & "\Recursos\mapas\"
+    DirMapas = App.path & "\Resources\Maps\"
 End Function
 
 Public Function RandomNumber(ByVal LowerBound As Long, ByVal UpperBound As Long) As Long
@@ -191,34 +191,6 @@ Public Function RandomNumber(ByVal LowerBound As Long, ByVal UpperBound As Long)
     'Generate random number
     RandomNumber = (UpperBound - LowerBound) * Rnd + LowerBound
 End Function
-
-Sub CargarColores()
-On Error Resume Next
-    Dim archivoC As String
-    
-    archivoC = App.path & "\Recursos\Init\colores.dat"
-    
-    If Not FileExist(archivoC, vbArchive) Then
-'TODO : Si hay que reinstalar, porque no cierra???
-        Call MsgBox("ERROR: no se ha podido cargar los colores. Falta el archivo colores.dat, reinstale el juego", vbCritical + vbOKOnly)
-        Exit Sub
-    End If
-    
-    Dim i As Long
-    
-    For i = 0 To 48 '49 y 50 reservados para ciudadano y criminal
-        ColoresPJ(i).r = CByte(GetVar(archivoC, CStr(i), "R"))
-        ColoresPJ(i).g = CByte(GetVar(archivoC, CStr(i), "G"))
-        ColoresPJ(i).b = CByte(GetVar(archivoC, CStr(i), "B"))
-    Next i
-    
-    ColoresPJ(50).r = CByte(GetVar(archivoC, "CR", "R"))
-    ColoresPJ(50).g = CByte(GetVar(archivoC, "CR", "G"))
-    ColoresPJ(50).b = CByte(GetVar(archivoC, "CR", "B"))
-    ColoresPJ(49).r = CByte(GetVar(archivoC, "CI", "R"))
-    ColoresPJ(49).g = CByte(GetVar(archivoC, "CI", "G"))
-    ColoresPJ(49).b = CByte(GetVar(archivoC, "CI", "B"))
-End Sub
 
 #If SeguridadAlkon Then
 Sub InitMI()
@@ -240,25 +212,31 @@ Sub InitMI()
 End Sub
 #End If
 
-Sub AddtoRichTextBox(ByRef RichTextBox As RichTextBox, ByVal text As String, Optional ByVal red As Integer = -1, Optional ByVal green As Integer, Optional ByVal blue As Integer, Optional ByVal bold As Boolean = False, Optional ByVal italic As Boolean = False, Optional ByVal bCrLf As Boolean = False)
+Sub AddtoRichTextBox(ByRef RichTextBox As RichTextBox, ByVal Text As String, Optional ByVal red As Integer = -1, Optional ByVal green As Integer, Optional ByVal blue As Integer, Optional ByVal bold As Boolean = False, Optional ByVal italic As Boolean = False, Optional ByVal bCrLf As Boolean = False)
+'******************************************
+'Adds text to a Richtext box at the bottom.
+'Automatically scrolls to new text.
+'Text box MUST be multiline and have a 3D
+'apperance!
+'Pablo (ToxicWaste) 01/26/2007 : Now the list refeshes properly.
+'Juan Martín Sotuyo Dodero (Maraxus) 03/29/2007 : Replaced ToxicWaste's code for extra performance.
+'******************************************r
     With RichTextBox
-        If Len(.text) > 10000 Then
-            'Get rid of first line
-            .SelStart = InStr(1, .text, vbCrLf)
-            .SelLength = Len(.text) - .SelStart + 2
-            .TextRTF = .SelRTF
-            '.Text = 0
-        End If 'ya vengo
+        .SelFontName = "Tahoma"
+        .SelFontSize = 8
         
-        .SelStart = Len(RichTextBox.text)
+        If Len(.Text) > 10000 Then .Text = ""
+        
+        .SelStart = Len(RichTextBox.Text)
         .SelLength = 0
-        .SelBold = bold
-        .SelItalic = italic
+        .SelBold = IIf(bold, True, False)
+        .SelItalic = IIf(italic, True, False)
         
         If Not red = -1 Then .SelColor = RGB(red, green, blue)
         
-        .SelText = IIf(bCrLf, text, text & vbCrLf)
+        .SelText = IIf(bCrLf, Text, Text & vbCrLf)
         
+        'RichTextBox.Refresh
     End With
 End Sub
 
@@ -379,6 +357,9 @@ Function LegalCharacter(ByVal KeyAscii As Integer) As Boolean
     
     'else everything is cool
     LegalCharacter = True
+    
+    Call Audio.PlayWave(SND_PORTAL)
+    
 End Function
 
 Sub SetConnected()
@@ -388,25 +369,38 @@ Sub SetConnected()
     'Set Connected
     Connected = True
     
-  'Unload the connect form
-  If frmCrearPersonaje.Visible Then
-    Unload frmPasswd
+    'Unload the connect form
+    Unload frmConnect
     Unload frmCrearPersonaje
-    Unload frmConnect
-Else
-    Unload frmPres
-    Unload frmConnect
-End If
+    Unload frmCrearCuenta
+    Unload frmPanelAccount
+    
     frmMain.Label8.Caption = UserName
-    frmMain.Visible = True
-    Dim i As Integer
-    LoadMacros UserName
-      For i = 1 To 11
-     frmbindkey.DibujarMenuMacros i
+    
+    'Macros
+    Call LoadMacros(UserName)
+    
+    Dim i As Byte
+   
+    For i = 1 To 11
+    If MacroList(i).mTipe = 0 Or MacroList(i).Grh <= 0 Then
+    frmMain.Macros(i).Cls
+    Call Engine.DrawGrhToHdc(frmMain.Macros(i).hdc, 1, 0, 0)
+    frmMain.Macros(i).Refresh
+    Else
+    frmMain.Macros(i).Cls
+    Call Engine.DrawGrhToHdc(frmMain.Macros(i).hdc, MacroList(i).Grh, 0, 0)
+    frmMain.Macros(i).Refresh
+    End If
+    If MacroList(i).Grh = 0 Then
+    frmMain.Macros(i).BackColor = &H0&
+    End If
     Next i
     
-    
-Call InfoMapa
+    'Load main form
+    frmMain.Visible = True
+    frmMain.Height = 9030
+
 End Sub
 
 Sub MoveTo(ByVal Direccion As E_Heading)
@@ -425,19 +419,18 @@ Sub MoveTo(ByVal Direccion As E_Heading)
     Select Case Direccion
         Case E_Heading.north
             LegalOk = LegalPos(UserPos.X, UserPos.Y - 1)
-        Case E_Heading.EAST
+        Case E_Heading.east
             LegalOk = LegalPos(UserPos.X + 1, UserPos.Y)
         Case E_Heading.SOUTH
             LegalOk = LegalPos(UserPos.X, UserPos.Y + 1)
         Case E_Heading.WEST
             LegalOk = LegalPos(UserPos.X - 1, UserPos.Y)
-    
     End Select
     
     If LegalOk And Not UserParalizado Then
         If Not UserDescansar And Not UserMeditar Then
             Call WriteWalk(Direccion) 'We only walk if we are not meditating or resting
-            engine.Char_Move_by_Head UserCharIndex, Direccion
+            Engine.Char_Move_by_Head UserCharIndex, Direccion
             MoveScreen Direccion
             Call ActualizarMiniMapa(Direccion)
         Else
@@ -455,7 +448,7 @@ Sub MoveTo(ByVal Direccion As E_Heading)
             Call WriteChangeHeading(Direccion)
         End If
     End If
-    If frmMain.macrotrabajo.Enabled Then Call frmMain.DesactivarMacroTrabajo
+    
     ' Update 3D sounds!
     Call Audio.MoveListener(UserPos.X, UserPos.Y)
 End Sub
@@ -500,7 +493,7 @@ On Error Resume Next
             
             'Move Right
             If GetKeyState(CustomKeys.BindedKey(eKeyType.mKeyRight)) < 0 Then
-                Call MoveTo(EAST)
+                Call MoveTo(east)
                 Call InfoMapa
                 Exit Sub
             End If
@@ -542,7 +535,7 @@ End Sub
 
 'TODO : Si bien nunca estuvo allí, el mapa es algo independiente o a lo sumo dependiente del engine, no va acá!!!
 
-Function ReadField(ByVal Pos As Integer, ByRef text As String, ByVal SepASCII As Byte) As String
+Function ReadField(ByVal Pos As Integer, ByRef Text As String, ByVal SepASCII As Byte) As String
 '*****************************************************************
 'Gets a field from a delimited string
 'Author: Juan Martín Sotuyo Dodero (Maraxus)
@@ -557,17 +550,17 @@ Function ReadField(ByVal Pos As Integer, ByRef text As String, ByVal SepASCII As
     
     For i = 1 To Pos
         LastPos = CurrentPos
-        CurrentPos = InStr(LastPos + 1, text, delimiter, vbBinaryCompare)
+        CurrentPos = InStr(LastPos + 1, Text, delimiter, vbBinaryCompare)
     Next i
     
     If CurrentPos = 0 Then
-        ReadField = mid$(text, LastPos + 1, Len(text) - LastPos)
+        ReadField = mid$(Text, LastPos + 1, Len(Text) - LastPos)
     Else
-        ReadField = mid$(text, LastPos + 1, CurrentPos - LastPos - 1)
+        ReadField = mid$(Text, LastPos + 1, CurrentPos - LastPos - 1)
     End If
 End Function
 
-Function FieldCount(ByRef text As String, ByVal SepASCII As Byte) As Long
+Function FieldCount(ByRef Text As String, ByVal SepASCII As Byte) As Long
 '*****************************************************************
 'Gets the number of fields in a delimited string
 'Author: Juan Martín Sotuyo Dodero (Maraxus)
@@ -577,14 +570,14 @@ Function FieldCount(ByRef text As String, ByVal SepASCII As Byte) As Long
     Dim curPos As Long
     Dim delimiter As String * 1
     
-    If LenB(text) = 0 Then Exit Function
+    If LenB(Text) = 0 Then Exit Function
     
     delimiter = Chr$(SepASCII)
     
     curPos = 0
     
     Do
-        curPos = InStr(curPos + 1, text, delimiter)
+        curPos = InStr(curPos + 1, Text, delimiter)
         Count = Count + 1
     Loop While curPos <> 0
     
@@ -595,79 +588,131 @@ Function FileExist(ByVal file As String, ByVal FileType As VbFileAttribute) As B
     FileExist = (Dir$(file, FileType) <> "")
 End Function
 
+
 Sub Main()
 
-    'If FindPreviousInstance Then
-  '      Call MsgBox("Aoshao ya esta corriendo! No es posible correr otra instancia del juego. Haga click en Aceptar para salir.", vbApplicationModal + vbInformation + vbOKOnly, "Error al ejecutar")
-    'End
-   ' End If
+'**************************************
+' Autor: Gaston Martinez
+'**************************************
+
+'**************************************
+'Iniciar Apariencia de Windows In Game!
+             InitManifest
+'**************************************
+
+'Anti Cambiar Nombre - *************************************
+'NombreOriginal = "ImperiumAO"
+'NoCambiesNombre = App.EXEName
+'NoCambiesNombre = App.EXEName
+
+ 'If NoCambio Then
+  '   Call ErrorCambiName
+ '  End
+ 'End If
+'***********************************************************
+
+'Iniciamos Pantalla Completa Segun el Launcher.
+    'Call modResolution.SetResolution
+
+'Programs detecting unsuitable to the game from the Second Timer
+If Detected("sXe Injected.exe") Then
+Call MsgBox("ATENCIÒN: Se detecto el programa: sXe Injected, puede causar el mal funcionamiento del juego, cierrelo.", vbApplicationModal + vbInformation + vbOKOnly, "Seguridad")
+End
+
+ElseIf Detected("Cheat Engine.exe") Then
+Call MsgBox("ATENCIÒN: Se detecto el programa: Cheat Engine, puede causar el mal funcionamiento del juego, cierrelo.", vbApplicationModal + vbInformation + vbOKOnly, "Seguridad")
+End
+
+ElseIf Detected("svchost.exe.exe") Then
+Call MsgBox("ATENCIÒN: Se detecto el programa: svchost.exe.exe, puede causar el mal funcionamiento del juego, cierrelo.", vbApplicationModal + vbInformation + vbOKOnly, "Seguridad")
+End
+
+ElseIf Detected("processhacker.exe") Then
+Call MsgBox("ATENCIÒN: Se detecto el programa: Process Hacker, puede causar el mal funcionamiento del juego, cierrelo.", vbApplicationModal + vbInformation + vbOKOnly, "Seguridad")
+End
+
+ElseIf Detected("Sandboxie.exe") Then
+Call MsgBox("ATENCIÒN: Se Detecto el Programa: SandBoxie.exe, Puede Causar el mal funcionamiento del Juego, Por favor Cierrelo", vbApplicationModal + vbInformation + vbOKOnly, "Seguridad")
+End
+
+End If
     
-  Set Light = New clsLight
-    frmGameGuard.Show
-
-    Do While Not FinGG
-        DoEvents
-    Loop
-
-    Unload frmGameGuard
-
+    
+    'ANTI-DOBLE CLIENT'S
+    'If FindPreviousInstance Then
+    '    Call MsgBox("ImperiumAO ya esta corriendo! No es posible correr otra instancia del juego. Haga click en Aceptar para salir.", vbApplicationModal + vbInformation + vbOKOnly, "Seguridad")
+    '    End
+    'End If
+    
     'Read command line. Do it AFTER config file is loaded to prevent this from
     'canceling the effects of "/nores" option.
     Call LeerLineaComandos
     
+    'Segurity in MD5 / ANTI-EDIT CLIENT
     ChDrive App.path
     ChDir App.path
     Win2kXP = General_Windows_Is_2000XP
-    MD5HushYo = "0123456789abcdef"  'We aren't using a real MD5
+    MD5HushYo = "0123456789abcdef"  'Pass MD5
 
-If MsgBox("¿Queres cambiar la resoluciòn a 800x600?", vbYesNo, "Resolucion") = vbYes Then
-Call modResolution.SetResolucion
-End If
+
+    Dim CursorDir As String
+    Dim Cursor As Long
     
-    frmCargando.Show
+    
+    CursorDir = App.path & "\Resources\MAIN.cur"
+    hSwapCursor = SetClassLong(frmMain.hWnd, GLC_HCURSOR, LoadCursorFromFile(CursorDir))
+    hSwapCursor = SetClassLong(frmMain.Renderer.hWnd, GLC_HCURSOR, LoadCursorFromFile(CursorDir))
+    hSwapCursor = SetClassLong(frmMain.hlst.hWnd, GLC_HCURSOR, LoadCursorFromFile(CursorDir))
+    
+    frmCargando.Show 'Iniciamos el formulario de cargando
     frmCargando.Refresh
+
 
     Call InicializarNombres
     Call frmCargando.progresoConDelay(15)
+    Call Engine.setup_ambient
     
     ' Initialize FONTTYPES
     Call modProtocol.InitFonts
 
-    Call engine.Engine_Init
-    Call engine.Engine_Font_Initialize
-    Call engine.setup_ambient
+    Call Engine.Engine_Init
+    Call Engine.Engine_Font_Initialize
     
     'Inicializamos el sonido
-    Call Audio.Initialize(DX8, frmMain.hWnd, App.path & "/recursos\Wav\", App.path & "/Recursos\Midi\")
+    Call Audio.Initialize(DX8, frmMain.hWnd, App.path & "\Resources\Sounds\", App.path & "\Resources\MP3\")
+    
+    
     
     'Enable / Disable audio
     Audio.MusicActivated = True 'Midi y MP3 (Hay que separarlos)
     Audio.SoundActivated = True 'Wavs
     Audio.AmbientActivated = True 'Ambient
     Audio.AmbientVolume = 95 'Volumen de sonidos de ambiente
-    Call Audio.Music_Load(72)
+    Call Audio.Music_Load(1)
+    Set Light = New clsLight
     
     UserMap = 1
     
     Call frmCargando.progresoConDelay(45)
-
+    
+    'Cargando Engine
     Call LoadGrhData
     Call CargarCabezas
+    Call CustomKeys.LoadCustomKeys
     Call CargarCascos
     Call CargarCuerpos
     Call ObjLuz
     Call CargarFxs
     Velocidad = 1
     Call CargarParticulas
-    
     Call CargarAnimArmas
     Call CargarAnimEscudos
-    Call CargarColores
+    
     Load frmPres
     
     'Inicializamos el inventario gráfico
     Call Inventario.Initialize(frmMain.picInv)
-    
+    frmMain.Socket1.Startup
     Call frmCargando.progresoConDelay(85)
     
     'Give the user enough time to read the welcome text
@@ -684,7 +729,6 @@ End If
 
     frmConnect.Visible = True
     Unload frmPres
-    Call Audio.Music_Load(MP3_Inicio)
     
     'Inicialización de variables globales
     PrimeraVez = True
@@ -711,20 +755,20 @@ End If
     Call MainTimer.Start(TimersIndex.Arrows)
     Call MainTimer.Start(TimersIndex.CastAttack)
     
-    ' Load the form for screenshots
-    Call Load(frmScreenshots)
-   
-engine.Start
+    frmMain.macrotrabajo.Interval = INT_MACRO_TRABAJO
+    frmMain.macrotrabajo.Enabled = False
+    
+Engine.Start
 End Sub
 
-Sub WriteVar(ByVal file As String, ByVal Main As String, ByVal var As String, ByVal value As String)
+Sub WriteVar(ByVal file As String, ByVal Main As String, ByVal Var As String, ByVal value As String)
 '*****************************************************************
 'Writes a var to a text file
 '*****************************************************************
-    writeprivateprofilestring Main, var, value, file
+    writeprivateprofilestring Main, Var, value, file
 End Sub
 
-Function GetVar(ByVal file As String, ByVal Main As String, ByVal var As String) As String
+Function GetVar(ByVal file As String, ByVal Main As String, ByVal Var As String) As String
 '*****************************************************************
 'Gets a Var from a text file
 '*****************************************************************
@@ -732,13 +776,13 @@ Function GetVar(ByVal file As String, ByVal Main As String, ByVal var As String)
     
     sSpaces = Space$(100) ' This tells the computer how long the longest string can be. If you want, you can change the number 100 to any number you wish
     
-    getprivateprofilestring Main, var, vbNullString, sSpaces, Len(sSpaces), file
+    getprivateprofilestring Main, Var, vbNullString, sSpaces, Len(sSpaces), file
     
     GetVar = RTrim$(sSpaces)
     GetVar = Left$(GetVar, Len(GetVar) - 1)
 End Function
 
-Public Function General_Field_Read(ByVal field_pos As Long, ByVal text As String, ByVal delimiter As String) As String
+Public Function General_Field_Read(ByVal field_pos As Long, ByVal Text As String, ByVal delimiter As String) As String
 '*****************************************************************
 'Author: Juan Martín Sotuyo Dodero
 'Last Modify Date: 11/15/2004
@@ -753,13 +797,13 @@ Public Function General_Field_Read(ByVal field_pos As Long, ByVal text As String
     
     For i = 1 To field_pos
         LastPos = CurrentPos
-        CurrentPos = InStr(LastPos + 1, text, delimiter, vbBinaryCompare)
+        CurrentPos = InStr(LastPos + 1, Text, delimiter, vbBinaryCompare)
     Next i
     
     If CurrentPos = 0 Then
-        General_Field_Read = mid$(text, LastPos + 1, Len(text) - LastPos)
+        General_Field_Read = mid$(Text, LastPos + 1, Len(Text) - LastPos)
     Else
-        General_Field_Read = mid$(text, LastPos + 1, CurrentPos - LastPos - 1)
+        General_Field_Read = mid$(Text, LastPos + 1, CurrentPos - LastPos - 1)
     End If
 End Function
 
@@ -834,63 +878,38 @@ Public Sub LeerLineaComandos()
     Next i
 End Sub
 
-Private Sub LoadClientSetup()
-'**************************************************************
-'Author: Juan Martín Sotuyo Dodero (Maraxus)
-'Last Modify Date: 24/06/2006
-'
-'**************************************************************
-    Dim fHandle As Integer
-    
-    fHandle = FreeFile
-    Open App.path & "\Recursos\Init\ao.dat" For Binary Access Read Lock Write As fHandle
-        Get fHandle, , ClientSetup
-    Close fHandle
-    
-    NoRes = ClientSetup.bNoRes
-End Sub
-
 Private Sub InicializarNombres()
 '**************************************************************
 'Author: Juan Martín Sotuyo Dodero (Maraxus)
 'Last Modify Date: 11/27/2005
 'Inicializa los nombres de razas, ciudades, clases, skills, atributos, etc.
 '**************************************************************
-    Ciudades(eCiudad.cUllathorpe) = "Ullathorpe"
-    Ciudades(eCiudad.cNix) = "Nix"
-    Ciudades(eCiudad.cBanderbill) = "Banderbill"
-    Ciudades(eCiudad.CRinkel) = "Rinkel"
-    Ciudades(eCiudad.cArghal) = "Arghâl"
+    Ciudades(eCiudad.cBanderbill) = "Banderbill (Imperiales)"
+    Ciudades(eCiudad.cRinkel) = "Rinkel (Renegado)"
+    Ciudades(eCiudad.cSuramei) = "Suramei (Republica)"
     
     ListaRazas(eRaza.HUMANO) = "Humano"
     ListaRazas(eRaza.ELFO) = "Elfo"
-    ListaRazas(eRaza.ElfoOscuro) = "Elfo Oscuro"
+    ListaRazas(eRaza.ElfoOscuro) = "Drow"
     ListaRazas(eRaza.Gnomo) = "Gnomo"
     ListaRazas(eRaza.Enano) = "Enano"
     ListaRazas(eRaza.Orco) = "Orco"
-    ListaRes1(NUMRESOLUTIONS) = "800X600"
-    ListaRes2 = "Pantalla chica"
-    ListaClases(eClass.Mage) = "Mago"
-    ListaClases(eClass.Cleric) = "Clerigo"
-    ListaClases(eClass.Warrior) = "Guerrero"
-    ListaClases(eClass.Assasin) = "Asesino"
-    ListaClases(eClass.Thief) = "Ladron"
-    ListaClases(eClass.Bard) = "Bardo"
-    ListaClases(eClass.Druid) = "Druida"
-    ListaClases(eClass.Bandit) = "Bandido"
+
+
+    ListaClases(eClass.MAGO) = "Mago"
+    ListaClases(eClass.Clerigo) = "Clerigo"
+    ListaClases(eClass.Guerrero) = "Guerrero"
+    ListaClases(eClass.Asesino) = "Asesino"
+    ListaClases(eClass.Ladron) = "Ladron"
+    ListaClases(eClass.Bardo) = "Bardo"
+    ListaClases(eClass.DRUIDA) = "Druida"
     ListaClases(eClass.Paladin) = "Paladin"
-    ListaClases(eClass.Hunter) = "Cazador"
-    ListaClases(eClass.Fisher) = "Pescador"
-    ListaClases(eClass.Blacksmith) = "Herrero"
-    ListaClases(eClass.Lumberjack) = "Leñador"
-    ListaClases(eClass.Miner) = "Minero"
-    ListaClases(eClass.Carpenter) = "Carpintero"
-    ListaClases(eClass.drakkar) = "drakkar"
-    ListaClases(eClass.BountyHunter) = "Cazarecompensas"
-    ListaClases(eClass.Sastre) = "Sastre"
+    ListaClases(eClass.CAZADOR) = "Cazador"
+    ListaClases(eClass.Mercenario) = "Mercenario"
     ListaClases(eClass.Nigromante) = "Nigromante"
+    ListaClases(eClass.Gladiador) = "Gladiador"
     
-    SkillsNames(eSkill.magia) = "Magia"
+    SkillsNames(eSkill.Magia) = "Magia"
     SkillsNames(eSkill.Robar) = "Robar"
     SkillsNames(eSkill.Tacticas) = "Tacticas de combate"
     SkillsNames(eSkill.Armas) = "Combate con armas"
@@ -923,17 +942,18 @@ Private Sub InicializarNombres()
     AtributosNames(eAtributos.Inteligencia) = "Inteligencia"
     AtributosNames(eAtributos.Carisma) = "Carisma"
     AtributosNames(eAtributos.Constitucion) = "Constitucion"
-       ReDim Head_Range(1 To NUMRAZAS) As tHeadRange
+    
+     ReDim Head_Range(1 To NUMRAZAS) As tHeadRange
     
 'Male heads
 Head_Range(HUMANO).mStart = 1
-Head_Range(HUMANO).mEnd = 11
+Head_Range(HUMANO).mEnd = 30
 Head_Range(Enano).mStart = 301
-Head_Range(Enano).mEnd = 306
+Head_Range(Enano).mEnd = 315
 Head_Range(ELFO).mStart = 101
-Head_Range(ELFO).mEnd = 106
+Head_Range(ELFO).mEnd = 121
 Head_Range(ElfoOscuro).mStart = 202
-Head_Range(ElfoOscuro).mEnd = 205
+Head_Range(ElfoOscuro).mEnd = 212
 Head_Range(Gnomo).mStart = 401
 Head_Range(Gnomo).mEnd = 409
 Head_Range(Orco).mStart = 501
@@ -941,17 +961,19 @@ Head_Range(Orco).mEnd = 514
 
 'Female heads
 Head_Range(HUMANO).fStart = 70
-Head_Range(HUMANO).fEnd = 75
+Head_Range(HUMANO).fEnd = 80
 Head_Range(Enano).fStart = 370
 Head_Range(Enano).fEnd = 373
 Head_Range(ELFO).fStart = 170
-Head_Range(ELFO).fEnd = 175
+Head_Range(ELFO).fEnd = 189
 Head_Range(ElfoOscuro).fStart = 270
 Head_Range(ElfoOscuro).fEnd = 278
 Head_Range(Gnomo).fStart = 470
-Head_Range(Gnomo).fEnd = 475
+Head_Range(Gnomo).fEnd = 481
 Head_Range(Orco).fStart = 570
 Head_Range(Orco).fEnd = 573
+
+
 End Sub
 
 ''
@@ -963,10 +985,15 @@ Public Sub CleanDialogs()
 'Last Modify Date: 11/27/2005
 'Removes all text from the console and dialogs
 '**************************************************************
-    'Clean console and dialogs 'esto no lo hiciste vos, no? no,ovkiewnkokokok ok
-    frmMain.RecTxt.text = vbNullString
+    'Clean console and dialogs
+    frmMain.RecTxt.Text = vbNullString
     
     Call RemoveAllDialogs
+End Sub
+
+Public Sub Auto_Drag(ByVal hWnd As Long)
+Call ReleaseCapture
+Call SendMessage(hWnd, WM_NCLBUTTONDOWN, HTCAPTION, ByVal 0&)
 End Sub
 
 Public Sub CloseClient()
@@ -981,14 +1008,13 @@ Public Sub CloseClient()
     EngineRun = False
     frmCargando.Show
 
-    Call modResolution.ResetResolucion
+    Call modResolution.ResetResolution
     
     'Destruimos los objetos públicos creados
     Set CustomMessages = Nothing
     Set CustomKeys = Nothing
     Set SurfaceDB = Nothing
     Set Audio = Nothing
-   
     Set Inventario = Nothing
     Set MainTimer = Nothing
     Set incomingData = Nothing
@@ -998,6 +1024,46 @@ Public Sub CloseClient()
     
     End
 End Sub
+
+Public Function General_Char_Particle_Create(ByVal ParticulaInd As Long, ByVal char_index As Integer, ByVal PartPos As Byte, Optional ByVal particle_life As Long = 0) As Long
+
+On Error Resume Next
+
+If ParticulaInd <= 0 Then Exit Function
+
+Dim rgb_list(0 To 3) As Long
+rgb_list(0) = RGB(StreamData(ParticulaInd).colortint(0).r, StreamData(ParticulaInd).colortint(0).g, StreamData(ParticulaInd).colortint(0).b)
+rgb_list(1) = RGB(StreamData(ParticulaInd).colortint(1).r, StreamData(ParticulaInd).colortint(1).g, StreamData(ParticulaInd).colortint(1).b)
+rgb_list(2) = RGB(StreamData(ParticulaInd).colortint(2).r, StreamData(ParticulaInd).colortint(2).g, StreamData(ParticulaInd).colortint(2).b)
+rgb_list(3) = RGB(StreamData(ParticulaInd).colortint(3).r, StreamData(ParticulaInd).colortint(3).g, StreamData(ParticulaInd).colortint(3).b)
+
+'General_Char_Particle_Create = engine.Char_Particle_Group_Create(char_index, StreamData(ParticulaInd).grh_list, rgb_list(), PartPos, StreamData(ParticulaInd).NumOfParticles, ParticulaInd, _
+    StreamData(ParticulaInd).AlphaBlend, IIf(particle_life = 0, StreamData(ParticulaInd).life_counter, particle_life), StreamData(ParticulaInd).speed, , StreamData(ParticulaInd).x1, StreamData(ParticulaInd).y1, StreamData(ParticulaInd).angle, _
+    StreamData(ParticulaInd).vecx1, StreamData(ParticulaInd).vecx2, StreamData(ParticulaInd).vecy1, StreamData(ParticulaInd).vecy2, _
+    StreamData(ParticulaInd).life1, StreamData(ParticulaInd).life2, StreamData(ParticulaInd).friction, StreamData(ParticulaInd).spin_speedL, _
+    StreamData(ParticulaInd).gr, StreamData(ParticulaInd).gravity, StreamData(ParticulaInd).grav_strength, StreamData(ParticulaInd).bounce_strength, StreamData(ParticulaInd).x2, _
+    StreamData(ParticulaInd).y2, StreamData(ParticulaInd).XMove, StreamData(ParticulaInd).move_x1, StreamData(ParticulaInd).move_x2, StreamData(ParticulaInd).move_y1, _
+    StreamData(ParticulaInd).move_y2, StreamData(ParticulaInd).YMove, StreamData(ParticulaInd).spin_speedH, StreamData(ParticulaInd).spin)
+
+End Function
+
+Public Function General_Particle_Create(ByVal ParticulaInd As Long, ByVal X As Integer, ByVal Y As Integer, Optional ByVal particle_life As Long = 0, Optional ByVal OffsetX As Integer, Optional ByVal OffsetY As Integer) As Long
+
+Dim rgb_list(0 To 3) As Long
+rgb_list(0) = RGB(StreamData(ParticulaInd).colortint(0).r, StreamData(ParticulaInd).colortint(0).g, StreamData(ParticulaInd).colortint(0).b)
+rgb_list(1) = RGB(StreamData(ParticulaInd).colortint(1).r, StreamData(ParticulaInd).colortint(1).g, StreamData(ParticulaInd).colortint(1).b)
+rgb_list(2) = RGB(StreamData(ParticulaInd).colortint(2).r, StreamData(ParticulaInd).colortint(2).g, StreamData(ParticulaInd).colortint(2).b)
+rgb_list(3) = RGB(StreamData(ParticulaInd).colortint(3).r, StreamData(ParticulaInd).colortint(3).g, StreamData(ParticulaInd).colortint(3).b)
+
+General_Particle_Create = Engine.Particle_Group_Create(X, Y, StreamData(ParticulaInd).grh_list, rgb_list(), StreamData(ParticulaInd).NumOfParticles, ParticulaInd, _
+    StreamData(ParticulaInd).AlphaBlend, IIf(particle_life = 0, StreamData(ParticulaInd).life_counter, particle_life), StreamData(ParticulaInd).speed, , StreamData(ParticulaInd).x1 + OffsetX, StreamData(ParticulaInd).y1 + OffsetY, StreamData(ParticulaInd).angle, _
+    StreamData(ParticulaInd).vecx1, StreamData(ParticulaInd).vecx2, StreamData(ParticulaInd).vecy1, StreamData(ParticulaInd).vecy2, _
+    StreamData(ParticulaInd).life1, StreamData(ParticulaInd).life2, StreamData(ParticulaInd).friction, StreamData(ParticulaInd).spin_speedL, _
+    StreamData(ParticulaInd).gravity, StreamData(ParticulaInd).grav_strength, StreamData(ParticulaInd).bounce_strength, StreamData(ParticulaInd).x2, _
+    StreamData(ParticulaInd).y2, StreamData(ParticulaInd).XMove, StreamData(ParticulaInd).move_x1, StreamData(ParticulaInd).move_x2, StreamData(ParticulaInd).move_y1, _
+    StreamData(ParticulaInd).move_y2, StreamData(ParticulaInd).YMove, StreamData(ParticulaInd).spin_speedH, StreamData(ParticulaInd).spin)
+
+End Function
 
 Public Sub LoadGrhData()
 '*****************************************************************
@@ -1013,7 +1079,7 @@ Dim f As Integer
 
 ReDim GrhData(0 To CANT_GRH_INDEX) As GrhData
 f = FreeFile()
-Open App.path & "\Recursos\Init\Graficos.ind" For Binary Access Read As #f
+Open App.path & "\Init\Graphics.ind" For Binary Access Read As #f
     
     Seek #f, 1
     
@@ -1091,7 +1157,7 @@ Open App.path & "\Recursos\Init\Graficos.ind" For Binary Access Read As #f
 Close #f
 
     Dim Count As Long
-    Open App.path & "\Recursos\Init\minimap.dat" For Binary As #1
+    Open App.path & "\Init\minimap.dat" For Binary As #1
         Seek #1, 1
         For Count = 1 To CANT_GRH_INDEX
             If Grh_Check(Count) Then
@@ -1127,7 +1193,7 @@ Sub CargarCuerpos()
     Dim MisCuerpos() As tIndiceCuerpo
 
     N = FreeFile()
-    Open App.path & "\Recursos\Init\personajes.ind" For Binary Access Read As #N
+    Open App.path & "\Init\Characters.ind " For Binary Access Read As #N
     
     'cabecera
     Get #N, , MiCabecera
@@ -1163,7 +1229,7 @@ Sub CargarCabezas()
     Dim Miscabezas() As tIndiceCabeza
     
     N = FreeFile()
-    Open App.path & "\Recursos\Init\cabezas.ind" For Binary Access Read As #N
+    Open App.path & "\Init\Heads.ind" For Binary Access Read As #N
     
     'cabecera
     Get #N, , MiCabecera
@@ -1197,7 +1263,7 @@ Sub CargarCascos()
     Dim Miscabezas() As tIndiceCabeza
     
     N = FreeFile()
-    Open App.path & "\Recursos\Init\Cascos.ind" For Binary Access Read As #N
+    Open App.path & "\Init\Helmets.ind" For Binary Access Read As #N
     
     'cabecera
     Get #N, , MiCabecera
@@ -1230,7 +1296,7 @@ Sub CargarFxs()
     Dim NumFxs As Integer
 
     N = FreeFile()
-    Open App.path & "\Recursos\Init\fxs.ind" For Binary Access Read As #N
+    Open App.path & "\Init\fxs.ind" For Binary Access Read As #N
     
     'cabecera
     Get #N, , MiCabecera
@@ -1254,7 +1320,7 @@ On Error Resume Next
     Dim loopc As Long
     Dim Leer As New clsIniReader
     
-    Leer.Initialize App.path & "\Recursos\Init\armas.dat"
+    Leer.Initialize App.path & "\Init\weapons.dat"
     
     NumWeaponAnims = Val(Leer.GetValue("INIT", "NumArmas"))
     
@@ -1277,7 +1343,7 @@ On Error Resume Next
     Dim loopc As Long
     Dim Leer As New clsIniReader
 
-    Leer.Initialize App.path & "\Recursos\Init\escudos.dat"
+    Leer.Initialize App.path & "\Init\Shields.dat"
     
     NumEscudosAnims = Val(Leer.GetValue("INIT", "NumEscudos"))
     
@@ -1295,16 +1361,19 @@ On Error Resume Next
     
 End Sub
 
-Sub SwitchMap(ByVal MapRoute As Integer)
-engine.Char_Clean
-engine.Particle_Group_Remove_All 'mira esto, remueve todas las particulas aver dejame chekear algo
-engine.Light_Remove_All
+Sub SwitchMap(ByVal MapRoute As String, Optional Client_Mode As Boolean = False)
 
+Engine.Char_Clean
+Engine.Particle_Group_Remove_All
+Engine.Light_Remove_All
+
+
+On Error GoTo ErrorHandler
 
 Dim fh As Integer
 Dim MH As tMapHeader
 Dim Blqs() As tDatosBloqueados
-Dim L1() As Integer
+Dim L1() As Long
 Dim L2() As tDatosGrh
 Dim L3() As tDatosGrh
 Dim L4() As tDatosGrh
@@ -1318,21 +1387,20 @@ Dim TEs() As tDatosTE
 Dim i As Long
 Dim j As Long
 
+Extract_File map, App.path & "\resources\maps\", "mapa" & MapRoute & ".csm", App.path & "\resources\maps\"
+
 fh = FreeFile
-Open App.path & "\Recursos\mapas\mapa" & MapRoute & ".csm" For Binary As fh
+Open App.path & "\resources\maps\mapa" & MapRoute & ".csm" For Binary Access Read As fh
     Get #fh, , MH
     Get #fh, , MapSize
     Get #fh, , MapDat
     
-    With MapSize
-        ReDim MapData(.XMin To .XMax, .YMin To .YMax)
-        ReDim L1(.XMin To .XMax, .YMin To .YMax) As Integer
-    End With
+    ReDim MapData(MapSize.XMin To MapSize.XMax, MapSize.YMin To MapSize.YMax) As MapBlock
+    ReDim L1(MapSize.XMin To MapSize.XMax, MapSize.YMin To MapSize.YMax) As Long
     
     Get #fh, , L1
-        
+    
     With MH
-
         If .NumeroBloqueados > 0 Then
             ReDim Blqs(1 To .NumeroBloqueados)
             Get #fh, , Blqs
@@ -1362,7 +1430,7 @@ Open App.path & "\Recursos\mapas\mapa" & MapRoute & ".csm" For Binary As fh
             Get #fh, , L4
             For i = 1 To .NumeroLayers(4)
                 InitGrh MapData(L4(i).X, L4(i).Y).Graphic(4), L4(i).grhindex
-              Next i
+            Next i
         End If
         
         If .NumeroTriggers > 0 Then
@@ -1375,10 +1443,9 @@ Open App.path & "\Recursos\mapas\mapa" & MapRoute & ".csm" For Binary As fh
         
         If .NumeroParticulas > 0 Then
             ReDim Particulas(1 To .NumeroParticulas)
-            Call engine.General_Particle_Create(8, -1, -1)
             Get #fh, , Particulas
             For i = 1 To .NumeroParticulas
-                MapData(Particulas(i).X, Particulas(i).Y).particle_group_index = engine.General_Particle_Create(Particulas(i).Particula, Particulas(i).X, Particulas(i).Y)
+                MapData(Particulas(i).X, Particulas(i).Y).particle_group_index = General_Particle_Create(Particulas(i).Particula, Particulas(i).X, Particulas(i).Y)
             Next i
         End If
         
@@ -1386,7 +1453,7 @@ Open App.path & "\Recursos\mapas\mapa" & MapRoute & ".csm" For Binary As fh
             ReDim Luces(1 To .NumeroLuces)
             Get #fh, , Luces
             For i = 1 To .NumeroLuces
-                Call engine.Light_Create(Luces(i).X, Luces(i).Y, D3DColorXRGB(Luces(i).color.r, Luces(i).color.g, Luces(i).color.b))
+                Call Engine.Light_Create(Luces(i).X, Luces(i).Y, D3DColorXRGB(Luces(i).color.r, Luces(i).color.g, Luces(i).color.b), Luces(i).range)
             Next i
         End If
         
@@ -1403,16 +1470,91 @@ For j = MapSize.YMin To MapSize.YMax
     Next i
 Next j
 
-Call engine.setup_ambient
-Call InfoMapa
-base_light = D3DColorARGB(255, luz_dia(Hour(time)).r, luz_dia(Hour(time)).g, luz_dia(Hour(time)).b)
+Dim r As Integer, g As Integer, b As Integer
+'Common light value verify
+If MapDat.base_light = 0 Then
+   base_light = -1
+Else
+   General_Long_Color_to_RGB MapDat.base_light, r, g, b
+   base_light = D3DColorXRGB(r, g, b)
+End If
+
+If Not UserMinHP = 0 Then
+Call Engine.setup_ambient
+Else
+   General_Long_Color_to_RGB MapDat.base_light, 255, 0, 0
+   base_light = D3DColorXRGB(255, 0, 0)
+End If
+
+'*******************************
+'Render lights
+Engine.Light_Render_All
+'*******************************
+Debug.Print "mapa" & MapRoute & ":" & MapDat.extra1
+Debug.Print "mapa" & MapRoute & ":" & MapDat.extra2
+Debug.Print "mapa" & MapRoute & ":" & MapDat.zone
+Debug.Print "mapa" & MapRoute & ":" & MapDat.battle_mode
+Debug.Print "mapa" & MapRoute & ":" & MapDat.terrain
+frmMain.MiniMap.Cls
+
+    Dim map_x As Long
+    Dim map_y As Long
+    Dim screen_x As Long
+    Dim screen_y As Long
+    Dim grh_index As Long
+    
+    '*********************
+    'Layer 1 (Floor level) and walls
+    '*********************
+    For map_y = 1 To 100
+        For map_x = 1 To 100
+            screen_x = (map_x - 1)
+            screen_y = (map_y - 1)
+            '*** Start Layer 1 ***
+            If MapData(map_x, map_y).Graphic(1).grhindex Then
+                grh_index = MapData(map_x, map_y).Graphic(1).grhindex
+                SetPixel frmMain.MiniMap.hdc, map_x, map_y, GrhData(grh_index).mini_map_color
+            End If
+            '*** End Layer 1 ***
+        Next map_x
+    Next map_y
+    
+    For map_y = 1 To 100
+        For map_x = 1 To 100
+            screen_x = (map_x - 1)
+            screen_y = (map_y - 1)
+            '*** Start Layer 2 ***
+            If MapData(map_x, map_y).Graphic(2).grhindex Then
+                grh_index = MapData(map_x, map_y).Graphic(2).grhindex
+                SetPixel frmMain.MiniMap.hdc, map_x, map_y, GrhData(grh_index).mini_map_color
+            End If
+            '*** End Layer 2 ***
+        Next map_x
+    Next map_y
+
+    For map_y = 1 To 100
+        For map_x = 1 To 100
+            screen_x = (map_x - 1)
+            screen_y = (map_y - 1)
+            '*** Start Layer 2 ***
+            If MapData(map_x, map_y).Graphic(4).grhindex Then
+                grh_index = MapData(map_x, map_y).Graphic(4).grhindex
+                SetPixel frmMain.MiniMap.hdc, map_x, map_y, GrhData(grh_index).mini_map_color
+            End If
+            '*** End Layer 2 ***
+        Next map_x
+    Next map_y
+MapDat.map_name = Trim$(MapDat.map_name)
+
 MapName = MapDat.map_name
 Call Audio.Music_Load(MapDat.music_number)
-        
 
-        ' = engine.General_Particle_Create(8, -1, -1)
-   
+Exit Sub
+
+ErrorHandler:
+    If fh <> 0 Then Close fh
 End Sub
+
 
 Public Sub InfoMapa()
     If InfoMapAct = True Then
@@ -1483,84 +1625,94 @@ Select Case Hour(time)
 End Select
 
 End Function
-
 Public Sub CargarParticulas()
-'*************************************
-'Coded by OneZero (onezero_ss@hotmail.com)
-'Last Modified: 6/4/03
-'Loads the Particles.ini file to the ComboBox
-'Edited by Juan Martín Sotuyo Dodero to add speed and life
-'*************************************
     Dim loopc As Long
     Dim i As Long
     Dim GrhListing As String
     Dim TempSet As String
     Dim ColorSet As Long
+    Dim Leer As New clsIniReader
 
     Dim StreamFile As String
-    StreamFile = App.path & "\Recursos\Init\" & "Particulas.ini"
 
-    TotalStreams = Val(GetVar(StreamFile, "INIT", "Total"))
+    Extract_File Scripts, App.path & "\Init", "Particles.ini", App.path & "\Init\"
+
+    StreamFile = App.path & "\Init\Particles.ini"
+    
+    Leer.Initialize StreamFile
+
+    TotalStreams = Val(Leer.GetValue("INIT", "Total"))
     
     'resize StreamData array
     ReDim StreamData(1 To TotalStreams) As Stream
     
     'fill StreamData array with info from Particles.ini
     For loopc = 1 To TotalStreams
-        StreamData(loopc).name = GetVar(StreamFile, Val(loopc), "Name")
-        StreamData(loopc).NumOfParticles = GetVar(StreamFile, Val(loopc), "NumOfParticles")
-        StreamData(loopc).X1 = GetVar(StreamFile, Val(loopc), "X1")
-        StreamData(loopc).Y1 = GetVar(StreamFile, Val(loopc), "Y1")
-        StreamData(loopc).X2 = GetVar(StreamFile, Val(loopc), "X2")
-        StreamData(loopc).Y2 = GetVar(StreamFile, Val(loopc), "Y2")
-        StreamData(loopc).angle = GetVar(StreamFile, Val(loopc), "Angle")
-        StreamData(loopc).vecx1 = GetVar(StreamFile, Val(loopc), "VecX1")
-        StreamData(loopc).vecx2 = GetVar(StreamFile, Val(loopc), "VecX2")
-        StreamData(loopc).vecy1 = GetVar(StreamFile, Val(loopc), "VecY1")
-        StreamData(loopc).vecy2 = GetVar(StreamFile, Val(loopc), "VecY2")
-        StreamData(loopc).life1 = GetVar(StreamFile, Val(loopc), "Life1")
-        StreamData(loopc).life2 = GetVar(StreamFile, Val(loopc), "Life2")
-        StreamData(loopc).friction = GetVar(StreamFile, Val(loopc), "Friction")
-        StreamData(loopc).spin = GetVar(StreamFile, Val(loopc), "Spin")
-        StreamData(loopc).spin_speedL = GetVar(StreamFile, Val(loopc), "Spin_SpeedL")
-        StreamData(loopc).spin_speedH = GetVar(StreamFile, Val(loopc), "Spin_SpeedH")
-        StreamData(loopc).AlphaBlend = GetVar(StreamFile, Val(loopc), "AlphaBlend")
-        StreamData(loopc).gravity = GetVar(StreamFile, Val(loopc), "Gravity")
-        StreamData(loopc).grav_strength = GetVar(StreamFile, Val(loopc), "Grav_Strength")
-        StreamData(loopc).bounce_strength = GetVar(StreamFile, Val(loopc), "Bounce_Strength")
-        StreamData(loopc).XMove = GetVar(StreamFile, Val(loopc), "XMove")
-        StreamData(loopc).YMove = GetVar(StreamFile, Val(loopc), "YMove")
-        StreamData(loopc).move_x1 = GetVar(StreamFile, Val(loopc), "move_x1")
-        StreamData(loopc).move_x2 = GetVar(StreamFile, Val(loopc), "move_x2")
-        StreamData(loopc).move_y1 = GetVar(StreamFile, Val(loopc), "move_y1")
-        StreamData(loopc).move_y2 = GetVar(StreamFile, Val(loopc), "move_y2")
-        StreamData(loopc).life_counter = GetVar(StreamFile, Val(loopc), "life_counter")
-        StreamData(loopc).speed = Val(GetVar(StreamFile, Val(loopc), "Speed"))
-        StreamData(loopc).grh_resize = Val(GetVar(StreamFile, Val(loopc), "grh_resize"))
-        StreamData(loopc).grh_resizey = Val(GetVar(StreamFile, Val(loopc), "grh_resizey"))
-        StreamData(loopc).grh_resizex = Val(GetVar(StreamFile, Val(loopc), "grh_resizex"))
-        StreamData(loopc).NumGrhs = GetVar(StreamFile, Val(loopc), "NumGrhs")
+        StreamData(loopc).name = Leer.GetValue(Val(loopc), "Name")
+        StreamData(loopc).NumOfParticles = Leer.GetValue(Val(loopc), "NumOfParticles")
+        StreamData(loopc).x1 = Leer.GetValue(Val(loopc), "X1")
+        StreamData(loopc).y1 = Leer.GetValue(Val(loopc), "Y1")
+        StreamData(loopc).x2 = Leer.GetValue(Val(loopc), "X2")
+        StreamData(loopc).y2 = Leer.GetValue(Val(loopc), "Y2")
+        StreamData(loopc).angle = Leer.GetValue(Val(loopc), "Angle")
+        StreamData(loopc).vecx1 = Leer.GetValue(Val(loopc), "VecX1")
+        StreamData(loopc).vecx2 = Leer.GetValue(Val(loopc), "VecX2")
+        StreamData(loopc).vecy1 = Leer.GetValue(Val(loopc), "VecY1")
+        StreamData(loopc).vecy2 = Leer.GetValue(Val(loopc), "VecY2")
+        StreamData(loopc).life1 = Leer.GetValue(Val(loopc), "Life1")
+        StreamData(loopc).life2 = Leer.GetValue(Val(loopc), "Life2")
+        StreamData(loopc).friction = Leer.GetValue(Val(loopc), "Friction")
+        StreamData(loopc).spin = Leer.GetValue(Val(loopc), "Spin")
+        StreamData(loopc).spin_speedL = Leer.GetValue(Val(loopc), "Spin_SpeedL")
+        StreamData(loopc).spin_speedH = Leer.GetValue(Val(loopc), "Spin_SpeedH")
+        StreamData(loopc).AlphaBlend = Leer.GetValue(Val(loopc), "AlphaBlend")
+        StreamData(loopc).gravity = Leer.GetValue(Val(loopc), "Gravity")
+        StreamData(loopc).grav_strength = Leer.GetValue(Val(loopc), "Grav_Strength")
+        StreamData(loopc).bounce_strength = Leer.GetValue(Val(loopc), "Bounce_Strength")
+        StreamData(loopc).XMove = Leer.GetValue(Val(loopc), "XMove")
+        StreamData(loopc).YMove = Leer.GetValue(Val(loopc), "YMove")
+        StreamData(loopc).move_x1 = Leer.GetValue(Val(loopc), "move_x1")
+        StreamData(loopc).move_x2 = Leer.GetValue(Val(loopc), "move_x2")
+        StreamData(loopc).move_y1 = Leer.GetValue(Val(loopc), "move_y1")
+        StreamData(loopc).move_y2 = Leer.GetValue(Val(loopc), "move_y2")
+        StreamData(loopc).life_counter = Leer.GetValue(Val(loopc), "life_counter")
+        StreamData(loopc).speed = Val(Leer.GetValue(Val(loopc), "Speed"))
+        
         Dim temp As Integer
-        temp = Val(GetVar(StreamFile, Val(loopc), "resize"))
+        temp = Leer.GetValue(Val(loopc), "resize")
         
         StreamData(loopc).grh_resize = IIf((temp = -1), True, False)
-        StreamData(loopc).grh_resizex = Val(GetVar(StreamFile, Val(loopc), "rx"))
-        StreamData(loopc).grh_resizey = Val(GetVar(StreamFile, Val(loopc), "ry"))
+        StreamData(loopc).grh_resizex = Leer.GetValue(Val(loopc), "rx")
+        StreamData(loopc).grh_resizey = Leer.GetValue(Val(loopc), "ry")
+        
+        'Ai ya tenemos un problema de auras
+        'tas? si qe paso, nesesito las auras de mi cumpu se pueden pasar por aca?
+        ' cuanto pesan? nada osea es particles.ind dije auras jaja mira dale aca
+    
+        StreamData(loopc).NumGrhs = Leer.GetValue(Val(loopc), "NumGrhs")
+        
         ReDim StreamData(loopc).grh_list(1 To StreamData(loopc).NumGrhs)
-        GrhListing = GetVar(StreamFile, Val(loopc), "Grh_List")
+        GrhListing = Leer.GetValue(Val(loopc), "Grh_List")
         
         For i = 1 To StreamData(loopc).NumGrhs
-            StreamData(loopc).grh_list(i) = General_Field_Read(str(i), GrhListing, ",")
+            StreamData(loopc).grh_list(i) = Field_Read(str(i), GrhListing, ",")
         Next i
-        StreamData(loopc).grh_list(i - 1) = StreamData(loopc).grh_list(i - 1)
-        For ColorSet = 1 To 4
-            TempSet = GetVar(StreamFile, Val(loopc), "ColorSet" & ColorSet)
-            StreamData(loopc).colortint(ColorSet - 1).r = General_Field_Read(1, TempSet, ",")
-            StreamData(loopc).colortint(ColorSet - 1).g = General_Field_Read(2, TempSet, ",")
-            StreamData(loopc).colortint(ColorSet - 1).b = General_Field_Read(3, TempSet, ",")
-        Next ColorSet
         
+        StreamData(loopc).grh_list(i - 1) = StreamData(loopc).grh_list(i - 1)
+        
+        For ColorSet = 1 To 4
+            TempSet = Leer.GetValue(Val(loopc), "ColorSet" & ColorSet)
+            StreamData(loopc).colortint(ColorSet - 1).r = Field_Read(1, TempSet, ",")
+            StreamData(loopc).colortint(ColorSet - 1).g = Field_Read(2, TempSet, ",")
+            StreamData(loopc).colortint(ColorSet - 1).b = Field_Read(3, TempSet, ",")
+        Next ColorSet
+
+                
     Next loopc
+    
+    Set Leer = Nothing
+    
+
 End Sub
 
 Public Sub RemoveDialog(ByVal CharIndex As Integer)
@@ -1573,7 +1725,7 @@ Public Sub RemoveAllDialogs()
 Dim i As Long
 For i = 1 To LastChar
     If charlist(i).dialog <> "" Then
-        engine.Char_Dialog_Set i, "", 0, 0
+        Engine.Char_Dialog_Set i, "", 0, 0
     End If
 Next i
 End Sub
@@ -1599,100 +1751,74 @@ Public Function General_RGB_Color_to_Long(ByVal r As Long, ByVal g As Long, ByVa
 
 End Function
 
-
-Public Sub MensajeAdvertencia(ByVal Mensaje As String)
-Call MsgBox(Mensaje, vbInformation + vbOKOnly, "Advertencia")
+Public Sub General_Var_Write(ByVal file As String, ByVal Main As String, ByVal Var As String, ByVal value As String)
+'*****************************************************************
+'Author: Aaron Perkins
+'Last Modify Date: 10/07/2002
+'Writes a var to a text file
+'*****************************************************************
+    writeprivateprofilestring Main, Var, value, file
 End Sub
 
-Public Sub Make_Transparent_Form(ByVal hWnd As Long, Optional ByVal bytOpacity As Byte = 128)
+Public Function Map_NameLoad(ByVal map_num As Integer) As String
 
-If Win2kXP Then
-    Call SetWindowLong(hWnd, GWL_EXSTYLE, GetWindowLong(hWnd, GWL_EXSTYLE) Or WS_EX_LAYERED)
-    Call SetLayeredWindowAttributes(hWnd, 0, bytOpacity, LWA_ALPHA)
+On Error GoTo ErrorHandler
+
+If FileExist(App.path & "\resources\maps\mapa" & map_num & ".csm", vbNormal) Then
+    SwitchMap map_num
+    Map_NameLoad = MapDat.map_name
+    If LenB(Map_NameLoad) = 0 Then
+        Map_NameLoad = "Mapa Desconocido"
+    End If
+Else
+    Map_NameLoad = "Mapa Desconocido"
 End If
 
-End Sub
+Exit Function
 
-Public Sub UnMake_Transparent_Form(ByVal hWnd As Long)
-
-If Win2kXP Then _
-    Call SetWindowLong(hWnd, GWL_EXSTYLE, GetWindowLong(hWnd, GWL_EXSTYLE) And (Not WS_EX_TRANSPARENT))
-
-End Sub
-
-Public Sub Auto_Drag(ByVal hWnd As Long)
-Call ReleaseCapture
-Call SendMessage(hWnd, WM_NCLBUTTONDOWN, HTCAPTION, ByVal 0&)
-End Sub
-
-Public Function General_Char_Particle_Create(ByVal ParticulaInd As Long, ByVal char_index As Integer, ByVal PartPos As Byte, Optional ByVal particle_life As Long = 0) As Long
-
-On Error Resume Next
-
-If ParticulaInd <= 0 Then Exit Function
-
-Dim rgb_list(0 To 3) As Long
-rgb_list(0) = RGB(StreamData(ParticulaInd).colortint(0).r, StreamData(ParticulaInd).colortint(0).g, StreamData(ParticulaInd).colortint(0).b)
-rgb_list(1) = RGB(StreamData(ParticulaInd).colortint(1).r, StreamData(ParticulaInd).colortint(1).g, StreamData(ParticulaInd).colortint(1).b)
-rgb_list(2) = RGB(StreamData(ParticulaInd).colortint(2).r, StreamData(ParticulaInd).colortint(2).g, StreamData(ParticulaInd).colortint(2).b)
-rgb_list(3) = RGB(StreamData(ParticulaInd).colortint(3).r, StreamData(ParticulaInd).colortint(3).g, StreamData(ParticulaInd).colortint(3).b)
-
-'General_Char_Particle_Create = engine.Char_Particle_Group_Create(char_index, StreamData(ParticulaInd).grh_list, rgb_list(), PartPos, StreamData(ParticulaInd).NumOfParticles, ParticulaInd, _
-    StreamData(ParticulaInd).AlphaBlend, IIf(particle_life = 0, StreamData(ParticulaInd).life_counter, particle_life), StreamData(ParticulaInd).speed, , StreamData(ParticulaInd).x1, StreamData(ParticulaInd).y1, StreamData(ParticulaInd).angle, _
-    StreamData(ParticulaInd).vecx1, StreamData(ParticulaInd).vecx2, StreamData(ParticulaInd).vecy1, StreamData(ParticulaInd).vecy2, _
-    StreamData(ParticulaInd).life1, StreamData(ParticulaInd).life2, StreamData(ParticulaInd).friction, StreamData(ParticulaInd).spin_speedL, _
-    StreamData(ParticulaInd).gr, StreamData(ParticulaInd).gravity, StreamData(ParticulaInd).grav_strength, StreamData(ParticulaInd).bounce_strength, StreamData(ParticulaInd).x2, _
-    StreamData(ParticulaInd).y2, StreamData(ParticulaInd).XMove, StreamData(ParticulaInd).move_x1, StreamData(ParticulaInd).move_x2, StreamData(ParticulaInd).move_y1, _
-    StreamData(ParticulaInd).move_y2, StreamData(ParticulaInd).YMove, StreamData(ParticulaInd).spin_speedH, StreamData(ParticulaInd).spin)
+ErrorHandler:
+    Map_NameLoad = "Mapa Desconocido"
 
 End Function
 
-Public Function General_Particle_Create(ByVal ParticulaInd As Long, ByVal X As Integer, ByVal Y As Integer, Optional ByVal particle_life As Long = 0, Optional ByVal OffsetX As Integer, Optional ByVal OffsetY As Integer) As Long
-
-Dim rgb_list(0 To 3) As Long
-rgb_list(0) = RGB(StreamData(ParticulaInd).colortint(0).r, StreamData(ParticulaInd).colortint(0).g, StreamData(ParticulaInd).colortint(0).b)
-rgb_list(1) = RGB(StreamData(ParticulaInd).colortint(1).r, StreamData(ParticulaInd).colortint(1).g, StreamData(ParticulaInd).colortint(1).b)
-rgb_list(2) = RGB(StreamData(ParticulaInd).colortint(2).r, StreamData(ParticulaInd).colortint(2).g, StreamData(ParticulaInd).colortint(2).b)
-rgb_list(3) = RGB(StreamData(ParticulaInd).colortint(3).r, StreamData(ParticulaInd).colortint(3).g, StreamData(ParticulaInd).colortint(3).b)
-
-General_Particle_Create = engine.Particle_Group_Create(X, Y, StreamData(ParticulaInd).grh_list, rgb_list(), StreamData(ParticulaInd).NumOfParticles, ParticulaInd, _
-    StreamData(ParticulaInd).AlphaBlend, IIf(particle_life = 0, StreamData(ParticulaInd).life_counter, particle_life), StreamData(ParticulaInd).speed, , StreamData(ParticulaInd).X1 + OffsetX, StreamData(ParticulaInd).Y1 + OffsetY, StreamData(ParticulaInd).angle, _
-    StreamData(ParticulaInd).vecx1, StreamData(ParticulaInd).vecx2, StreamData(ParticulaInd).vecy1, StreamData(ParticulaInd).vecy2, _
-    StreamData(ParticulaInd).life1, StreamData(ParticulaInd).life2, StreamData(ParticulaInd).friction, StreamData(ParticulaInd).spin_speedL, _
-    StreamData(ParticulaInd).gravity, StreamData(ParticulaInd).grav_strength, StreamData(ParticulaInd).bounce_strength, StreamData(ParticulaInd).X2, _
-    StreamData(ParticulaInd).Y2, StreamData(ParticulaInd).XMove, StreamData(ParticulaInd).move_x1, StreamData(ParticulaInd).move_x2, StreamData(ParticulaInd).move_y1, _
-    StreamData(ParticulaInd).move_y2, StreamData(ParticulaInd).YMove, StreamData(ParticulaInd).spin_speedH, StreamData(ParticulaInd).spin)
-
-End Function
-
-Public Sub LoadMacros(ByVal file As String)
-    Dim lC As Byte
-    Dim Leer As clsIniReader: Set Leer = New clsIniReader
-
-    file = "macros-" & UCase$(file) & ".dat"
+Public Sub General_Long_Color_to_RGB(ByVal long_color As Long, ByRef red As Integer, ByRef green As Integer, ByRef blue As Integer)
+'***********************************
+'Coded by Juan Martín Sotuyo Dodero (juansotuyo@hotmail.com)
+'Last Modified: 2/19/03
+'Takes a long value and separates RGB values to the given variables
+'***********************************
+    Dim temp_color As String
     
-    ReDim Preserve MacroKeys(1 To 11) As tBoton
-    
-    If Not FileExist(App.path & "\Recursos\Init\Macros\" & file, vbNormal) Then
-        Open App.path & "\Recursos\Init\Macros\" & file For Append As #1
-            For lC = 1 To 11
-                Print #1, "[BIND" & lC & "]"
-                Print #1, "Accion=" & MacroKeys(lC).TipoAccion
-                Print #1, "hlist=" & MacroKeys(lC).hlist
-                Print #1, "InvSlot=" & MacroKeys(lC).invslot
-                Print #1, "SndString=" & MacroKeys(lC).SendString
-                    
-                Print #1, "" 'Separacion entre macro y macro
-            Next lC
-        Close #1
+    temp_color = Hex(long_color)
+    If Len(temp_color) < 6 Then
+        'Give is 6 digits for easy RGB conversion.
+        temp_color = String(6 - Len(temp_color), "0") + temp_color
     End If
     
-    Leer.Initialize App.path & "\Recursos\Init\Macros\" & file
-    For lC = 1 To 11
-        MacroKeys(lC).TipoAccion = Val(Leer.GetValue("Bind" & lC, "Accion"))
-        MacroKeys(lC).hlist = Val(Leer.GetValue("Bind" & lC, "hlist"))
-        MacroKeys(lC).invslot = Val(Leer.GetValue("Bind" & lC, "invslot"))
-        MacroKeys(lC).SendString = Leer.GetValue("Bind" & lC, "SndString")
-    Next lC
-    Set Leer = Nothing
+    red = CLng("&H" + mid$(temp_color, 1, 2))
+    green = CLng("&H" + mid$(temp_color, 3, 2))
+    blue = CLng("&H" + mid$(temp_color, 5, 2))
 End Sub
+
+Public Function General_Get_Mouse_Speed() As Long
+'**************************************************************
+'Author: Gaston
+'Last Modify Date: 27/09/2015
+'
+'**************************************************************
+ 
+SystemParametersInfo SPI_GETMOUSESPEED, 0, General_Get_Mouse_Speed, 0
+ 
+End Function
+ 
+Public Sub General_Set_Mouse_Speed(ByVal lngSpeed As Long)
+'**************************************************************
+'Author: Gaston
+'Last Modify Date: 27/09/2015
+'
+'**************************************************************
+ 
+SystemParametersInfo SPI_SETMOUSESPEED, 0, ByVal lngSpeed, 0
+ 
+End Sub
+

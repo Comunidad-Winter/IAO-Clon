@@ -1,41 +1,39 @@
 Attribute VB_Name = "modTileEngine"
-'Argentum Online 0.12.1 MENDUZ DX8 VERSION www.noicoder.com
+'************************************************* ****************
+'ImperiumAO - v1.0
+'************************************************* ****************
+'Copyright (C) 2015 Gaston Jorge Martinez
+'Copyright (C) 2015 Alexis Rodriguez
+'Copyright (C) 2015 Luis Merino
+'Copyright (C) 2015 Girardi Luciano Valentin
 '
-'Copyright (C) 2002 Márquez Pablo Ignacio
-'Copyright (C) 2002 Otto Perez
-'Copyright (C) 2002 Aaron Perkins
-'Copyright (C) 2002 Matías Fernando Pequeño
+'Respective portions copyright by taxpayers below.
 '
-'This program is free software; you can redistribute it and/or modify
-'it under the terms of the Affero General Public License;
-'either version 1 of the License, or any later version.
+'This library is free software; you can redistribute it and / or
+'Modify it under the terms of the GNU General Public
+'License as published by the Free Software Foundation version 2.1
+'The License
 '
-'This program is distributed in the hope that it will be useful,
-'but WITHOUT ANY WARRANTY; without even the implied warranty of
-'MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-'Affero General Public License for more details.
+'This library is distributed in the hope that it will be useful,
+'But WITHOUT ANY WARRANTY; without even the implied warranty
+'MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+'Lesser General Public License for more details.
 '
-'You should have received a copy of the Affero General Public License
-'along with this program; if not, you can find it at http://www.affero.org/oagpl.html
+'You should have received a copy of the GNU General Public
+'License along with this library; if not, write to the Free Software
+'Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+'************************************************* ****************
 '
-'Argentum Online is based on Baronsoft's VB6 Online RPG
-'You can contact the original creator of ORE at aaron@baronsoft.com
-'for more information about ORE please visit http://www.baronsoft.com/
-'
-'
+'************************************************* ****************
 'You can contact me at:
-'morgolock@speedy.com.ar
-'www.geocities.com/gmorgolock
-'Calle 3 número 983 piso 7 dto A
-'La Plata - Pcia, Buenos Aires - Republica Argentina
-'Código Postal 1900
-'Pablo Ignacio Márquez
+'Gaston Jorge Martinez (Zenitram@Hotmail.com)
+'************************************************* ****************
 
 Option Explicit
-Public AmbientColor As D3DCOLORVALUE
+
 Public map_base_light As Long
 
-Public engine As New clsDX8Engine
+Public Engine As New clsDX8Engine
 
 Public DX8 As DirectX8
 Public D3D As Direct3D8
@@ -56,7 +54,7 @@ Public Type TLVERTEX
     Y As Single
     Z As Single
     rhw As Single
-    Color As Long
+    color As Long
     Specular As Long
     tu As Single
     tv As Single
@@ -132,7 +130,7 @@ End Type
 
 'apunta a una estructura grhdata y mantiene la animacion
 Public Type Grh
-    grhindex As Long
+    grhindex As Integer
     FrameCounter As Single
     speed As Single
     Started As Byte
@@ -161,13 +159,21 @@ Type ShieldAnimData
     ShieldWalk(E_Heading.north To E_Heading.WEST) As Grh
 End Type
 
+Type tAura
+    Grh As Grh
+    color As Long
+End Type
 
 'Apariencia del personaje
 Public Type Char
+    MinVida As Long
+    MaxVida As Long
     active As Byte
     Heading As E_Heading
     Pos As Position
-  
+    
+    label_color(3) As Long
+    
     iHead As Integer
     iBody As Integer
     body As BodyData
@@ -177,12 +183,19 @@ Public Type Char
     Escudo As ShieldAnimData
     UsandoArma As Boolean
     
+    ShieldOffSetY As Integer
+    
+    plusGrh(2) As tAura
+    
     fX As Grh
     FxIndex As Integer
     
+        AlphaX As Integer
+    last_tick As Long
+    
     Criminal As Byte
     
-    nombre As String
+    Nombre As String
     
     scrollDirectionX As Integer
     scrollDirectionY As Integer
@@ -194,7 +207,7 @@ Public Type Char
     pie As Boolean
     muerto As Boolean
     invisible As Boolean
-    priv As Byte
+    Priv As Byte
     
     dialog As String
     dialog_color As Long
@@ -203,17 +216,20 @@ Public Type Char
     dialog_offset_counter_y As Single
     dialog_scroll As Boolean
     
+    group_index As Integer
+    
     particle_count As Integer
     particle_group() As Long
 End Type
 
 'Info de un objeto
-Public Type Obj
-    OBJIndex As Integer
-    amount As Integer
+Public Type obj
     TieneLuz As Byte
-    EsFijo As Byte
+    OBJIndex As Integer
+    Amount As Integer
 End Type
+
+Public AmbientColor As D3DCOLORVALUE
 
 'Tipo de las celdas del mapa
 Public Type MapBlock
@@ -225,7 +241,7 @@ Public Type MapBlock
     particle_group_index As Long
     
     NpcIndex As Integer
-    OBJInfo As Obj
+    OBJInfo As obj
     TileExit As WorldPos
     Blocked As Byte
     
@@ -256,6 +272,22 @@ Public MinXBorder As Byte
 Public MaxXBorder As Byte
 Public MinYBorder As Byte
 Public MaxYBorder As Byte
+
+'********************************************
+'*************Configuracion******************
+'********************************************
+Public Sound As Byte
+Public Music As Byte
+Public EffectSound As Byte
+Public VolumeSound As Integer
+Public VolumeMusic As Integer
+Public cSombras As Byte
+Public cTechos As Byte
+Public cLimitarFps As Byte
+Public cObjName As Byte
+'********************************************
+'*************/Configuracion*****************
+'********************************************
 
 'Status del user
 Public CurMap As Integer 'Mapa actual
@@ -373,13 +405,8 @@ End Enum
 '       [END]
 '¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?
 
-Private Declare Function BitBlt Lib "gdi32" (ByVal hDestDC As Long, ByVal X As Long, ByVal Y As Long, ByVal nWidth As Long, ByVal nHeight As Long, ByVal hSrcDC As Long, ByVal xSrc As Long, ByVal ySrc As Long, ByVal dwRop As Long) As Long
-Private Declare Function SelectObject Lib "gdi32" (ByVal hdc As Long, ByVal hObject As Long) As Long
-Private Declare Function CreateCompatibleDC Lib "gdi32" (ByVal hdc As Long) As Long
-Private Declare Function DeleteDC Lib "gdi32" (ByVal hdc As Long) As Long
-Private Declare Function DeleteObject Lib "gdi32" (ByVal hObject As Long) As Long
 
-Private Declare Function GetWindowLong Lib "user32" Alias "GetWindowLongA" (ByVal hWnd As Long, ByVal nIndex As Long) As Long
+
 
 'Added by Juan Martín Sotuyo Dodero
 Private Declare Function StretchBlt Lib "gdi32" (ByVal hDestDC As Long, ByVal X As Long, ByVal Y As Long, ByVal nWidth As Long, ByVal nHeight As Long, ByVal hSrcDC As Long, ByVal xSrc As Long, ByVal ySrc As Long, ByVal nSrcWidth As Long, ByVal nSrcHeight As Long, ByVal dwRop As Long) As Long
@@ -396,7 +423,7 @@ Private Declare Function QueryPerformanceCounter Lib "kernel32" (lpPerformanceCo
 Private Declare Function GetTextExtentPoint32 Lib "gdi32" Alias "GetTextExtentPoint32A" (ByVal hdc As Long, ByVal lpsz As String, ByVal cbString As Long, lpSize As size) As Long
 
 'To get free bytes in drive
-Private Declare Function GetDiskFreeSpace Lib "kernel32" Alias "GetDiskFreeSpaceExA" (ByVal lpRootPathName As String, FreeBytesToCaller As Currency, bytesTotal As Currency, FreeBytesTotal As Currency) As Long
+Private Declare Function GetDiskFreeSpace Lib "kernel32" Alias "GetDiskFreeSpaceExA" (ByVal lpRootPathName As String, FreeBytesToCaller As Currency, BytesTotal As Currency, FreeBytesTotal As Currency) As Long
 
 'To get free bytes in RAM
 
@@ -413,26 +440,29 @@ Private Type MEMORYSTATUS
     dwAvailVirtual As Long
 End Type
 
+
+
 Private Declare Sub GlobalMemoryStatus Lib "kernel32" (lpBuffer As MEMORYSTATUS)
 
 Sub ConvertCPtoTP(ByVal viewPortX As Integer, ByVal viewPortY As Integer, ByRef tX As Byte, ByRef tY As Byte)
 '******************************************
 'Converts where the mouse is in the main window to a tile position. MUST be called eveytime the mouse moves.
 '******************************************
-    tX = UserPos.X + viewPortX \ 32 - frmMain.Renderer.ScaleWidth \ 65
-    tY = UserPos.Y + viewPortY \ 32 - frmMain.Renderer.ScaleHeight \ 65
+    tX = UserPos.X + viewPortX \ 32 - frmMain.Renderer.ScaleWidth \ 64
+    tY = UserPos.Y + viewPortY \ 32 - frmMain.Renderer.ScaleHeight \ 64
     Debug.Print tX; tY
 End Sub
 
 Sub ResetCharInfo(ByVal CharIndex As Integer)
     With charlist(CharIndex)
+        Call Engine.Char_Particle_Group_Remove_All(CharIndex)
         .active = 0
         .Criminal = 0
         .FxIndex = 0
         .invisible = False
         .Moving = 0
         .muerto = False
-        .nombre = ""
+        .Nombre = ""
         .pie = False
         .Pos.X = 0
         .Pos.Y = 0
@@ -460,7 +490,8 @@ On Error Resume Next
         .iBody = body
         .Head = HeadData(Head)
         .body = BodyData(body)
-        .Arma = WeaponAnimData(Arma)
+
+        If Not Arma = 29 Then .Arma = WeaponAnimData(Arma)
         
         .Escudo = ShieldAnimData(Escudo)
         .Casco = CascoAnimData(Casco)
@@ -478,10 +509,102 @@ On Error Resume Next
         
         'Make active
         .active = 1
+        
+    Select Case .Priv
+        Case 1 'Gris
+            Engine.Long_To_RGB_List charlist(CharIndex).label_color, D3DColorXRGB(128, 128, 128)
+        Case 2 'Azul
+            Engine.Long_To_RGB_List charlist(CharIndex).label_color, D3DColorXRGB(0, 0, 176)
+        Case 3 'Verde
+            Engine.Long_To_RGB_List charlist(CharIndex).label_color, D3DColorXRGB(0, 128, 0)
+        Case 4 'Verde
+            Engine.Long_To_RGB_List charlist(CharIndex).label_color, D3DColorXRGB(0, 128, 0)
+        Case 5 'Naranja
+            Engine.Long_To_RGB_List charlist(CharIndex).label_color, D3DColorXRGB(255, 128, 0)
+        Case 6 'Armada Real
+            Engine.Long_To_RGB_List charlist(CharIndex).label_color, D3DColorXRGB(40, 181, 159)
+        Case 7 'Rojo
+            Engine.Long_To_RGB_List charlist(CharIndex).label_color, D3DColorXRGB(210, 0, 0)
+    End Select
     End With
+    
+    Call PonerAura(CharIndex, Escudo, Arma, body)
     
     'Plot on map
     MapData(X, Y).CharIndex = CharIndex
+End Sub
+
+Sub PonerAura(ByVal CharIndex As Integer, ByVal Escudo As Byte, ByVal Arma As Byte, ByVal body As Integer)
+With charlist(CharIndex)
+    If body = 255 Then
+        InitGrh .plusGrh(2).Grh, 20206
+        .plusGrh(2).color = &HFFFD7E
+    Else
+        .plusGrh(2).Grh.grhindex = 0
+    End If
+
+    If Escudo = 27 Then
+        InitGrh .plusGrh(1).Grh, 20203
+        .plusGrh(1).color = &HFFCC33
+    Else
+        .plusGrh(1).Grh.grhindex = 0
+    End If
+
+    If Arma = 23 Then
+        InitGrh .plusGrh(0).Grh, 20128
+        .plusGrh(0).color = &HFFCC33
+    ElseIf Arma = 24 Then
+        InitGrh .plusGrh(0).Grh, 20133
+        .plusGrh(0).color = &HFF3300
+    ElseIf Arma = 25 Then
+        InitGrh .plusGrh(0).Grh, 20152
+        .plusGrh(0).color = &HFF0000
+    ElseIf Arma = 26 Then
+        InitGrh .plusGrh(0).Grh, 20185
+        .plusGrh(0).color = -65536
+    ElseIf Arma = 31 Then
+        InitGrh .plusGrh(0).Grh, 20155
+        .plusGrh(0).color = &HFF0000
+    ElseIf Arma = 21 Then
+        InitGrh .plusGrh(0).Grh, 20151
+        .plusGrh(0).color = &HFFFF00
+    ElseIf Arma = 28 Then
+        InitGrh .plusGrh(0).Grh, 20148
+        .plusGrh(0).color = &HFF
+    ElseIf Arma = 29 Then
+        InitGrh .plusGrh(0).Grh, 20146
+        .plusGrh(0).color = &H6B1B
+    ElseIf Arma = 30 Then
+        InitGrh .plusGrh(0).Grh, 20200
+        .plusGrh(0).color = &HCCFF33
+    ElseIf Arma = 32 Then
+        InitGrh .plusGrh(0).Grh, 20147
+        .plusGrh(0).color = &HFF
+    Else
+        .plusGrh(0).Grh.grhindex = 0
+    End If
+    
+    If body = 291 Then
+        .ShieldOffSetY = 30
+    ElseIf body = 415 Or body = 384 Or body = 382 Then
+        .ShieldOffSetY = 16
+    ElseIf body = 416 Then
+        .ShieldOffSetY = 32
+    ElseIf body = 282 Or body = 292 Then
+        .ShieldOffSetY = 20
+    ElseIf body = 317 Or body = 292 Then
+        .ShieldOffSetY = 20
+    ElseIf body = 381 Or body = 383 Then
+        .ShieldOffSetY = 24
+    Else
+        .ShieldOffSetY = 0
+    End If
+    
+    If BodyData(body).HeadOffset.Y = -28 Then
+        .ShieldOffSetY = .ShieldOffSetY - 5
+    End If
+    
+End With
 End Sub
 
 Sub EraseChar(ByVal CharIndex As Integer)
@@ -562,72 +685,59 @@ Private Function EstaPCarea(ByVal CharIndex As Integer) As Boolean
 End Function
 
 Sub DoPasosFx(ByVal CharIndex As Integer)
-  Dim paso As Byte
     If Not UserNavegando Then
         With charlist(CharIndex)
-            If .muerto = False And EstaPCarea(CharIndex) = True And (.priv <> 5) Then
+            If Not .muerto And EstaPCarea(CharIndex) Then
                 .pie = Not .pie
-                paso = Map_GetTerrenoDePaso(GrhData(MapData(.Pos.X, .Pos.Y).Graphic(1).grhindex).FileNum)
-                
-                If paso = 1 Then
+        'Si esta en una superficie de pasto?
+                If MapData(.Pos.X, .Pos.Y).Graphic(1).grhindex >= 6000 And MapData(.Pos.X, .Pos.Y).Graphic(1).grhindex <= 6559 Then
                     If .pie Then
-                        Call Audio.PlayWave(SND_PASOS7)
+                        Call Audio.PlayWave(SND_PASOS3)
                     Else
-                        Call Audio.PlayWave(SND_PASOS8)
-                    End If
-                ElseIf paso = 2 Or paso = 5 Then
-                    If .pie Then
-                        Call Audio.PlayWave(SND_PASOS1)
-                    Else
-                        Call Audio.PlayWave(SND_PASOS2)
-                    End If
-                ElseIf paso = 3 Then
-                    If .pie Then
                         Call Audio.PlayWave(SND_PASOS4)
-                    Else
-                        Call Audio.PlayWave(SND_PASOS5)
                     End If
-                ElseIf paso = 4 Then
-                    If .pie Then
-                       Call Audio.PlayWave(SND_PASOS3)
-                    Else
-                       Call Audio.PlayWave(SND_PASOS4)
-                    End If
+            'Si esta en una superficie de Arena?
+            ElseIf MapData(.Pos.X, .Pos.Y).Graphic(1).grhindex >= 7700 And MapData(.Pos.X, .Pos.Y).Graphic(1).grhindex <= 7719 Then
+                If .pie Then
+                    Call Audio.PlayWave(SND_PASOS5)
+                Else
+                    Call Audio.PlayWave(SND_PASOS6)
+                End If
+            'Si esta en una superficie de Nieve?
+            ElseIf MapData(.Pos.X, .Pos.Y).Graphic(1).grhindex >= 7379 And MapData(.Pos.X, .Pos.Y).Graphic(1).grhindex <= 7507 Then
+                If .pie Then
+                    Call Audio.PlayWave(SND_PASOS7)
+                Else
+                    Call Audio.PlayWave(SND_PASOS8)
+                End If
+            Else
+                If .pie Then
+                    Call Audio.PlayWave(SND_PASOS1)
+                Else
+                    Call Audio.PlayWave(SND_PASOS2)
                 End If
             End If
-        End With
-   ElseIf UserNavegando And FxNavega = 1 Then
-Call Audio.PlayWave(SND_NAVEGANDO, charlist(CharIndex).Pos.X, charlist(CharIndex).Pos.Y)
-ElseIf UserMontando Then
-Call Audio.PlayWave(SND_PASOS1, charlist(CharIndex).Pos.X, charlist(CharIndex).Pos.Y)
-End If
-End Sub
-Private Function Map_GetTerrenoDePaso(ByVal TerrainFileNum As Integer) As Byte
-    If (TerrainFileNum >= 6000 And TerrainFileNum <= 6004) Or (TerrainFileNum >= 550 And TerrainFileNum <= 552) Or (TerrainFileNum >= 6018 And TerrainFileNum <= 6020) Then
-        Map_GetTerrenoDePaso = 1
-        Exit Function
-    ElseIf (TerrainFileNum >= 7501 And TerrainFileNum <= 7507) Or (TerrainFileNum = 7500 Or TerrainFileNum = 7508 Or TerrainFileNum = 1533 Or TerrainFileNum = 2508) Then
-        Map_GetTerrenoDePaso = 2
-        Exit Function
-    ElseIf (TerrainFileNum >= 5000 And TerrainFileNum <= 5004) Then
-        Map_GetTerrenoDePaso = 3
-        Exit Function
-    ElseIf TerrainFileNum = 6021 Then
-        Map_GetTerrenoDePaso = 4
-        Exit Function
-    Else
-        Map_GetTerrenoDePaso = 5
+
+    'Feo este Sistema****************************
+    If UserNavegando Then
+    'TODO : Actually we would have to check if the CharIndex char is in the water or not....
+        Call Audio.PlayWave(SND_NAVEGANDO)
     End If
-End Function
+    '********************************************
+ 
+    End If
+    End With
+    End If
+End Sub
+
 Sub MoveCharbyPos(ByVal CharIndex As Integer, ByVal nX As Integer, ByVal nY As Integer)
 On Error Resume Next
     Dim X As Integer
     Dim Y As Integer
     Dim addx As Integer
     Dim addy As Integer
-    
     Dim nHeading As E_Heading
-       
+    
     With charlist(CharIndex)
         X = .Pos.X
         Y = .Pos.Y
@@ -638,7 +748,7 @@ On Error Resume Next
         addy = nY - Y
         
         If Sgn(addx) = 1 Then
-            nHeading = E_Heading.EAST
+            nHeading = E_Heading.east
         End If
         
         If Sgn(addx) = -1 Then
@@ -652,11 +762,6 @@ On Error Resume Next
         If Sgn(addy) = 1 Then
             nHeading = E_Heading.SOUTH
         End If
-        
-        If nX < 1 Or nX > 100 Or nY < 1 Or nY > 100 Then Exit Sub
-        If Not (InMapBounds(nX, nY)) Then Exit Sub
-        
-        
         
         MapData(nX, nY).CharIndex = CharIndex
         
@@ -700,7 +805,7 @@ Sub MoveScreen(ByVal nHeading As E_Heading)
         Case E_Heading.north
             Y = -1
         
-        Case E_Heading.EAST
+        Case E_Heading.east
             X = 1
         
         Case E_Heading.SOUTH
@@ -721,13 +826,14 @@ Sub MoveScreen(ByVal nHeading As E_Heading)
         'Start moving... MainLoop does the rest
         AddtoUserPos.X = X
         UserPos.X = tX
-        AddtoUserPos.Y = Y
+         AddtoUserPos.Y = Y
         UserPos.Y = tY
         UserMoving = 1
         
         bTecho = IIf(MapData(UserPos.X, UserPos.Y).Trigger = 1 Or _
                 MapData(UserPos.X, UserPos.Y).Trigger = 2 Or _
-                MapData(UserPos.X, UserPos.Y).Trigger = 4, True, False)
+                MapData(UserPos.X, UserPos.Y).Trigger = 4 Or _
+                MapData(UserPos.X, UserPos.Y).Trigger >= 20, True, False)
     End If
 End Sub
 
@@ -795,12 +901,11 @@ Function LegalPos(ByVal X As Integer, ByVal Y As Integer) As Boolean
         Exit Function
     End If
     
-      If UserMontando = True Then
+    If UserMontando = True Then
         If MapData(X, Y).Trigger = 1 Or MapData(X, Y).Trigger = 2 Or MapData(X, Y).Trigger = 4 Or MapData(X, Y).Trigger >= 20 Then
             Exit Function
         End If
     End If
-    
     
     LegalPos = True
 End Function
@@ -853,7 +958,7 @@ Function GetBitmapDimensions(ByVal BmpFile As String, ByRef bmWidth As Long, ByR
     bmHeight = BINFOHeader.biHeight
 End Function
 
-Public Sub Grh_Render_To_Hdc(ByVal desthDC As Long, grh_index As Long, ByVal screen_x As Integer, ByVal screen_y As Integer, Optional transparent As Boolean = False)
+Public Sub Grh_Render_To_Hdc(ByVal desthDC As Long, grh_index As Integer, ByVal screen_x As Integer, ByVal screen_y As Integer, Optional transparent As Boolean = False)
 '**************************************************************
 'Author: Aaron Perkins
 'Last Modify Date: 8/30/2004
@@ -881,7 +986,7 @@ Public Sub Grh_Render_To_Hdc(ByVal desthDC As Long, grh_index As Long, ByVal scr
         grh_index = GrhData(grh_index).Frames(1)
     End If
 
-        file_path = App.path & "\Recursos\Graficos\" & GrhData(grh_index).FileNum & ".bmp"
+        file_path = App.path & "\Resources\graphics\" & GrhData(grh_index).FileNum & ".bmp"
         
         src_x = GrhData(grh_index).sX
         src_y = GrhData(grh_index).sY
@@ -901,9 +1006,9 @@ Public Sub Grh_Render_To_Hdc(ByVal desthDC As Long, grh_index As Long, ByVal scr
             Grh_Create_Mask hdcsrc, MaskDC, src_x, src_y, src_width, src_height
             
             'Render tranparently
-        '    BitBlt desthDC, screen_x, screen_y, src_width, src_height, MaskDC, src_x, src_y, vbSrcAnd
-           ' BitBlt desthDC, screen_x, screen_y, src_width, src_height, hdcsrc, src_x, src_y, vbSrcPaint
-            TransparentBlt desthDC, screen_x, screen_y, src_width, src_height, hdcsrc, src_x, src_y, src_width, src_height, RGB(0, 0, 0)
+            BitBlt desthDC, screen_x, screen_y, src_width, src_height, MaskDC, src_x, src_y, vbSrcAnd
+            BitBlt desthDC, screen_x, screen_y, src_width, src_height, hdcsrc, src_x, src_y, vbSrcPaint
+            
             Call DeleteObject(SelectObject(MaskDC, PrevObj2))
             
             DeleteDC MaskDC
@@ -1051,70 +1156,8 @@ If UserMap = 12 Or UserMap = 13 Then
     frmMain.MiniMap.Cls
     Exit Sub
 End If
-
-Dim map_x, map_y, Capas As Byte
-    For map_y = 1 To 100
-        For map_x = 1 To 100
-        For Capas = 1 To 2
-            If MapData(map_x, map_y).Graphic(Capas).grhindex > 0 Then
-                SetPixel frmMain.MiniMap.hdc, map_x - 1, map_y - 1, GrhData(MapData(map_x, map_y).Graphic(Capas).grhindex).mini_map_color
-            End If
-        Next Capas
-        Next map_x
-    Next map_y
    
     frmMain.MiniMap.Refresh
     Call ActualizarMiniMapa(0)
 End Sub
 
-
-Function isMontura(ByVal body As Integer) As Boolean
-    isMontura = (body <> 272 And body <> 316 And _
-                 body <> 315 And body <> 314 And _
-                 body <> 313 And body <> 317)
-End Function
-
-Public Sub DrawGrhToHdc(ByVal desthDC As Long, Grh As Long, ByVal screen_x As Integer, ByVal screen_y As Integer)
- 
-On Error GoTo Err
- 
-    Dim file_path As String
-    Dim src_x As Integer
-    Dim src_y As Integer
-    Dim src_width As Integer
-    Dim src_height As Integer
-    Dim hdcsrc As Long
-    Dim MaskDC As Long
-    Dim PrevObj As Long
-    Dim PrevObj2 As Long
-    Dim grh_index As Integer
-   
-    grh_index = Grh
- 
-    If grh_index <= 0 Then Exit Sub
-    If GrhData(grh_index).NumFrames = 0 Then Exit Sub
- 
-    If GrhData(grh_index).NumFrames <> 1 Then
-        grh_index = GrhData(grh_index).Frames(1)
-    End If
- 
-    src_x = GrhData(grh_index).sX
-    src_y = GrhData(grh_index).sY
-    src_width = GrhData(grh_index).pixelWidth
-    src_height = GrhData(grh_index).pixelHeight
-           
-    hdcsrc = CreateCompatibleDC(desthDC)
- 
-    file_path = App.path & "\recursos\graficos\" & GrhData(grh_index).FileNum & ".bmp"
-    PrevObj = SelectObject(hdcsrc, LoadPicture(file_path))
-   
-    'BitBlt desthDC, screen_x, screen_y, src_width, src_height, hdcsrc, src_x, src_y, vbSrcCopy
-   TransparentBlt desthDC, screen_x, screen_y, src_width, src_height, hdcsrc, src_x, src_y, src_width, src_height, RGB(0, 0, 0)
- 
-   Call DeleteObject(SelectObject(hdcsrc, PrevObj))
-   DeleteDC hdcsrc
- 
-Err:
-If Err.Number = 481 Then MsgBox "Imposible cargar recurso error: " & "481"
- 
-End Sub

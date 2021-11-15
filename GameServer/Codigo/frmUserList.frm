@@ -8,7 +8,7 @@ Begin VB.Form frmUserList
    LinkTopic       =   "Form1"
    ScaleHeight     =   4665
    ScaleWidth      =   5520
-   StartUpPosition =   3  'Windows Default
+   StartUpPosition =   2  'CenterScreen
    Begin VB.CommandButton Command2 
       Caption         =   "Echar todos los no Logged"
       Height          =   375
