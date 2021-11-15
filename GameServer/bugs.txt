@@ -1,0 +1,6 @@
+bugs:
+
+No saca las luz de los items (Solucionado)
+no guarda los comandos en los macros
+sacar paquete de target invalido(solucionado)
+label experiencia no dice el % (solucionado)

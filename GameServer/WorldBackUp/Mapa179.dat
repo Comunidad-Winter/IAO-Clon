@@ -1,0 +1,12 @@
+[Mapa179]
+Name=Puerto de Illiandor                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
+MusicNum=20-1                                                                                                                                                                                                
+MagiaSinefecto=0
+InviSinEfecto=0
+ResuSinEfecto=0
+StartPos=0-0-0
+Terreno=NIEVE                                                                                                                                                                                
+Zona=CIUDAD                                                                                                                                                                
+Restringir=No                                
+BackUp= 1
+Pk=0

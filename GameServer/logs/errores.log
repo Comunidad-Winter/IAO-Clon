@@ -1,0 +1,33 @@
+01/11/2016 1:58:02 Error: 9 [El subíndice está fuera del intervalo]  Source: ServidorArgentum	 HelpFile: 	 HelpContext: 1000009	 LastDllError: 0	 - UserIndex: 1 - producido al manejar el paquete: 32
+04/11/2016 0:28:44 Error: 13 [No coinciden los tipos]  Source: ServidorArgentum	 HelpFile: 	 HelpContext: 1000013	 LastDllError: 0	 - UserIndex: 1 - producido al manejar el paquete: 0
+04/11/2016 0:28:48 Error: 13 [No coinciden los tipos]  Source: ServidorArgentum	 HelpFile: 	 HelpContext: 1000013	 LastDllError: 0	 - UserIndex: 1 - producido al manejar el paquete: 0
+04/11/2016 0:29:56 Error: 13 [No coinciden los tipos]  Source: ServidorArgentum	 HelpFile: 	 HelpContext: 1000013	 LastDllError: 0	 - UserIndex: 1 - producido al manejar el paquete: 0
+04/11/2016 0:30:19 Error: 13 [No coinciden los tipos]  Source: ServidorArgentum	 HelpFile: 	 HelpContext: 1000013	 LastDllError: 0	 - UserIndex: 1 - producido al manejar el paquete: 2
+04/11/2016 0:32:17 Error: 13 [No coinciden los tipos]  Source: ServidorArgentum	 HelpFile: C:\Windows\Help\VBENLR98.CHM	 HelpContext: 1000013	 LastDllError: 0	 - UserIndex: 1 - producido al manejar el paquete: 0
+04/11/2016 0:32:20 Error: 13 [No coinciden los tipos]  Source: ServidorArgentum	 HelpFile: C:\Windows\Help\VBENLR98.CHM	 HelpContext: 1000013	 LastDllError: 0	 - UserIndex: 1 - producido al manejar el paquete: 0
+04/11/2016 1:19:57 Error: 9 [El subíndice está fuera del intervalo]  Source: ServidorArgentum	 HelpFile: C:\Windows\Help\VBENLR98.CHM	 HelpContext: 1000009	 LastDllError: 0	 - UserIndex: 1 - producido al manejar el paquete: 85
+04/11/2016 2:38:06 Error: 13 [No coinciden los tipos]  Source: ServidorArgentum	 HelpFile: 	 HelpContext: 1000013	 LastDllError: 0	 - UserIndex: 1 - producido al manejar el paquete: 0
+04/11/2016 2:38:10 Error: 13 [No coinciden los tipos]  Source: ServidorArgentum	 HelpFile: 	 HelpContext: 1000013	 LastDllError: 0	 - UserIndex: 1 - producido al manejar el paquete: 0
+04/11/2016 2:38:43 Error: 13 [No coinciden los tipos]  Source: ServidorArgentum	 HelpFile: 	 HelpContext: 1000013	 LastDllError: 0	 - UserIndex: 1 - producido al manejar el paquete: 0
+04/11/2016 2:38:45 Error: 13 [No coinciden los tipos]  Source: ServidorArgentum	 HelpFile: 	 HelpContext: 1000013	 LastDllError: 0	 - UserIndex: 1 - producido al manejar el paquete: 0
+04/11/2016 2:47:52 Error: 13 [No coinciden los tipos]  Source: ServidorArgentum	 HelpFile: 	 HelpContext: 1000013	 LastDllError: 0	 - UserIndex: 1 - producido al manejar el paquete: 0
+04/11/2016 2:54:29 Error: 13 [No coinciden los tipos]  Source: ServidorArgentum	 HelpFile: 	 HelpContext: 1000013	 LastDllError: 0	 - UserIndex: 1 - producido al manejar el paquete: 0
+05/11/2016 5:00:34 Error: 9 [El subíndice está fuera del intervalo]  Source: ServidorArgentum	 HelpFile: 	 HelpContext: 1000009	 LastDllError: 0	 - UserIndex: 1 - producido al manejar el paquete: 24
+05/11/2016 5:00:40 Error: 9 [El subíndice está fuera del intervalo]  Source: ServidorArgentum	 HelpFile: 	 HelpContext: 1000009	 LastDllError: 0	 - UserIndex: 1 - producido al manejar el paquete: 24
+05/11/2016 5:00:47 Error: 9 [El subíndice está fuera del intervalo]  Source: ServidorArgentum	 HelpFile: 	 HelpContext: 1000009	 LastDllError: 0	 - UserIndex: 1 - producido al manejar el paquete: 24
+08/11/2016 3:27:02 Error en IniciarComercioConUsuario: El subíndice está fuera del intervalo
+09/11/2016 2:07:45 Error en MuereNpc - Error: 0 - Desc: 
+09/11/2016 5:01:12 Error: 91 [La variable de tipo Object o la variable de bloque With no está establecida]  Source: ServidorArgentum	 HelpFile: 	 HelpContext: 1000091	 LastDllError: 0	 - UserIndex: 1 - producido al manejar el paquete: 0
+09/11/2016 5:01:18 Error: 91 [La variable de tipo Object o la variable de bloque With no está establecida]  Source: ServidorArgentum	 HelpFile: 	 HelpContext: 1000091	 LastDllError: 0	 - UserIndex: 1 - producido al manejar el paquete: 0
+10/11/2016 1:52:28 Error en MuereNpc - Error: 9 - Desc: El subíndice está fuera del intervalo
+11/11/2016 0:29:28 Error: 6 [Desbordamiento]  Source: ServidorArgentum	 HelpFile: 	 HelpContext: 1000006	 LastDllError: 0	 - UserIndex: 1 - producido al manejar el paquete: 25
+11/11/2016 0:30:17 Error: 6 [Desbordamiento]  Source: ServidorArgentum	 HelpFile: C:\Windows\Help\VBENLR98.CHM	 HelpContext: 1000006	 LastDllError: 0	 - UserIndex: 1 - producido al manejar el paquete: 25
+11/11/2016 0:35:34 Error: 6 [Desbordamiento]  Source: ServidorArgentum	 HelpFile: C:\Windows\Help\VBENLR98.CHM	 HelpContext: 1000006	 LastDllError: 0	 - UserIndex: 1 - producido al manejar el paquete: 25
+11/11/2016 1:56:10 Error: 13 [No coinciden los tipos]  Source: ServidorArgentum	 HelpFile: 	 HelpContext: 1000013	 LastDllError: 0	 - UserIndex: 2 - producido al manejar el paquete: 0
+11/11/2016 1:56:32 Error: 13 [No coinciden los tipos]  Source: ServidorArgentum	 HelpFile: 	 HelpContext: 1000013	 LastDllError: 0	 - UserIndex: 2 - producido al manejar el paquete: 0
+11/11/2016 1:57:00 Error: 13 [No coinciden los tipos]  Source: ServidorArgentum	 HelpFile: 	 HelpContext: 1000013	 LastDllError: 0	 - UserIndex: 2 - producido al manejar el paquete: 0
+11/11/2016 6:00:18 Error: 13 [No coinciden los tipos]  Source: ServidorArgentum	 HelpFile: 	 HelpContext: 1000013	 LastDllError: 0	 - UserIndex: 1 - producido al manejar el paquete: 0
+11/11/2016 8:42:04 Error: 9 [El subíndice está fuera del intervalo]  Source: ServidorArgentum	 HelpFile: C:\Windows\Help\VBENLR98.CHM	 HelpContext: 1000009	 LastDllError: 0	 - UserIndex: 1 - producido al manejar el paquete: 32
+12/11/2016 0:13:23 Error: 6 [Desbordamiento]  Source: ServidorArgentum	 HelpFile: C:\Windows\Help\VBENLR98.CHM	 HelpContext: 1000006	 LastDllError: 0	 - UserIndex: 1 - producido al manejar el paquete: 209
+14/11/2016 6:07:21 Error: 9 [El subíndice está fuera del intervalo]  Source: ServidorArgentum	 HelpFile: 	 HelpContext: 1000009	 LastDllError: 0	 - UserIndex: 1 - producido al manejar el paquete: 27
+14/11/2016 23:40:51 Error: 9 [El subíndice está fuera del intervalo]  Source: ServidorArgentum	 HelpFile: 	 HelpContext: 1000009	 LastDllError: 0	 - UserIndex: 1 - producido al manejar el paquete: 27

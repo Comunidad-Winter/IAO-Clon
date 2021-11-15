@@ -1,0 +1,127 @@
+
+''
+' Writes the "Ofertar" message to the outgoing data buffer.
+'
+' @param    slot Position within user inventory in which the desired item is.
+' @param    amount Number of items to offer.
+' @remarks  The data is not actually sent until the buffer is properly flushed.
+
+Public Sub WriteOfertar()
+'***************************************************
+'Author: Luciano girardi
+'Last Modification: 17/10/16
+'Writes the "Oferta" message to the outgoing data buffer
+'***************************************************
+    With outgoingData
+        Call .WriteByte(ClientPacketID.ofertar)
+
+        Call .WriteLong(ofrecer)
+    End With
+End Sub
+
+''
+' Writes the "Subastar" message to the outgoing data buffer.
+'
+' @param    slot Position within user inventory in which the desired item is.
+' @param    amount Number of items to offer.
+' @remarks  The data is not actually sent until the buffer is properly flushed.
+
+Public Sub WriteSubastar()
+'***************************************************
+'Author: Luciano girardi (Crip)
+'Last Modification: 05/17/06
+'Writes the "Subastar" message to the outgoing data buffer
+'***************************************************
+    With outgoingData
+        Call .WriteByte(ClientPacketID.subastar)
+        Call .WriteLong(precioinicial)
+        Call .WriteInteger(ItemSubastar)
+        Call .WriteInteger(CantidadItemSubastar)
+    End With
+End Sub
+
+
+
+''
+' Handles the "Ofertar" message.
+'
+' @param    userIndex The index of the user sending the message.
+
+Private Sub HandleOfertar(ByVal UserIndex As Integer)
+'***************************************************
+'Author: Luciano Girardi(Crip)
+'Last Modification: 17/10/16
+'
+'***************************************************
+    If UserList(UserIndex).incomingData.length < 4 Then
+        Err.raise UserList(UserIndex).incomingData.NotEnoughDataErrCode
+        Exit Sub
+    End If
+    
+    With UserList(UserIndex)
+        'Remove packet ID
+        Call .incomingData.ReadByte
+        
+        Dim ofrecer As Long
+        
+        
+        ofrecer = .incomingData.ReadLong()
+       
+            'Is he alive??
+            If UserList(tUser).flags.Muerto = 1 Then
+                Call WriteConsoleMsg(UserIndex, "No puedes subastar muerto", FontTypeNames.FONTTYPE_INFO)
+                Exit Sub
+            End If
+            
+            If oferta > 2000000000 Then Exit Sub
+            
+Call ofertar(UserIndex, oferta)
+    End With
+End Sub
+
+''
+' Handles the "Subastador" message.
+'
+' @param    userIndex The index of the user sending the message.
+
+Private Sub HandleSubastador(ByVal UserIndex As Integer)
+'***************************************************
+'Author: Luciano Girardi(Crip)
+'Last Modification: 17/10/16
+'
+'***************************************************
+    If UserList(UserIndex).incomingData.length < 8 Then
+        Err.raise UserList(UserIndex).incomingData.NotEnoughDataErrCode
+        Exit Sub
+    End If
+    
+    With UserList(UserIndex)
+        'Remove packet ID
+        Call .incomingData.ReadByte
+        
+        Dim PrecioInicial As Long
+        Dim ItemSubastar As Byte
+        Dim CantidadItemSubastar As Integer
+        
+        ItemSubastar = .incomingData.ReadInteger()
+        PrecioInicial = .incomingData.ReadLong()
+        CantidadItemSubastar = .incomingData.ReadInteger()
+        
+       
+            'Is he alive??
+            If UserList(tUser).flags.Muerto = 1 Then
+                Call WriteConsoleMsg(UserIndex, "No puedes subastar muerto", FontTypeNames.FONTTYPE_INFO)
+                Exit Sub
+            End If
+            
+If PrecioInicial <= 0 Then PrecioInicial = 1
+End If
+
+If Subastas.HaySubastas = True Then
+Call WriteConsoleMsg(UserIndex, "Ya hay una subasta,Espera a que termine", FontTypeNames.FONTTYPE_INFO)
+Exit Sub
+End If
+Call subastar(UserIndex, PrecioInicial)
+       
+    End With
+End Sub

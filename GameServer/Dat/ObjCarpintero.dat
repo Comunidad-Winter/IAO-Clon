@@ -1,0 +1,74 @@
+[INIT]
+NumObjs=24
+
+[OBJ1] 'Flecha
+Index=480
+
+[OBJ2] 'Flecha +1
+Index=551
+
+[OBJ3] 'Flecha +2
+Index=552
+
+[OBJ4] 'Flecha +3
+Index=553
+
+[OBJ5] 'Arco de Cazador
+Index=478
+
+[OBJ6] 'Arco Compuesto Reforzado
+Index=479
+
+[OBJ7] 'Arco compuesto
+Index=709
+
+[OBJ8] 'Arco Simple Reforzado
+Index=1001
+
+[OBJ9] 'Arco simple
+Index=989
+
+[OBJ10] 'Barca
+Index=474
+
+[OBJ11] 'Galera
+Index=475
+
+[OBJ12] 'Galeón
+Index=476
+
+[OBJ13] 'Flecha Explosiva
+Index=1082
+
+[OBJ14] 'Flecha Eléctrica
+Index=1086
+
+[OBJ15] 'Flecha Incendiaria
+Index=1084
+
+[OBJ16] 'Flecha Envenenante
+Index=1083
+
+[OBJ17] 'Flecha Paralizante
+Index=1085
+
+[OBJ18] 'Arco Simple Reforzado
+Index=709
+
+[OBJ19] 'Arco Compuesto
+Index=479
+
+[OBJ20] 'Arco Reforzado
+Index=1085
+
+[OBJ21] 'Ballesta
+Index=749
+
+[OBJ22] 'Arco Caza Demonios
+Index=666
+
+[OBJ23] 'Arco de Cazador
+Index=478
+
+[OBJ24] 'Arco Élfico
+Index=899
